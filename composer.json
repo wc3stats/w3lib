@@ -1,0 +1,19 @@
+{
+    "name": "anders/w3lib",
+    "authors": [
+        {
+            "name": "Ethan Anders",
+            "email": "ethananders97@gmail.com"
+        }
+    ],
+    "require": {
+    },
+    "autoload": {
+        "psr-4" : {
+            "w3lib\\" : "src/"
+        },
+        "files" : [
+            "src/functions.php"
+        ]
+    }
+}

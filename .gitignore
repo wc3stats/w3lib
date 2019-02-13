@@ -1,1 +1,4 @@
 *sublime-*
+/vendor
+composer.lock
+*.w3g
