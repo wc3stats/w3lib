@@ -10,6 +10,7 @@
     },
     "autoload": {
         "psr-4" : {
+            "w3lib\\Library\\": "lib/",
             "w3lib\\" : "src/"
         },
         "files" : [

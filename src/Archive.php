@@ -27,21 +27,6 @@ class Archive
         flock ($this->_fh, LOCK_EX);
     }
 
-    public function read ($size)
-    {
-        if (($block = fread ($this->_fh, $size)) === FALSE) {
-            throw new Exception (
-                sprintf (
-                    'Failed to read archive: [%s] with error: [fgets (%d)]',
-                    $this->_fp,
-                    $size
-                )
-            );
-        }
-    
-        return $block;
-    }
-
     public function close ()
     {
         flock  ($this->_fh, LOCK_UN);
