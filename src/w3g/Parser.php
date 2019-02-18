@@ -4,6 +4,7 @@ namespace w3lib\w3g;
 
 use Exception;
 use w3lib\Library\Parser as Model;
+use w3lib\Library\Stream;
 
 class Parser extends Stream
 {
@@ -16,13 +17,15 @@ class Parser extends Stream
             'headerVersion'     => Model::uint32 (),
             'uncompressedSize'  => Model::uint32 (),
             'numBlocks'         => Model::uint32 (),
-            'identification'    => Model::char   (4),
+            'identification'    => Model::string (4),
             'majorVersion'      => Model::uint32 (),
             'buildVersion'      => Model::uint16 (),
             'flags'             => Model::uint16 (),
             'length'            => Model::uint32 (),
             'checksum'          => Model::uint32 ()
         ]);
+
+        var_dump ($header->unpack ($this));
     }
 
     // const MISC_MAX_DATABLOCK = 1500;

@@ -1,6 +1,6 @@
 <?php
 
-use w3lib\Library;
+namespace w3lib\Library;
 
 use Exception;
 
