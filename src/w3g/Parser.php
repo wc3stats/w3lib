@@ -3,29 +3,48 @@
 namespace w3lib\w3g;
 
 use Exception;
-use w3lib\Library\Parser as Model;
+use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\Library\Type;
+use w3lib\w3g\Model\Header;
+use w3lib\w3g\Model\Block;
+
 
 class Parser extends Stream
 {
-    public function parse ()
+    public function parse (Replay $replay)
     {
-        $header = new Model ([
-            'intro'             => Model::string (),
-            'headerSize'        => Model::uint32 (),
-            'compressedSize'    => Model::uint32 (),
-            'headerVersion'     => Model::uint32 (),
-            'uncompressedSize'  => Model::uint32 (),
-            'numBlocks'         => Model::uint32 (),
-            'identification'    => Model::string (4),
-            'majorVersion'      => Model::uint32 (),
-            'buildVersion'      => Model::uint16 (),
-            'flags'             => Model::uint16 (),
-            'length'            => Model::uint32 (),
-            'checksum'          => Model::uint32 ()
-        ]);
+        debug ('Parsing replay header.');
 
-        var_dump ($header->unpack ($this));
+        // $header = new Model ([
+        //     'intro'             => Model::string (),
+        //     'headerSize'        => Model::uint32 (),
+        //     'compressedSize'    => Model::uint32 (),
+        //     'headerVersion'     => Model::uint32 (),
+        //     'uncompressedSize'  => Model::uint32 (),
+        //     'numBlocks'         => Model::uint32 (),
+        //     'identification'    => Model::string (4),
+        //     'majorVersion'      => Model::uint32 (),
+        //     'buildVersion'      => Model::uint16 (),
+        //     'flags'             => Model::uint16 (),
+        //     'length'            => Model::uint32 (),
+        //     'checksum'          => Model::uint32 ()
+        // ]);
+
+        $replay->header = new Header ();
+        $replay->header->unpack ($this);
+
+        debug ('Parsing replay blocks.');
+
+        for ($i = 1; $i <= $replay->header->numBlocks; $i++) {
+            debug ("Parsing block #$i");
+
+            $block = new Block ();
+            $block->unpack ($this);
+
+            xxd ($block->body);
+            die ();
+        }
     }
 
     // const MISC_MAX_DATABLOCK = 1500;

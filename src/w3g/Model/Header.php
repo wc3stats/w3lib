@@ -1,23 +1,44 @@
 <?php
 
-use w3lib\w3g\Model;
+namespace w3lib\w3g\Model;
 
-class Header
+use w3lib\Library\Model;
+use w3lib\Library\Type;
+use w3lib\Library\Stream;
+
+class Header extends Model
 {
-    public $intro;
-}
+    const REPLAY_INTRO = "Warcraft III recorded game";
 
-    //     'intro'             => Types::string (),
-    //     'headerSize'        => Types::uint32 (),
-    //     'compressedSize'    => Types::uint32 (),
-    //     'headerVersion'     => Types::uint32 (),
-    //     'uncompressedSize'  => Types::uint32 (),
-    //     'numBlocks'         => Types::uint32 (),
-    //     'identification'    => Types::char (4),
-    //     'majorVersion'      => Types::uint32 (),
-    //     'buildVersion'      => Types::uint16 (),
-    //     'flags'             => Types::uint16 (),
-    //     'length'            => Types::uint32 (),
-    //     'checksum'          => Types::uint32 ()
+    public function __construct ()
+    {
+        $this->intro            = Type::string ();
+        $this->headerSize       = Type::uint32 ();
+        $this->compressedSize   = Type::uint32 ();
+        $this->headerVersion    = Type::uint32 ();
+        $this->uncompressedSize = Type::uint32 ();
+        $this->numBlocks        = Type::uint32 ();
+        $this->identification   = Type::string (4);
+        $this->majorVersion     = Type::uint32 ();
+        $this->buildVersion     = Type::uint16 ();
+        $this->flags            = Type::uint16 ();
+        $this->length           = Type::uint32 ();
+        $this->checksum         = Type::uint32 ();
+    }
+
+    public function unpack (Stream $stream)
+    {
+        $model = parent::unpack ($stream);
+
+        if (strpos ($this->intro, self::REPLAY_INTRO) !== 0) {
+            return sprintf (
+                'Unrecognized replay file intro: [%s]',
+                $this->intro
+            );
+        }
+
+        return $model;
+    }
+}
 
 ?>

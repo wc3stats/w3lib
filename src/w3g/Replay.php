@@ -16,7 +16,10 @@ class Replay extends Archive
         parent::__construct ($filepath);
 
         $parser = new Parser ($this->_fh);
-        $parser->parse ();
+        $parser->parse ($this);
+
+        var_dump ($this);
+        die ();
     }
 }
 

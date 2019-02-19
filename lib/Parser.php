@@ -20,28 +20,6 @@ class Parser
         'buffer'
     ];
 
-    private $_types = [];
-
-    public function __construct (array $types = [])
-    {
-        $this->_types = $types;
-    }
-
-    public function unpack (Stream $stream)
-    {
-        $data = [];
-
-        foreach ($this->_types as $key => $type) {
-            if ($type instanceof Parser) {
-                throw new Exception ('Not implemented.');
-            } else if ($type instanceof Type) {
-                $data [$key] = $type->read ($stream);
-            }
-        }
-
-        return $data;
-    }
-
     public static function __callStatic ($name, array $arguments)
     {
         if (!preg_match ('/([u]?)([a-z]+)(\d*)((?:le|be)?)/i', $name, $matches)) {
