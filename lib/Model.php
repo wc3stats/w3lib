@@ -19,16 +19,33 @@ class Model
 
     	foreach ($instance as $key => $type) {
     		if ($type instanceof Model) {
-    			throw new Exception ('Not implemented.');
+    			$type->unpack ($stream);
     		}
 
     		if ($type instanceof Type) {
-    			$type->resolve ($this);
     			$this->$key = $type->read ($stream);
+                $this->resolve ();
     		}
     	}
+    }
 
-    	return $this;
+    public function resolve ()
+    {
+        $instance = get_object_vars ($this);
+
+        foreach ($instance as $key => $type) {
+            if (! ($type instanceof Type)) {
+                continue;
+            }
+
+            $size = $type->getSize ();
+
+            if (!is_string ($size)) {
+                continue;
+            }
+
+            $type->setSize ($this->$size);
+        }
     }
 }
 

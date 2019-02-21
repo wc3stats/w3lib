@@ -5,10 +5,12 @@ namespace w3lib\w3g;
 use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\Library\Stream\Buffer;
 use w3lib\Library\Type;
 use w3lib\w3g\Model\Header;
 use w3lib\w3g\Model\Block;
-
+use w3lib\w3g\Model\Player;
+use w3lib\w3g\Model\MetaBlock;
 
 class Parser extends Stream
 {
@@ -16,23 +18,11 @@ class Parser extends Stream
     {
         debug ('Parsing replay header.');
 
-        // $header = new Model ([
-        //     'intro'             => Model::string (),
-        //     'headerSize'        => Model::uint32 (),
-        //     'compressedSize'    => Model::uint32 (),
-        //     'headerVersion'     => Model::uint32 (),
-        //     'uncompressedSize'  => Model::uint32 (),
-        //     'numBlocks'         => Model::uint32 (),
-        //     'identification'    => Model::string (4),
-        //     'majorVersion'      => Model::uint32 (),
-        //     'buildVersion'      => Model::uint16 (),
-        //     'flags'             => Model::uint16 (),
-        //     'length'            => Model::uint32 (),
-        //     'checksum'          => Model::uint32 ()
-        // ]);
-
         $replay->header = new Header ();
         $replay->header->unpack ($this);
+
+        var_dump ($replay->header);
+        die ();
 
         debug ('Parsing replay blocks.');
 
@@ -41,6 +31,16 @@ class Parser extends Stream
 
             $block = new Block ();
             $block->unpack ($this);
+
+            $stream = new Buffer ($block->body);
+
+            if ($i === 1) {
+                $meta = new MetaBlock ();
+                $meta->unpack ($stream);
+
+                var_dump ($meta);
+                die ();
+            }
 
             xxd ($block->body);
             die ();
@@ -82,93 +82,6 @@ class Parser extends Stream
     // const ACTION_MACRO          = 0x01;
     // const ACTION_MICRO          = 0x02;
     // const ACTION_GENERAL        = 0x04;
-
-    // private $_header = [
-    //     'intro'             => Types::string (),
-    //     'headerSize'        => Types::uint32 (),
-    //     'compressedSize'    => Types::uint32 (),
-    //     'headerVersion'     => Types::uint32 (),
-    //     'uncompressedSize'  => Types::uint32 (),
-    //     'numBlocks'         => Types::uint32 (),
-    //     'identification'    => Types::char (4),
-    //     'majorVersion'      => Types::uint32 (),
-    //     'buildVersion'      => Types::uint16 (),
-    //     'flags'             => Types::uint16 (),
-    //     'length'            => Types::uint32 (),
-    //     'checksum'          => Types::uint32 ()
-    // ];
-
-    // private $_block = [
-    //     'compressedSize'   => Types::uint16 (),
-    //     'uncompressedSize' => Types::uint16 (),
-    //     'checksum'         => Types::uint32 (),
-    //     'unknown'          => Types::char (2)
-    // ];
-
-    // private $_player = [
-    //     'recordId'   => Types::uint8 (),
-    //     'playerId'   => Types::uint8 (),
-    //     'playerName' => Types::string (),
-    //     'type'       => Types::uint8 (),
-    //     'flags'      => Types::uint8 ()
-    // ];
-
-
-    // public function parse ()
-    // {
-    //     debug ('Parsing replay header');
-
-
- 
-    //     // $header = $this->unpack (Header::class);
-
-    //     var_dump ($header);
-    //     die ();
-        
-    //     // $header = $this->unpack ($this->_header);
-
-    //     // if (strpos ($header ['intro'], self::FILE_INTRO) !== 0) {
-    //     //     throw new Exception (
-    //     //         sprintf (
-    //     //             'Unrecognized replay file intro: [%s]',
-    //     //             $header ['intro']
-    //     //         )
-    //     //     );
-    //     // }
-
-    //     // debug ('Parsing replay blocks');
-
-    //     // for ($i = 0; $i < $header ['numBlocks']; $i++) {
-    //     //     $blockHeader = $this->unpack ($this->_block);
-
-    //     //     $block = $this->read ($blockHeader ['compressedSize']);            
-            
-    //     //     // Last bit in the first byte needs to be set.
-    //     //     $block [0] = chr (ord ($block [0]) | 1);
-
-    //     //     if (! ($block = gzinflate ($block))) {
-    //     //         throw new Exception (
-    //     //             sprintf (
-    //     //                 'Failed to gzinflate replay block #%d',
-    //     //                 $i
-    //     //             )
-    //     //         );
-    //     //     }
-
-    //     //     $block = new Binary ($block);
-
-    //     //     if ($i === 0) {
-    //     //         $block->read (4);
-                
-    //     //         $owner = $block->unpack ($this->_player);
-            
-    //     //         var_dump ($owner);
-    //     //     }
-
-
-    //     //     die ();
-    //     // }
-    // }
 }
 
 ?>

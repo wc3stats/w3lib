@@ -13,20 +13,34 @@ abstract class Type
 		$this->_size = $size;
 	}
 
-	public abstract function read (Stream $stream);
-
-	public function resolve (Model $references)
+	public function read (Stream $stream)
 	{
-		$size = $this->_size;
+        if (!is_int ($this->_size)) {
+            throw new Exception (
+                sprintf (
+                    "Cannot read non-integer size: [%s]",
+                    $this->_size
+                )
+            );
+        }
 
-		if (is_string ($size)) {
-			if (!is_int ($references->$size)) {
-				throw new Exception ("Cannot resolve illegal reference to non-integer key: [$key]");
-			}
-
-			$this->_size = $references->$size;
-		}
+        return $stream->read ($this->_size);
 	}
+
+    public function getSize ()
+    {
+        return $this->_size;
+    }
+
+    public function setSize ($size)
+    {
+        if (!is_int ($size) || $size < 0) {
+            return false;
+        }
+
+        $this->_size = $size;
+        return true;
+    }
 
 	/** **/
 

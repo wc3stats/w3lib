@@ -19,10 +19,10 @@ class Block extends Model
 
     public function unpack (Stream $stream)
     {
-        $model = parent::unpack ($stream);
+        parent::unpack ($stream);
 
         // Decompress body.
-        $body = $model->body;
+        $body = $this->body;
         $body = substr ($body, 2, -4);
 
         // Last bit in the first byte needs to be set.
@@ -45,9 +45,7 @@ class Block extends Model
             );
         }
 
-        $model->body = $body;
-
-        return $model;
+        $this->body = $body;
     }
 }
 

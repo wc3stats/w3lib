@@ -28,7 +28,7 @@ class Header extends Model
 
     public function unpack (Stream $stream)
     {
-        $model = parent::unpack ($stream);
+        parent::unpack ($stream);
 
         if (strpos ($this->intro, self::REPLAY_INTRO) !== 0) {
             return sprintf (
@@ -36,8 +36,6 @@ class Header extends Model
                 $this->intro
             );
         }
-
-        return $model;
     }
 }
 

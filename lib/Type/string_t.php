@@ -17,7 +17,7 @@ class string_t extends Type
 
 		$block = '';
 
-		while (($c = $stream->read (1)) !== FALSE) {			
+		while (($c = $stream->read (1)) !== FALSE) {
 			if (ord ($c) == self::NUL) {
 				break;
 			}

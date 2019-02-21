@@ -45,7 +45,7 @@ abstract class Primitive extends Type
             [$this->_flags & self::M_SIZE] ?? NULL;
     }
 
-    public function read (Stream $stream)
+    public function read (Stream $stream, Model $model = NULL)
     {
         $block = $stream->read ($this->_size);
         $block = unpack ($this->getCode (), $block);

@@ -4,7 +4,7 @@ namespace w3lib\Library\Stream;
 
 use w3lib\Library\Stream;
 
-class String extends Stream
+class Buffer extends Stream
 {
     public function __construct (string $s)
     {
