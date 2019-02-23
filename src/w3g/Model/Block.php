@@ -5,29 +5,25 @@ namespace w3lib\w3g\Model;
 use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
-use w3lib\Library\Type;
 
 class Block extends Model
 {
-    public function __construct ()
+    public function read (Stream $stream)
     {
-        $this->compressedSize   = Type::uint16 ();
-        $this->uncompressedSize = Type::uint16 ();
-        $this->checksum         = Type::uint32 ();
-        $this->body             = Type::buffer ('compressedSize');
-    }
+        $this->compressedSize   = $stream->uint16 ();
+        $this->uncompressedSize = $stream->uint16 ();
+        $this->checksum         = $stream->uint32 ();
+        
+        // 2 unknown bytes.
+        $stream->char (2);
 
-    public function unpack (Stream $stream)
-    {
-        parent::unpack ($stream);
-
-        // Decompress body.
-        $body = $this->body;
-        $body = substr ($body, 2, -4);
+        $body = $stream->read ($this->compressedSize);
 
         // Last bit in the first byte needs to be set.
         $body [0] = chr (ord ($body [0]) | 1);
-        $body     = gzinflate ($body);
+        
+        // Decompress body.
+        $body = gzinflate ($body);
 
         if (!$body) {
             throw new Exception ('Failed to gzinflate block.');

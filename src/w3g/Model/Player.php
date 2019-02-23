@@ -3,7 +3,6 @@
 namespace w3lib\w3g\Model;
 
 use w3lib\Library\Model;
-use w3lib\Library\Type;
 use w3lib\Library\Stream;
 
 class Player extends Model
@@ -21,28 +20,49 @@ class Player extends Model
     const RANDOM   = 0x20;
     const FIXED    = 0x40;
 
-    public function __construct ()
+    const RED       = 0x00;
+    const BLUE      = 0x01;
+    const TEAL      = 0x02;
+    const PURPLE    = 0x03;
+    const YELLOW    = 0x04;
+    const ORANGE    = 0x05;
+    const GREEN     = 0x06;
+    const PINK      = 0x07;
+    const GREY      = 0x08;
+    const LIGHTBLUE = 0x09;
+    const DARKGREEN = 0x0A;
+    const BROWN     = 0x0B;
+    const MAROON    = 0x0C;
+    const NAVY      = 0x0D;
+    const TURQUOISE = 0x0F;
+    const VIOLET    = 0x10;
+    const WHEAT     = 0x11;
+    const PEACH     = 0x12;
+    const MINT      = 0x13;
+    const LAVENDER  = 0x14;
+    const COAL      = 0x15;
+    const SNOW      = 0x16;
+    const EMERALD   = 0x17;
+    const PEANUT    = 0x18;
+
+    public function read (Stream $stream)
     {
-        $this->type  = Type::char ();
-        $this->id    = Type::char ();
-        $this->name  = Type::string ();
-        $this->addon = Type::char ();
-    }
+        $this->type  = $stream->uint8 ();
+        $this->id    = $stream->uint8 ();
+        $this->name  = $stream->string ();
+        $this->addon = $stream->uint8 ();
 
-    public function unpack (Stream $stream)
-    {
-    	parent::unpack ($stream);
+        switch ($this->addon) {
+            case self::CUSTOM:
+                // Null byte
+                $stream->read (1); 
+            break;
 
-    	switch ($this->addon) {
-    		case self::CUSTOM:
-    			Type::void (1)->read ($stream);
-    		break;
-
-    		case self::LADDER:
-    			$this->runtime = Type::uint32 ()->read ($stream);
-    			$this->race    = Type::uint32 ()->read ($stream);
-    		break;
-    	}
+            case self::LADDER:
+                $this->runtime = $stream->uint32 ();
+                $this->race    = $stream->uint32 ();
+            break;
+        }
     }
 }
 

@@ -10,7 +10,7 @@ use w3lib\Library\Type;
 use w3lib\w3g\Model\Header;
 use w3lib\w3g\Model\Block;
 use w3lib\w3g\Model\Player;
-use w3lib\w3g\Model\MetaBlock;
+use w3lib\w3g\Model\HeaderBlock;
 
 class Parser extends Stream
 {
@@ -18,27 +18,26 @@ class Parser extends Stream
     {
         debug ('Parsing replay header.');
 
-        $replay->header = new Header ();
-        $replay->header->unpack ($this);
-
-        var_dump ($replay->header);
-        die ();
+        $replay->header = Header::unpack ($this);
 
         debug ('Parsing replay blocks.');
 
         for ($i = 1; $i <= $replay->header->numBlocks; $i++) {
             debug ("Parsing block #$i");
 
-            $block = new Block ();
-            $block->unpack ($this);
+            $block = Block::unpack ($this);
 
             $stream = new Buffer ($block->body);
 
             if ($i === 1) {
-                $meta = new MetaBlock ();
-                $meta->unpack ($stream);
+                // 4 unknown bytes.
+                $this->read (4);
 
-                var_dump ($meta);
+                $replay->host = Player::unpack ($this);
+                $replay->game = Game::unpack ($this);
+
+                var_dump ($replay->host);
+                var_dump ($replay->game);
                 die ();
             }
 
