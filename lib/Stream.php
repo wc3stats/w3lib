@@ -9,10 +9,13 @@ class Stream
     protected $_handle;
     protected $_endian;
 
+    private $_mark;
+
     const ENDIAN_BE = 0x00;
     const ENDIAN_LE = 0x01;
 
-    const NUL = 0x00;
+    const NUL  = 0x00;
+    const PEEK = 0x01;
 
     public function __construct ($handle, $endian = self::ENDIAN_LE)
     {
@@ -20,10 +23,18 @@ class Stream
         $this->_endian = $endian;
     }
 
-    public function read ($bytes)
+    public function read ($bytes, $flags = 0x00)
     {
+        if ($flags & self::PEEK) {
+            $this->_mark ();
+        }
+
         if (($block = fread ($this->_handle, $bytes)) === FALSE) {
             throw new Exception ("Failed to read [$bytes] bytes from stream");
+        }
+
+        if ($flags & self::PEEK) {
+            $this->_return ();
         }
 
         if (($actual = mb_strlen ($block, '8bit')) != $bytes) {
@@ -57,6 +68,16 @@ class Stream
     public function char ($n = 1)
     {
         return $this->read ($n);
+    }
+
+    public function bool ()
+    {
+        return (bool) $this->char ();
+    }
+
+    public function byte ()
+    {
+        return ord ($this->char ());
     }
 
     public function float ()
@@ -93,6 +114,36 @@ class Stream
     {
         $data = unpack ($this->_endian ? $le : $be, $this->read ($size));
         return current ($data);
+    }
+
+    protected function _mark ()
+    {
+        $this->_mark = ftell ($this->_handle);
+    }
+
+    protected function _return ()
+    {
+        if (!is_int ($this->_mark) || $this->_mark < 0) {
+            throw new Exception ('Attempting to return to illegal mark.');
+        }
+
+        rewind ($this->_handle);
+        fseek ($this->_handle, $this->_mark);
+    }
+
+    public function __toString ()
+    {
+        $buffer = '';
+        
+        $this->_mark ();
+
+        while (!feof ($this->_handle)) {
+            $buffer .= fread ($this->_handle, 0x2000);
+        }
+
+        $this->_return ();
+
+        return $buffer;
     }
 }
 

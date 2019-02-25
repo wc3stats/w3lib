@@ -10,7 +10,7 @@ use w3lib\Library\Type;
 use w3lib\w3g\Model\Header;
 use w3lib\w3g\Model\Block;
 use w3lib\w3g\Model\Player;
-use w3lib\w3g\Model\HeaderBlock;
+use w3lib\w3g\Model\Game;
 
 class Parser extends Stream
 {
@@ -31,11 +31,12 @@ class Parser extends Stream
 
             if ($i === 1) {
                 // 4 unknown bytes.
-                $this->read (4);
+                $stream->read (4);
 
-                $replay->host = Player::unpack ($this);
-                $replay->game = Game::unpack ($this);
+                $replay->host = Player::unpack ($stream);
+                $replay->game = Game::unpack ($stream);
 
+                var_dump ($replay->header);
                 var_dump ($replay->host);
                 var_dump ($replay->game);
                 die ();
