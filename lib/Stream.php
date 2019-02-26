@@ -80,9 +80,9 @@ class Stream
         return (bool) ord ($this->char ());
     }
 
-    public function byte ()
+    public function byte ($flags = 0x00)
     {
-        return ord ($this->char ());
+        return ord ($this->read (1, $flags));
     }
 
     public function float ()

@@ -39,7 +39,7 @@ class Parser extends Stream
                 die ();
             }
 
-            xxd ($block->body);
+            // xxd ($block->body);
             die ();
         }
     }

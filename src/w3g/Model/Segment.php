@@ -8,7 +8,7 @@ use w3lib\Library\Stream;
 
 class Segment extends Model
 {
-    private $_codes [
+    private $_codes = [
         'startA'    => 0x1A,
         'startB'    => 0x1B,
         'startC'    => 0x1C,
@@ -21,10 +21,10 @@ class Segment extends Model
         'leaveGame' => 0x17
     ];
 
-    public $id;
-
-    public function __construct ($id)
+    public function read (Stream $stream)
     {
+        $id = $stream->byte (Stream::PEEK);
+
         if (!in_array ($id, $this->_codes)) {
             throw new Exception (
                 sprintf (
@@ -34,12 +34,37 @@ class Segment extends Model
             );
         }
 
-        $this->id = $id;
-    }
+        $this->id = $stream->byte ();
 
-    public function read (Stream $stream)
-    {
-        
+        switch ($this->id) {
+            case $this->_codes ['startA']:
+            case $this->_codes ['startB']:
+            case $this->_codes ['startC']:
+                
+            break;
+
+            case $this->_codes ['timeslot1']:
+            case $this->_codes ['timeslot2']:
+
+            break;
+
+            case $this->_codes ['chat']:
+
+            break;
+
+            case $this->_codes ['unknown1']:
+            case $this->_codes ['unknown2']:
+
+            break;
+
+            case $this->_codes ['gameEnd']:
+
+            break;
+
+            case $this->_codes ['leaveGame']:
+                
+            break;
+        }
     }
 }
 

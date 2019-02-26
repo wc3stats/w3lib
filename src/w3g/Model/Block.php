@@ -52,13 +52,13 @@ class Block extends Model
 
     public function segments ()
     {
-        // switch ($id = $this->body->byte ()) {
-        //     case Segment::ID_START_A:
-        //     case Segment::ID_START_B:
-        //     case Segment::ID_START_C:
-        //         new Segment ($id);
-        //     break;
-        // }
+        while (true) {
+            try {
+                yield Segment::unpack ($this->body);
+            } catch (Exception $e) {
+                break;
+            }
+        }
     }
 }
 

@@ -879,7 +879,7 @@ of each block (including the one byte block ID).
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-0x1F       - TimeSlot block                                       [ n+3 byte ]
+0x1F       - TimeSlot block                                        [ n+3 byte ]
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   1 word   - n = number of bytes that follow
   1 word   - time increment (milliseconds)

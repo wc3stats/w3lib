@@ -138,7 +138,7 @@ class Game extends Model
 
         $players = [];
 
-        while (ord ($stream->read (1, Stream::PEEK)) === Player::PLAYER) {
+        while ($stream->byte (Stream::PEEK) === Player::PLAYER) {
             $player = Player::unpack ($stream);
             $players [$player->id] = $player;
 
