@@ -8,35 +8,30 @@ use w3lib\Library\Stream\Buffer;
 
 class Game extends Model
 {
+    /* $game->speed */
 	const SPEED_SLOW   = 0x00;
 	const SPEED_NORMAL = 0x01;
 	const SPEED_FAST   = 0x02;
 
+    /* $game->visibility */
 	const VISIBILITY_HIDE_TERRAIN   = 0x00;
 	const VISIBILITY_MAP_EXPLORED   = 0x01;
 	const VISIBILITY_ALWAYS_VISIBLE = 0x02;
 	const VISIBILITY_DEFAULT		= 0x03;
 
+    /* game->observers */
 	const OBSERVER_NONE      = 0x00;
 	const OBSERVER_ON_DEFEAT = 0x02;
 	const OBSERVER_FULL 	 = 0x03;
 	const OBSERVER_REFEREE 	 = 0x04;
 
+    /* game->type */
 	const TYPE_LADDER_FFA  = 0x01;
 	const TYPE_CUSTOM      = 0x09;
 	const TYPE_LOCAL       = 0x0D;
 	const TYPE_LADDER_TEAM = 0x20;
 
-	const RACE_HUMAN    = 0x01;
-	const RACE_ORC      = 0x02;
-	const RACE_NIGHTELF = 0x04;
-	const RACE_UNDEAD   = 0x08;
-	const RACE_RANDOM   = 0x20;
-
-	const AI_EASY   = 0x01;
-	const AI_NORMAL = 0x02;
-	const AI_INSANE = 0x04;
-
+    /* $game->selectMode */
 	const MODE_TEAM_RACE_SELECTABLE 	= 0x00;
 	const MODE_TEAM_NOT_SELECTABLE  	= 0x01;
 	const MODE_TEAM_RACE_NOT_SELECTABLE = 0x03;
@@ -48,6 +43,29 @@ class Game extends Model
 	const CHAT_OBSERVERS = 0x02;
 	const CHAT_PAUSED 	 = 0xFE;
 	const CHAT_RESUMED 	 = 0xFF;
+
+    public $gameName;
+    public $speed;
+    public $visibility;
+    public $observers;
+    public $teamsTogether;
+    public $lockedTeams;
+    public $fullShare;
+    public $randomHero;
+    public $randomRaces;
+    public $checksum;
+    public $map;
+    public $host;
+    public $numSlots;
+    public $type;
+    public $private;
+    public $recordId;
+    public $recordLength;
+    public $slotRecords;
+    public $slots;
+    public $randomSeed;
+    public $selectMode;
+    public $startSpots;
 
     public function read (Stream $stream)
     {
@@ -111,21 +129,43 @@ class Game extends Model
         // xxd ($decoded);
         // die ();
 
-        $this->slots   = $stream->uint32 ();
-        $this->type    = $stream->byte ();
-        $this->private = $stream->bool ();
+        $this->numSlots = $stream->uint32 ();
+        $this->type     = $stream->byte ();
+        $this->private  = $stream->bool ();
 
         // 6 unknown bytes.
         $stream->read (6);
 
-        $this->players = [];
+        $players = [];
 
         while (ord ($stream->read (1, Stream::PEEK)) === Player::PLAYER) {
-            $this->players [] = Player::unpack ($stream);
+            $player = Player::unpack ($stream);
+            $players [$player->id] = $player;
 
             // 4 unknown padding bytes.
             $stream->read (4);
         }
+
+        // 2 unknown bytes.
+        $stream->read (2);
+
+        $this->recordId     = $stream->byte ();
+        $this->recordLength = $stream->uint16 ();
+        $this->slotRecords  = $stream->byte ();
+
+        for ($i = 0; $i < $this->slotRecords; $i++) {
+            $slot = Slot::unpack ($stream);
+
+            if (!$slot->isComputer && isset ($players [$slot->playerId])) {
+                $slot->player = $players [$slot->playerId];
+            }
+
+            $this->slots [$slot->playerId] = $slot;
+        }
+
+        $this->randomSeed = $stream->uint32 ();
+        $this->selectMode = $stream->byte ();
+        $this->startSpots = $stream->byte ();
     }
 }
 

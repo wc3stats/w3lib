@@ -5,9 +5,15 @@ namespace w3lib\w3g\Model;
 use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\Library\Stream\Buffer;
 
 class Block extends Model
 {
+    public $compressedSize;
+    public $uncompressedSize;
+    public $checksum;
+    public $body;
+
     public function read (Stream $stream)
     {
         $this->compressedSize   = $stream->uint16 ();
@@ -41,7 +47,18 @@ class Block extends Model
             );
         }
 
-        $this->body = $body;
+        $this->body = new Buffer ($body);
+    }
+
+    public function segments ()
+    {
+        // switch ($id = $this->body->byte ()) {
+        //     case Segment::ID_START_A:
+        //     case Segment::ID_START_B:
+        //     case Segment::ID_START_C:
+        //         new Segment ($id);
+        //     break;
+        // }
     }
 }
 

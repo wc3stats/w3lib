@@ -45,6 +45,13 @@ class Player extends Model
     const EMERALD   = 0x17;
     const PEANUT    = 0x18;
 
+    public $type;
+    public $id;
+    public $name;
+    public $addon;
+    public $runtime;
+    public $race;
+
     public function read (Stream $stream)
     {
         $this->type  = $stream->uint8 ();

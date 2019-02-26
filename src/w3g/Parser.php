@@ -5,7 +5,6 @@ namespace w3lib\w3g;
 use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
-use w3lib\Library\Stream\Buffer;
 use w3lib\Library\Type;
 use w3lib\w3g\Model\Header;
 use w3lib\w3g\Model\Block;
@@ -26,19 +25,17 @@ class Parser extends Stream
             debug ("Parsing block #$i");
 
             $block = Block::unpack ($this);
-
-            $stream = new Buffer ($block->body);
-
+            
             if ($i === 1) {
                 // 4 unknown bytes.
-                $stream->read (4);
+                $block->body->read (4);
 
-                $replay->host = Player::unpack ($stream);
-                $replay->game = Game::unpack ($stream);
+                $replay->host = Player::unpack ($block->body);
+                $replay->game = Game::unpack ($block->body);
+            }
 
-                var_dump ($replay->header);
-                var_dump ($replay->host);
-                var_dump ($replay->game);
+            foreach ($block->segments () as $segment) {
+                var_dump ($segment->id);
                 die ();
             }
 

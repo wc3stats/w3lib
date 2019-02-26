@@ -7,6 +7,19 @@ use w3lib\Library\Stream;
 
 class Header extends Model
 {
+    public $intro;
+    public $headerSize;
+    public $compressedSize;
+    public $headerVersion;
+    public $uncompressedSize;
+    public $numBlocks;
+    public $identification;
+    public $majorVersion;
+    public $buildVersion;
+    public $flags;
+    public $length;
+    public $checksum;
+    
     public function read (Stream $stream)
     {
         $this->intro            = $stream->string ();

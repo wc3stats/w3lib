@@ -50,6 +50,11 @@ class Stream
         return $block;
     }
 
+    public function eof ()
+    {
+        return feof ($this->_handle);
+    }
+
     public function string ()
     {
         $s = '';
@@ -72,7 +77,7 @@ class Stream
 
     public function bool ()
     {
-        return (bool) $this->char ();
+        return (bool) ord ($this->char ());
     }
 
     public function byte ()

@@ -79,11 +79,11 @@ class Lang
 	public function race ($value)
 	{
 		return [
-			Game::RACE_HUMAN => 'Human',
-			Game::RACE_ORC => 'Orc',
+			Game::RACE_HUMAN    => 'Human',
+			Game::RACE_ORC      => 'Orc',
 			Game::RACE_NIGHTELF => 'Night Elf',
-			Game::RACE_UNDEAD => 'Undead',
-			Game::RACE_RANDOM => 'Random'
+			Game::RACE_UNDEAD   => 'Undead',
+			Game::RACE_RANDOM   => 'Random'
 		] [$value] ?? NULL;
 	}
 
