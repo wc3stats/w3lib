@@ -49,18 +49,6 @@ class Block extends Model
 
         $this->body = new Buffer ($body);
     }
-
-    public function segments ()
-    {
-        while (true) {
-            try {
-                yield Segment::unpack ($this->body);
-            } catch (Exception $e) {
-                var_dump ($e);
-                break;
-            }
-        }
-    }
 }
 
 ?>

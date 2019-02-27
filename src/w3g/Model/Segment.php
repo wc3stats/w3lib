@@ -76,8 +76,11 @@ class Segment extends Model
                     $block = new Buffer ($stream->read ($this->length));
 
                     xxd ($block);
+
                     die ();
-                    $block = CommandBlock::unpack ($block);
+                    // foreach (Action::unpack ($block) as $action) {
+                    //     var_dump ($action->id);
+                    // }
                 }
             break;
 

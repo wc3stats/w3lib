@@ -10,6 +10,7 @@ use w3lib\w3g\Model\Header;
 use w3lib\w3g\Model\Block;
 use w3lib\w3g\Model\Player;
 use w3lib\w3g\Model\Game;
+use w3lib\w3g\Model\Segment;
 
 class Parser extends Stream
 {
@@ -34,7 +35,7 @@ class Parser extends Stream
                 $replay->game = Game::unpack ($block->body);
             }
 
-            foreach ($block->segments () as $segment) {
+            foreach (Segment::unpackAll ($block->body) as $segment) {
                 var_dump ($segment->id);
             }
 
