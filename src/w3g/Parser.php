@@ -36,7 +36,6 @@ class Parser extends Stream
 
             foreach ($block->segments () as $segment) {
                 var_dump ($segment->id);
-                die ();
             }
 
             // xxd ($block->body);

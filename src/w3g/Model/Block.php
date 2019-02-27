@@ -56,6 +56,7 @@ class Block extends Model
             try {
                 yield Segment::unpack ($this->body);
             } catch (Exception $e) {
+                var_dump ($e);
                 break;
             }
         }
