@@ -7,10 +7,11 @@ use w3lib\Library\Stream;
 
 class Player extends Model
 {
-    const HOST   = 0x00;
-    const PLAYER = 0x16;
-    const CUSTOM = 0x01;
-    const LADDER = 0x08;
+    const HOST    = 0x00;
+    const PLAYER  = 0x16;
+    const CUSTOM  = 0x01;
+    const NETEASE = 0x02;
+    const LADDER  = 0x08;
 
     const HUMAN    = 0x01;
     const ORC      = 0x02;
@@ -68,6 +69,10 @@ class Player extends Model
             case self::LADDER:
                 $this->runtime = $stream->uint32 ();
                 $this->race    = $stream->uint32 ();
+            break;
+
+            case self::NETEASE:
+                $stream->read (2);
             break;
         }
     }

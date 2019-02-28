@@ -15,16 +15,6 @@ class Buffer extends Stream
 
         parent::__construct ($stream);
     }
-
-    public function append ($s)
-    {
-        $this->_mark ();
-
-        fseek ($this->_handle, 0, SEEK_END);
-        fwrite ($this->_handle, $s);
-        
-        $this->_return ();
-    }
 }
 
 ?>

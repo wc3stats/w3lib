@@ -75,12 +75,9 @@ class Segment extends Model
                 if ($this->length > 2) {
                     $block = new Buffer ($stream->read ($this->length));
 
-                    xxd ($block);
-
-                    die ();
-                    // foreach (Action::unpack ($block) as $action) {
-                    //     var_dump ($action->id);
-                    // }
+                    foreach (Action::unpack ($block) as $action) {
+                        var_dump ($action->id);
+                    }
                 }
             break;
 
@@ -96,8 +93,8 @@ class Segment extends Model
             break;
 
             case $this->_codes ['unknown1']:
-                $stream->byte ();
-                $stream->uint32 ();
+                $this->size = $stream->byte ();
+                $this->body = $stream->read ($this->size);
             break;
 
             case $this->_codes ['unknown2']:

@@ -138,6 +138,7 @@ class Game extends Model
 
         $players = [];
 
+
         while ($stream->byte (Stream::PEEK) === Player::PLAYER) {
             $player = Player::unpack ($stream);
             $players [$player->id] = $player;
@@ -147,7 +148,7 @@ class Game extends Model
         }
 
         // 2 unknown bytes.
-        $stream->read (2);
+        // $stream->read (2);
 
         $this->recordId     = $stream->byte ();
         $this->recordLength = $stream->uint16 ();

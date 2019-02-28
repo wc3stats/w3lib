@@ -50,6 +50,26 @@ class Stream
         return $block;
     }
 
+    public function append ($s)
+    {
+        $this->_mark ();
+
+        fseek ($this->_handle, 0, SEEK_END);
+        fwrite ($this->_handle, $s);
+        
+        $this->_return ();
+    }
+
+    public function prepend ($s)
+    {
+        $this->_mark ();
+
+        fseek ($this->_handle, 0);
+        fwrite ($this->_handle, $s);
+
+        $this->_return ();
+    }
+
     public function eof ()
     {
         return feof ($this->_handle);
