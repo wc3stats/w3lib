@@ -86,10 +86,10 @@ class Game extends Model
         }
 
         $codes = [
-            $decoded->byte (),
-            $decoded->byte (),
-            $decoded->byte (),
-            $decoded->byte ()
+            $decoded->int8 (),
+            $decoded->int8 (),
+            $decoded->int8 (),
+            $decoded->int8 ()
         ];
 
         $this->speed = $codes [0];
@@ -130,7 +130,7 @@ class Game extends Model
         // die ();
 
         $this->numSlots = $stream->uint32 ();
-        $this->type     = $stream->byte ();
+        $this->type     = $stream->int8 ();
         $this->private  = $stream->bool ();
 
         // 6 unknown bytes.
@@ -138,8 +138,7 @@ class Game extends Model
 
         $players = [];
 
-
-        while ($stream->byte (Stream::PEEK) === Player::PLAYER) {
+        while ($stream->int8 (Stream::PEEK) === Player::PLAYER) {
             $player = Player::unpack ($stream);
             $players [$player->id] = $player;
 
@@ -150,9 +149,9 @@ class Game extends Model
         // 2 unknown bytes.
         // $stream->read (2);
 
-        $this->recordId     = $stream->byte ();
+        $this->recordId     = $stream->int8 ();
         $this->recordLength = $stream->uint16 ();
-        $this->slotRecords  = $stream->byte ();
+        $this->slotRecords  = $stream->int8 ();
 
         for ($i = 0; $i < $this->slotRecords; $i++) {
             $slot = Slot::unpack ($stream);
@@ -165,8 +164,8 @@ class Game extends Model
         }
 
         $this->randomSeed = $stream->uint32 ();
-        $this->selectMode = $stream->byte ();
-        $this->startSpots = $stream->byte ();
+        $this->selectMode = $stream->int8 ();
+        $this->startSpots = $stream->int8 ();
     }
 }
 

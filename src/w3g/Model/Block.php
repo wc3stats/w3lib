@@ -19,11 +19,9 @@ class Block extends Model
         $this->compressedSize   = $stream->uint16 ();
         $this->uncompressedSize = $stream->uint16 ();
         $this->checksum         = $stream->uint32 ();
-        
-        // 2 unknown bytes.
-        $stream->char (2);
 
         $body = $stream->read ($this->compressedSize);
+        $body = substr ($body, 2, -4);
 
         // Last bit in the first byte needs to be set.
         $body [0] = chr (ord ($body [0]) | 1);

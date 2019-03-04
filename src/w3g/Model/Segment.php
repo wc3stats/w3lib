@@ -3,6 +3,7 @@
 namespace w3lib\w3g\Model;
 
 use Exception;
+use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
@@ -24,98 +25,123 @@ class Segment extends Model
     const CHAT_ALLIES   = 0x01;
     const CHAT_OBSERVER = 0x02;
     const CHAT_PRIVATE  = 0x03; // + N (N = slotNumber)
-    */
 
     const TYPE_TIMESLOT   = 0x01;
     const TYPE_CHAT       = 0x02;
     const TYPE_GAME_END   = 0x04;
     const TYPE_LEAVE_GAME = 0x08;
+    */
 
-    private $_codes = [
-        'Start Block A'   => 0x1A,
-        'Start Block B'   => 0x1B,
-        'Start Block C'   => 0x1C,
-        'Timeslot Type 1' => 0x1E,
-        'Timeslot Type 2' => 0x1F,
-        'Chat Message'    => 0x20,
-        'Unknown Block 1' => 0x22,
-        'Unknown Block 2' => 0x23,
-        'Game Over'       => 0x2F,
-        'Leave Game'      => 0x17
-    ];
+    /** **/
+
+    const START_BLOCK_A = 0x1A;
+    const START_BLOCK_B = 0x1B;
+    const START_BLOCK_C = 0x1C;
+    const TIMESLOT      = 0x1F;
+    const CHAT_MESSAGE  = 0x20;
+    const UNKNOWN_1     = 0x22;
+    const UNKNOWN_2     = 0x23;
+    const GAME_OVER     = 0x2F;
+    const LEAVE_GAME    = 0x17;
 
     public function read (Stream $stream)
     {
-        $this->id = $stream->byte ();
+        $this->id  = $stream->int8 ();
+        $this->key = $this->keyName ($this->id);
+
+        Logger::debug (
+            sprintf (
+                'Found segment: [0x%2X:%s].',
+                $this->id, 
+                $this->key
+            )
+        );
 
         switch ($this->id) {
             default:
-                $stream->prepend ($this->id);
-
                 throw new Exception (
                     sprintf (
                         'Encountered unknown segment id: [%2X]',
-                        $id
+                        $this->id
                     )
                 );
             break;
 
-            case $this->_codes ['Start Block A']:
-            case $this->_codes ['Start Block B']:
-            case $this->_codes ['Start Block C']:
+            case self::START_BLOCK_A:
+            case self::START_BLOCK_B:
+            case self::START_BLOCK_C:
                 $stream->uint32 ();
             break;
 
-            case $this->_codes ['Timeslot Type 1']:
-            case $this->_codes ['Timeslot Type 2']:
-                $this->type          = self::TYPE_TIMESLOT;
+            // case self::TIMESLOT_1:
+            case self::TIMESLOT:
                 $this->length        = $stream->uint16 () - 2;
                 $this->timeIncrement = $stream->uint16 ();
+                $this->actions       = [];
 
-                if ($this->length > 2) {
+                if ($this->length > 0) {
                     $block = new Buffer ($stream->read ($this->length));
-                    xxd ($block);
 
-                    $this->playerId = $block->uint8 ();
-                    $this->length   = $block->uint16 ();
+                    // xxd ($block);
 
-                    foreach (Action::unpackAll ($block) as $action) {
-                        var_dump ($this->id);
+                    $playerId = $block->uint8 ();
+                    $length   = $block->uint16 ();
+
+                    Logger::debug (
+                        sprintf (
+                            'Processing actions for player [%d] of length [%d]',
+                            $playerId,
+                            $length
+                        )
+                    );
+
+                    $actions = new Buffer ($block->read ($length));
+                    
+                    xxd ($actions);
+
+                    foreach (Action::unpackAll ($actions) as $action) {
+                        /* Actions to ignore. */
+                        if (in_array ($action->id, [
+                            Action::UNKNOWN_1,
+                            Action::UNKNOWN_2,
+                            Action::UNKNOWN_3,
+                            Action::SCENARIO_TRIGGER,
+                            Action::PRE_SUBSELECT
+                        ])) {
+                            continue;
+                        }
+
+                        $this->actions [] = $action;
                     }
                 }
             break;
 
-            case $this->_codes ['Chat Message']:
-                xxd ($stream);
-                die ('CHAT');
-                $this->type     = self::TYPE_CHAT;
-                $this->playerId = $stream->char ();
+            case self::CHAT_MESSAGE:
+                $this->playerId = $stream->int8 ();
                 $this->length   = $stream->uint16 ();
-                $this->flags    = $stream->char ();
+                $this->flags    = $stream->int8 ();
                 $this->mode     = $stream->uint32 ();
                 $this->message  = $stream->string ();
             break;
 
-            case $this->_codes ['Unknown Block 1']:
-                $this->size = $stream->byte ();
+            case self::UNKNOWN_1:
+                $this->size = $stream->int8 ();
                 $this->body = $stream->read ($this->size);
             break;
 
-            case $this->_codes ['Unknown Block 2']:
+            case self::UNKNOWN_2:
                 $stream->uint32 ();
-                $stream->byte ();
+                $stream->int8 ();
                 $stream->uint32 ();
-                $stream->byte ();
+                $stream->int8 ();
             break;
 
-            case $this->_codes ['Game Over']:
-                $this->type      = self::TYPE_GAME_END;
+            case self::GAME_OVER:
                 $this->mode      = $stream->uint32 ();
                 $this->countdown = $stream->uint32 ();
             break;
 
-            case $this->_codes ['Leave Game']:
-                $this->type     = self::TYPE_LEAVE_GAME;
+            case self::LEAVE_GAME:
                 $this->reason   = $stream->uint32 ();
                 $this->playerId = $stream->char ();
                 $this->result   = $stream->uint32 ();

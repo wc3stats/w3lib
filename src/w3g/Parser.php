@@ -3,8 +3,10 @@
 namespace w3lib\w3g;
 
 use Exception;
+use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\Library\Stream\Buffer;
 use w3lib\Library\Type;
 use w3lib\w3g\Model\Header;
 use w3lib\w3g\Model\Block;
@@ -12,35 +14,49 @@ use w3lib\w3g\Model\Player;
 use w3lib\w3g\Model\Game;
 use w3lib\w3g\Model\Segment;
 
-class Parser extends Stream
+class Parser
 {
-    public function parse (Replay $replay)
+    private $_replay;
+
+    public function __construct (Replay $replay)
     {
-        debug ('Parsing replay header.');
+        $this->_replay = $replay;
+    } 
 
-        $replay->header = Header::unpack ($this);
+    public function parse ()
+    {
+        Logger::debug ('Parsing replay header.');
 
-        debug ('Parsing replay blocks.');
+        $replay->header = Header::unpack ($this->_replay);
+
+        Logger::debug ('Parsing replay blocks.');
+
+        $buffer = new Buffer ();
 
         for ($i = 1; $i <= $replay->header->numBlocks; $i++) {
-            debug ("Parsing block #$i");
+            Logger::info (
+                "Parsing block %d / %d (%.2f%%)",
+                $i,
+                $replay->header->numBlocks,
+                $i / $replay->header->numBlocks * 100
+            );
 
-            $block = Block::unpack ($this);
-            
+            $block = Block::unpack ($this->_replay);
+            $buffer->append ($block->body);
+
             if ($i === 1) {
                 // 4 unknown bytes.
-                $block->body->read (4);
+                $buffer->read (4);
 
-                $replay->host = Player::unpack ($block->body);
-                $replay->game = Game::unpack ($block->body);
+                $replay->host = Player::unpack ($buffer);
+                $replay->game = Game::unpack ($buffer);
             }
 
-            foreach (Segment::unpackAll ($block->body) as $segment) {
-                var_dump ($segment->id);
+            foreach (Segment::unpackAll ($buffer) as $k => $segment) {
+                if (!empty ($segment->actions)) {
+                    var_dump ($segment);
+                }
             }
-
-            // xxd ($block->body);
-            die ();
         }
     }
 

@@ -40,18 +40,18 @@ class Slot extends Model
 
     public function read (Stream $stream)
     {
-        $this->playerId = $stream->byte ();
+        $this->playerId = $stream->int8 ();
 
         // Map download percent (0x64 in custom, 0xFF in ladder)
-        $stream->byte ();
+        $stream->int8 ();
 
-        $this->status     = $stream->byte ();
+        $this->status     = $stream->int8 ();
         $this->isComputer = $stream->bool ();
-        $this->team       = $stream->byte ();
-        $this->colour     = $stream->byte ();
-        $this->race       = $stream->byte ();
-        $this->aiStrength = $stream->byte ();
-        $this->handicap   = $stream->byte ();
+        $this->team       = $stream->int8 ();
+        $this->colour     = $stream->int8 ();
+        $this->race       = $stream->int8 ();
+        $this->aiStrength = $stream->int8 ();
+        $this->handicap   = $stream->int8 ();
     }
 }
 

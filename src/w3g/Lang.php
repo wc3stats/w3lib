@@ -10,9 +10,9 @@ class Lang
 	public function speed ($value)
 	{
 		return [
-			Game::SPEED_SLOW => 'Slow',
+			Game::SPEED_SLOW   => 'Slow',
 			Game::SPEED_NORMAL => 'Normal',
-			Game::SPEED_FAST => 'Fast'
+			Game::SPEED_FAST   => 'Fast'
 		] [$value] ?? NULL;
 	}
 

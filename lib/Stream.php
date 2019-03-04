@@ -9,8 +9,6 @@ class Stream
     protected $_handle;
     protected $_endian;
 
-    private $_mark;
-
     const ENDIAN_BE = 0x00;
     const ENDIAN_LE = 0x01;
 
@@ -21,26 +19,38 @@ class Stream
     {
         $this->_handle = $handle;
         $this->_endian = $endian;
+
+        flock ($this->_handle, LOCK_EX);
+    }
+
+    public function __destruct ()
+    {
+        flock  ($this->_handle, LOCK_UN);
+        fclose ($this->_handle);
     }
 
     public function read ($bytes, $flags = 0x00)
     {
-        if ($flags & self::PEEK) {
-            $this->_mark ();
+        if ($bytes <= 0) {
+            return '';
         }
+
+        $offset = $this->offset ();
 
         if (($block = fread ($this->_handle, $bytes)) === FALSE) {
             throw new Exception ("Failed to read [$bytes] bytes from stream");
         }
 
         if ($flags & self::PEEK) {
-            $this->_return ();
+            $this->seek ($offset);
         }
 
-        if (($actual = mb_strlen ($block, '8bit')) != $bytes) {
+        if (($actual = mb_strlen ($block, '8bit')) != $bytes) { 
+            $this->seek ($offset);
+
             throw new Exception (
                 sprintf (
-                    'Expecting segment size [%d] but found size [%d]',
+                    'Expecting stream size [%d] but found size [%d]',
                     $bytes,
                     $actual
                 )
@@ -52,22 +62,22 @@ class Stream
 
     public function append ($s)
     {
-        $this->_mark ();
+        $offset = $this->offset ();
 
         fseek ($this->_handle, 0, SEEK_END);
         fwrite ($this->_handle, $s);
         
-        $this->_return ();
+        $this->seek ($offset);
     }
 
     public function prepend ($s)
     {
-        $this->_mark ();
+        $offset = $this->offset ();
 
         fseek ($this->_handle, 0);
         fwrite ($this->_handle, $s);
 
-        $this->_return ();
+        $this->seek ($offset);
     }
 
     public function eof ()
@@ -100,7 +110,7 @@ class Stream
         return (bool) ord ($this->char ());
     }
 
-    public function byte ($flags = 0x00)
+    public function int8 ($flags = 0x00)
     {
         return ord ($this->read (1, $flags));
     }
@@ -135,38 +145,34 @@ class Stream
         return $this->_unpack ('P', 'J', 8);
     }
 
+    public function offset ()
+    {
+        return ftell ($this->_handle);
+    }
+
+    public function seek ($offset)
+    {
+        rewind ($this->_handle);
+        fseek ($this->_handle, $offset);
+    }
+
     protected function _unpack ($le, $be, $size)
     {
         $data = unpack ($this->_endian ? $le : $be, $this->read ($size));
         return current ($data);
     }
 
-    protected function _mark ()
-    {
-        $this->_mark = ftell ($this->_handle);
-    }
-
-    protected function _return ()
-    {
-        if (!is_int ($this->_mark) || $this->_mark < 0) {
-            throw new Exception ('Attempting to return to illegal mark.');
-        }
-
-        rewind ($this->_handle);
-        fseek ($this->_handle, $this->_mark);
-    }
-
     public function __toString ()
     {
         $buffer = '';
         
-        $this->_mark ();
+        $offset = $this->offset ();
 
         while (!feof ($this->_handle)) {
             $buffer .= fread ($this->_handle, 0x2000);
         }
 
-        $this->_return ();
+        $this->seek ($offset);
 
         return $buffer;
     }
