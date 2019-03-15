@@ -63,6 +63,7 @@ class Game extends Model
     public $recordLength;
     public $slotRecords;
     public $slots;
+    public $players;
     public $randomSeed;
     public $selectMode;
     public $startSpots;
@@ -71,7 +72,7 @@ class Game extends Model
     {
         $this->gameName = $stream->string ();
 
-        // 1 null byte.
+        /* 1 null byte. */
         $stream->read (1);
 
         $decoded = new Buffer ();
@@ -117,7 +118,7 @@ class Game extends Model
         $this->randomRaces   = (bool) ($codes [3] & 0x04);
 
 
-        // 5 unknown bytes.
+        /* 5 unknown bytes. */
         $decoded->read (5);
 
         $this->checksum = $decoded->uint32 ();
@@ -133,20 +134,20 @@ class Game extends Model
         $this->type     = $stream->int8 ();
         $this->private  = $stream->bool ();
 
-        // 6 unknown bytes.
+        /* 6 unknown bytes. */
         $stream->read (6);
 
-        $players = [];
+        $this->players = [];
 
         while ($stream->int8 (Stream::PEEK) === Player::PLAYER) {
             $player = Player::unpack ($stream);
-            $players [$player->id] = $player;
+            $this->players [$player->id] = $player;
 
-            // 4 unknown padding bytes.
+            /* 4 unknown padding bytes. */
             $stream->read (4);
         }
 
-        // 2 unknown bytes.
+        /* 2 unknown bytes. */
         // $stream->read (2);
 
         $this->recordId     = $stream->int8 ();
@@ -155,12 +156,7 @@ class Game extends Model
 
         for ($i = 0; $i < $this->slotRecords; $i++) {
             $slot = Slot::unpack ($stream);
-
-            if (!$slot->isComputer && isset ($players [$slot->playerId])) {
-                $slot->player = $players [$slot->playerId];
-            }
-
-            $this->slots [$slot->playerId] = $slot;
+            $this->slots [] = $slot;
         }
 
         $this->randomSeed = $stream->uint32 ();

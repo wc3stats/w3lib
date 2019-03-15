@@ -17,9 +17,31 @@ class Replay extends Archive
 
         $parser = new Parser ($this);
         $parser->parse ();
+    }
 
-        var_dump ($this);
-        die ();
+    public function getPlayerById ($playerId)
+    {
+        foreach ($this->players as $player) {
+            if ($player->id === $playerId) {
+                return $player;
+            }
+        }
+
+        return NULL;
+    }
+
+    public function getPlayerBySlot ($slot)
+    {
+        if (! ($slot = $this->game->slots [$slot])) {
+            return NULL;
+        }
+
+        return $this->getPlayerById ($slot->playerId);
+    }
+
+    public function getLength ()
+    {
+        return $this->header->length;
     }
 }
 

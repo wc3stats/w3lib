@@ -17,21 +17,6 @@ class Segment extends Model
     const MODE_COUNTDOWN_RUNNING = 0x00;
     const MODE_COUNTDOWN_FORCED  = 0x01;
 
-    /*
-    const CHAT_FLAG_DELAYED_SCREEN = 0x10;
-    const CHAT_FLAG_NORMAL         = 0x20;
-
-    const CHAT_ALL      = 0x00;
-    const CHAT_ALLIES   = 0x01;
-    const CHAT_OBSERVER = 0x02;
-    const CHAT_PRIVATE  = 0x03; // + N (N = slotNumber)
-
-    const TYPE_TIMESLOT   = 0x01;
-    const TYPE_CHAT       = 0x02;
-    const TYPE_GAME_END   = 0x04;
-    const TYPE_LEAVE_GAME = 0x08;
-    */
-
     /** **/
 
     const START_BLOCK_A = 0x1A;
@@ -43,6 +28,9 @@ class Segment extends Model
     const UNKNOWN_2     = 0x23;
     const GAME_OVER     = 0x2F;
     const LEAVE_GAME    = 0x17;
+
+
+    private static $_time = 0x00;
 
     public function read (Stream $stream)
     {
@@ -79,27 +67,31 @@ class Segment extends Model
                 $this->timeIncrement = $stream->uint16 ();
                 $this->actions       = [];
 
+                self::$_time += $this->timeIncrement / 1000;
+
                 if ($this->length > 0) {
                     $block = new Buffer ($stream->read ($this->length));
 
                     // xxd ($block);
 
-                    $playerId = $block->uint8 ();
-                    $length   = $block->uint16 ();
+                    $this->playerId = $block->uint8 ();
+                    $this->length   = $block->uint16 ();
 
                     Logger::debug (
                         sprintf (
                             'Processing actions for player [%d] of length [%d]',
-                            $playerId,
-                            $length
+                            $this->playerId,
+                            $this->length
                         )
                     );
 
-                    $actions = new Buffer ($block->read ($length));
+                    $actions = new Buffer ($block->read ($this->length));
                     
                     xxd ($actions);
 
                     foreach (Action::unpackAll ($actions) as $action) {
+                        $action->time = self::$_time;
+
                         /* Actions to ignore. */
                         if (in_array ($action->id, [
                             Action::UNKNOWN_1,
@@ -117,11 +109,7 @@ class Segment extends Model
             break;
 
             case self::CHAT_MESSAGE:
-                $this->playerId = $stream->int8 ();
-                $this->length   = $stream->uint16 ();
-                $this->flags    = $stream->int8 ();
-                $this->mode     = $stream->uint32 ();
-                $this->message  = $stream->string ();
+                $this->message = ChatMessage::unpack ($stream);
             break;
 
             case self::UNKNOWN_1:

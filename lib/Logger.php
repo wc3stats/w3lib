@@ -9,14 +9,20 @@ use Bramus\Monolog\Formatter\ColoredLineFormatter;
 
 class Logger
 {
+    private static $_level;
     private static $_instance;
+
+    public static function setup ($level)
+    {
+        self::$_level = $level;
+    }
 
     public static function __callStatic ($name, $arguments = [])
     {
         if (!self::$_instance) {
             $instance = new Monolog (NULL);
 
-            $handler = new StreamHandler ('php://stdout', Monolog::DEBUG);
+            $handler = new StreamHandler ('php://stdout', self::$_level ?? Monolog::DEBUG);
 
             $handler->setFormatter (
                 new ColoredLineFormatter (NULL, "[%datetime%] %level_name% - %message% [%extra.file%:%extra.line%]\n")

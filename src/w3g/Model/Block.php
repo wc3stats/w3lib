@@ -23,10 +23,10 @@ class Block extends Model
         $body = $stream->read ($this->compressedSize);
         $body = substr ($body, 2, -4);
 
-        // Last bit in the first byte needs to be set.
+        /* Last bit in the first byte needs to be set. */
         $body [0] = chr (ord ($body [0]) | 1);
         
-        // Decompress body.
+        /* Decompress body. */
         $body = gzinflate ($body);
 
         if (!$body) {

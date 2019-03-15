@@ -85,12 +85,12 @@ class Stream
         return feof ($this->_handle);
     }
 
-    public function string ()
+    public function string ($term = self::NUL)
     {
         $s = '';
 
         while (($c = $this->read (1)) !== FALSE) {
-            if (ord ($c) == self::NUL) {
+            if (ord ($c) == $term) {
                 break;
             }
 
@@ -98,6 +98,11 @@ class Stream
         }
 
         return $s;
+    }
+
+    public function token ()
+    {
+        return $this->string (ord (' '));
     }
 
     public function char ($n = 1)

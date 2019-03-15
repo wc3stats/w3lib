@@ -6,6 +6,7 @@ use Exception;
 use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Data\Actions;
 
 class Action extends Model
@@ -79,10 +80,24 @@ class Action extends Model
 
     /** **/
 
-    private const STATE_SELECT   = 0x01;
-    private const STATE_DESELECT = 0x02;
-    private const STATE_PAUSED   = 0x04;
-    private const STATE_UNPAUSED = 0x08;
+    const W3MMD_PREFIX    = "MMD.Dat";
+    const W3MMD_INIT      = "init";
+    const W3MMD_EVENT     = "Event";
+    const W3MMD_DEF_EVENT = "DefEvent";
+    const W3MMD_DEF_VARP  = "DefVarP";
+    const W3MMD_FLAGP     = "FlagP";
+    const W3MMD_VARP      = "VarP";
+    
+    const W3MMD_FLAG_DRAWER     = 0x01;
+    const W3MMD_FLAG_LOSER      = 0x02;
+    const W3MMD_FLAG_WINNER     = 0x04;
+    const W3MMD_FLAG_LEAVER     = 0x08;
+    const W3MMD_FLAG_PRACTICING = 0x10;
+
+    /** **/
+
+    private const STATE_PAUSED   = 0x01;
+    private const STATE_UNPAUSED = 0x02;
 
     private static $_state = 0x00;
 
@@ -91,7 +106,7 @@ class Action extends Model
         $this->id  = $stream->uint8 ();
         $this->key = $this->keyName ($this->id);
 
-        Logger::info (
+        Logger::debug (
             'Found action: [0x%2X:%s].',
             $this->id, 
             $this->key
@@ -198,19 +213,7 @@ class Action extends Model
             case self::CHANGE_SELECTION:
                 $this->mode       = $stream->int8 ();
                 $this->numObjects = $stream->uint16 ();
-
-                switch ($this->mode) {
-                    case self::STATE_SELECT:
-                        self::$_state |= self::STATE_SELECT;
-                        self::$_state &= ~self::STATE_DESELECT;
-                    break;
-
-                    case self::STATE_DESELECT:
-                        self::$_state |= self::STATE_DESELECT;
-                        self::$_state &= ~self::STATE_SELECT;
-                    break;
-                }
-
+                
                 $this->objects = [];
 
                 for ($i = 0; $i < $this->numObjects; $i++) {
@@ -349,6 +352,59 @@ class Action extends Model
                 $this->intro   = $stream->string ();
                 $this->header  = $stream->string ();
                 $this->message = $stream->string ();
+
+                $toks = explode (' ', $this->message);
+
+                $this->type = $toks [0];
+
+                var_dump ($toks);
+
+                switch ($this->type) {
+                    case self::W3MMD_INIT:
+                        /**
+                         * [0] => Init
+                         * [1] => {type}
+                         * [2] => {pid}
+                         * [3] => {name}
+                         */
+                        $this->playerId   = (int) $toks [2];
+                        $this->playerName = $toks [3]; 
+                    break;
+
+                    case self::W3MMD_VARP:
+                        /**
+                         * [0] => VarP
+                         * [1] => {pid}
+                         * [2] => {varname}
+                         * [3] => {operator}
+                         * [4] => {value}
+                         */
+                        $this->playerId = (int) $toks [1];
+                        $this->variable = $toks [2];
+                        $this->operator = $toks [3];
+                        $this->value    = $toks [4];
+                    break;
+
+                    case self::W3MMD_EVENT:     break;
+                    case self::W3MMD_DEF_EVENT: break;
+
+                    case self::W3MMD_DEF_VARP:  
+                        /**
+                         * [0] => DefVarP
+                         * [1] => {dsss}
+                         */
+                    break;
+
+                    case self::W3MMD_FLAGP: 
+                        /**
+                         * [0] => FlagP
+                         * [1] => {pid}
+                         * [2] => {flag}
+                         */
+                        $this->playerId = (int) $toks [1];
+                        $this->flag     = $toks [2];
+                    break;
+                }
 
                 $stream->read (4);
             break;

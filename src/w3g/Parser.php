@@ -8,11 +8,13 @@ use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\Library\Type;
+use w3lib\w3g\Model\Action;
 use w3lib\w3g\Model\Header;
 use w3lib\w3g\Model\Block;
 use w3lib\w3g\Model\Player;
 use w3lib\w3g\Model\Game;
 use w3lib\w3g\Model\Segment;
+use w3lib\w3g\Model\ChatLog;
 
 class Parser
 {
@@ -27,74 +29,94 @@ class Parser
     {
         Logger::debug ('Parsing replay header.');
 
-        $replay->header = Header::unpack ($this->_replay);
+        $this->_replay->header  = Header::unpack ($this->_replay);
+        $this->_replay->chatlog = [];
 
         Logger::debug ('Parsing replay blocks.');
 
         $buffer = new Buffer ();
 
-        for ($i = 1; $i <= $replay->header->numBlocks; $i++) {
+        for ($i = 1; $i <= $this->_replay->header->numBlocks; $i++) {
             Logger::info (
                 "Parsing block %d / %d (%.2f%%)",
                 $i,
-                $replay->header->numBlocks,
-                $i / $replay->header->numBlocks * 100
+                $this->_replay->header->numBlocks,
+                $i / $this->_replay->header->numBlocks * 100
             );
 
             $block = Block::unpack ($this->_replay);
             $buffer->append ($block->body);
 
             if ($i === 1) {
-                // 4 unknown bytes.
+                /* 4 unknown bytes. */
                 $buffer->read (4);
 
-                $replay->host = Player::unpack ($buffer);
-                $replay->game = Game::unpack ($buffer);
+                $this->_replay->host = Player::unpack ($buffer);
+                $this->_replay->game = Game::unpack ($buffer);
             }
 
+            /* Host player is not included in the regular player list. */
+            $this->_replay->game->players [$this->_replay->host->id] = $this->_replay->host;
+            $this->_replay->players = $this->_replay->game->players;
+
+            /* TODO: (Anders) This could use a lot of cleanup... */
+            /* Unpack segments and populate the replay container with appropriate values. */
             foreach (Segment::unpackAll ($buffer) as $k => $segment) {
-                if (!empty ($segment->actions)) {
-                    var_dump ($segment);
+                switch ($segment->id) {
+                    case Segment::CHAT_MESSAGE:
+                        $this->_replay->chatlog [] = $segment->message;
+                    break;
+
+                    case Segment::TIMESLOT:
+                        if (!isset ($segment->playerId)) {
+                            continue;
+                        }
+                        
+                        $player = $this->_replay->getPlayerById ($segment->playerId);
+
+                        if (!$player) {
+                            Logger::warn (
+                                'Player referenced in segment but not found: [%d]',
+                                $segment->playerId
+                            );
+
+                            continue;
+                        }
+
+                        foreach ($segment->actions as $action) {
+                            switch ($action->id) {
+                                default:
+                                    $player->actions [] = $action;
+                                break;
+
+                                case Action::W3MMD:
+                                    if (!isset ($action->playerId)) {
+                                        continue;
+                                    }
+
+                                    $slotPlayer = $this->_replay->getPlayerBySlot ($action->playerId);
+
+                                    switch ($action->type) {
+                                        case Action::W3MMD_DEF_VARP:
+                                            $slotPlayer->variables [$action->variable] = NULL;
+                                        break;
+
+                                        case Action::W3MMD_VARP:
+                                            $slotPlayer->variables [$action->variable] = $action->value;
+                                        break;
+                                     
+                                        case Action::W3MMD_FLAGP: 
+                                            $slotPlayer->flags = $action->flag;
+                                        break;
+                                    }
+                                break;
+                            }
+                        }
+                    break;
                 }
             }
         }
     }
-
-    // const MISC_MAX_DATABLOCK = 1500;
-    // const MISC_APM_DELAY     = 200;
-
-    // const ACTION_ID_TYPE_STRING  = 0x01;
-    // const ACTION_ID_TYPE_NUMERIC = 0x02;
-
-    // const FILE_INTRO            = "Warcraft III recorded game";
-
-    // const W3MMD_PREFIX          = "MMD.Dat";
-    // const W3MMD_INIT            = "Init";
-    // const W3MMD_EVENT           = "Event";
-    // const W3MMD_DEF_EVENT       = "DefEvent";
-    // const W3MMD_DEF_VARP        = "DefVarP";
-    // const W3MMD_FLAGP           = "FlagP";
-    // const W3MMD_VARP            = "VarP";
-
-    // const W3MMD_FLAG_DRAWER     = 0x01;
-    // const W3MMD_FLAG_LOSER      = 0x02;
-    // const W3MMD_FLAG_WINNER     = 0x04;
-    // const W3MMD_FLAG_LEAVER     = 0x08;
-    // const W3MMD_FLAG_PRACTICING = 0x10;
-
-    // const STATE_DESELECT        = 0x01;
-    // const STATE_SUBGROUP        = 0x02;
-    // const STATE_BASIC_ACTION    = 0x04;
-
-    // const EVENT_CREATE_OBJECT   = 'Create';
-    // const EVENT_CANCEL_OBJECT   = 'Cancel';
-
-    // const LEAVE_VOLUNTARILY     = 'Left';
-    // const LEAVE_DISCONNECTED    = 'Disconnected';
-
-    // const ACTION_MACRO          = 0x01;
-    // const ACTION_MICRO          = 0x02;
-    // const ACTION_GENERAL        = 0x04;
 }
 
 ?>

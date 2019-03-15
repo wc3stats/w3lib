@@ -36,13 +36,12 @@ class Slot extends Model
     public $race;
     public $aiStrength;
     public $handicap;
-    public $player;
 
     public function read (Stream $stream)
     {
         $this->playerId = $stream->int8 ();
 
-        // Map download percent (0x64 in custom, 0xFF in ladder)
+        /* Map download percent (0x64 in custom, 0xFF in ladder) */
         $stream->int8 ();
 
         $this->status     = $stream->int8 ();
