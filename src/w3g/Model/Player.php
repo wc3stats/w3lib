@@ -103,6 +103,10 @@ class Player extends Model
 
         $numSegments = ceil ($lastActionTime / $sInterval);
 
+        if ($numSegments <= 0) {
+            return 0;
+        }
+
         /* Using array_fill to ensure no holes. */
         $timeSegments = array_fill (
             /* Start Index */        0, 
@@ -125,11 +129,6 @@ class Player extends Model
             }
 
             $timeSegments [$segmentIndex]++;
-        }
-
-        /* Convert total action numbers in each segment to actions per interval. */
-        foreach ($timeSegments as $index => $numActions) {
-            $timeSegments [$index] = ceil ($timeSegments [$index] / $sInterval);
         }
 
         /* Return entire array of segments, useful for charts and detecting action spikes. */

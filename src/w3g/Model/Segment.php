@@ -22,7 +22,8 @@ class Segment extends Model
     const START_BLOCK_A = 0x1A;
     const START_BLOCK_B = 0x1B;
     const START_BLOCK_C = 0x1C;
-    const TIMESLOT      = 0x1F;
+    const TIMESLOT_1    = 0x1E;
+    const TIMESLOT_2    = 0x1F;
     const CHAT_MESSAGE  = 0x20;
     const UNKNOWN_1     = 0x22;
     const UNKNOWN_2     = 0x23;
@@ -61,8 +62,8 @@ class Segment extends Model
                 $stream->uint32 ();
             break;
 
-            // case self::TIMESLOT_1:
-            case self::TIMESLOT:
+            case self::TIMESLOT_1:
+            case self::TIMESLOT_2:
                 $this->length        = $stream->uint16 () - 2;
                 $this->timeIncrement = $stream->uint16 ();
                 $this->actions       = [];
@@ -71,8 +72,6 @@ class Segment extends Model
 
                 if ($this->length > 0) {
                     $block = new Buffer ($stream->read ($this->length));
-
-                    // xxd ($block);
 
                     $this->playerId = $block->uint8 ();
                     $this->length   = $block->uint16 ();
@@ -87,7 +86,7 @@ class Segment extends Model
 
                     $actions = new Buffer ($block->read ($this->length));
                     
-                    xxd ($actions);
+                    // xxd ($actions);
 
                     foreach (Action::unpackAll ($actions) as $action) {
                         $action->time = self::$_time;

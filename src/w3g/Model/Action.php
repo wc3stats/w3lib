@@ -82,11 +82,14 @@ class Action extends Model
 
     const W3MMD_PREFIX    = "MMD.Dat";
     const W3MMD_INIT      = "init";
-    const W3MMD_EVENT     = "Event";
-    const W3MMD_DEF_EVENT = "DefEvent";
-    const W3MMD_DEF_VARP  = "DefVarP";
-    const W3MMD_FLAGP     = "FlagP";
-    const W3MMD_VARP      = "VarP";
+    const W3MMD_EVENT     = "event";
+    const W3MMD_DEF_EVENT = "defEvent";
+    const W3MMD_DEF_VARP  = "defVarP";
+    const W3MMD_FLAGP     = "flagP";
+    const W3MMD_VARP      = "varP";
+
+    const W3MMD_CHECK = "chk";
+    const W3MMD_VALUE = "val";
     
     const W3MMD_FLAG_DRAWER     = 0x01;
     const W3MMD_FLAG_LOSER      = 0x02;
@@ -353,17 +356,19 @@ class Action extends Model
                 $this->header  = $stream->string ();
                 $this->message = $stream->string ();
 
-                $toks = explode (' ', $this->message);
+                $toks = $this->_tokenizeW3MMD ($this->message);
 
                 $this->type = $toks [0];
 
-                var_dump ($toks);
+                if (stripos ($this->header, self::W3MMD_CHECK) === 0) {
+                    break;
+                }
 
                 switch ($this->type) {
                     case self::W3MMD_INIT:
                         /**
-                         * [0] => Init
-                         * [1] => {type}
+                         * [0] => init
+                         * [1] => pid
                          * [2] => {pid}
                          * [3] => {name}
                          */
@@ -373,16 +378,16 @@ class Action extends Model
 
                     case self::W3MMD_VARP:
                         /**
-                         * [0] => VarP
+                         * [0] => varP
                          * [1] => {pid}
                          * [2] => {varname}
                          * [3] => {operator}
                          * [4] => {value}
                          */
                         $this->playerId = (int) $toks [1];
-                        $this->variable = $toks [2];
+                        $this->varname  = $toks [2];
                         $this->operator = $toks [3];
-                        $this->value    = $toks [4];
+                        $this->value    = trim ($toks [4], ' ",');
                     break;
 
                     case self::W3MMD_EVENT:     break;
@@ -390,14 +395,19 @@ class Action extends Model
 
                     case self::W3MMD_DEF_VARP:  
                         /**
-                         * [0] => DefVarP
-                         * [1] => {dsss}
+                         * [0] => defVarP
+                         * [1] => {varname}
+                         * [2] => {vartype}
+                         * [3] => {goalType}
+                         * [4] => {suggestedType}
                          */
+                        $this->varname = $toks [1];
+                        $this->vartype = $toks [2];
                     break;
 
                     case self::W3MMD_FLAGP: 
                         /**
-                         * [0] => FlagP
+                         * [0] => flagP
                          * [1] => {pid}
                          * [2] => {flag}
                          */
@@ -433,6 +443,24 @@ class Action extends Model
         }
 
         return $data;
+    }
+
+    protected function _tokenizeW3MMD ($string)
+    {
+        $tok  = strtok ($string, " ");
+        $toks = [ ];
+        
+        while ($tok !== FALSE) {
+            /* Space has been escaped, _consume. */
+            while (substr ($tok, -1) === '\\') {
+                $tok = substr ($tok, 0, -1) . ucwords (strtok (" "));
+            }
+
+            $toks [] = lcfirst ($tok);
+            $tok = strtok (" ");
+        }
+
+        return $toks;
     }
 }
 

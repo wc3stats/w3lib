@@ -63,11 +63,8 @@ class Parser
             /* Unpack segments and populate the replay container with appropriate values. */
             foreach (Segment::unpackAll ($buffer) as $k => $segment) {
                 switch ($segment->id) {
-                    case Segment::CHAT_MESSAGE:
-                        $this->_replay->chatlog [] = $segment->message;
-                    break;
-
-                    case Segment::TIMESLOT:
+                    case Segment::TIMESLOT_1:
+                    case Segment::TIMESLOT_2:
                         if (!isset ($segment->playerId)) {
                             continue;
                         }
@@ -97,12 +94,8 @@ class Parser
                                     $slotPlayer = $this->_replay->getPlayerBySlot ($action->playerId);
 
                                     switch ($action->type) {
-                                        case Action::W3MMD_DEF_VARP:
-                                            $slotPlayer->variables [$action->variable] = NULL;
-                                        break;
-
                                         case Action::W3MMD_VARP:
-                                            $slotPlayer->variables [$action->variable] = $action->value;
+                                            $slotPlayer->variables [$action->varname] = $action->value;
                                         break;
                                      
                                         case Action::W3MMD_FLAGP: 
@@ -112,6 +105,14 @@ class Parser
                                 break;
                             }
                         }
+                    break;
+
+                    case Segment::CHAT_MESSAGE:
+                        $this->_replay->chatlog [] = $segment->message;
+                    break;
+
+                    case Segment::LEAVE_GAME:
+
                     break;
                 }
             }

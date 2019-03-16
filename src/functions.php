@@ -20,7 +20,7 @@ function xxd ($block, $width = 16)
     $chars = str_split (strtr ($block, $from, $to), $width);
 
     foreach ($hex as $i => $line) {
-        Logger::debug (
+        Logger::info (
             '%6X : %-s [%-s]',
             $offset,
             str_pad (implode (' ', str_split ($line, 2)), $width * 3 - 1),
