@@ -8,9 +8,15 @@ use w3lib\w3g\Replay;
 
 Logger::setup (Monolog::INFO);
 
-$replay = new Replay (__DIR__ . '/BrokenAlliances-1a.w3g');
+$replay = new Replay (__DIR__ . '/AzerothWars-2.w3g');
 
-var_dump ($replay);
-die ();
+foreach ($replay->players as $player) {
+    Logger::info (
+        'Player: %-16s | APM: %4d | Left: %6d',
+        $player->name,
+        $player->apm (),
+        $player->leftAt
+    );
+}
 
 ?>

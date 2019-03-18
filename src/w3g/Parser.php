@@ -18,6 +18,8 @@ use w3lib\w3g\Model\ChatLog;
 
 class Parser
 {
+    public static $time = 0x00;
+    
     private $_replay;
 
     public function __construct (Replay $replay)
@@ -65,46 +67,7 @@ class Parser
                 switch ($segment->id) {
                     case Segment::TIMESLOT_1:
                     case Segment::TIMESLOT_2:
-                        if (!isset ($segment->playerId)) {
-                            continue;
-                        }
-                        
-                        $player = $this->_replay->getPlayerById ($segment->playerId);
-
-                        if (!$player) {
-                            Logger::warn (
-                                'Player referenced in segment but not found: [%d]',
-                                $segment->playerId
-                            );
-
-                            continue;
-                        }
-
-                        foreach ($segment->actions as $action) {
-                            switch ($action->id) {
-                                default:
-                                    $player->actions [] = $action;
-                                break;
-
-                                case Action::W3MMD:
-                                    if (!isset ($action->playerId)) {
-                                        continue;
-                                    }
-
-                                    $slotPlayer = $this->_replay->getPlayerBySlot ($action->playerId);
-
-                                    switch ($action->type) {
-                                        case Action::W3MMD_VARP:
-                                            $slotPlayer->variables [$action->varname] = $action->value;
-                                        break;
-                                     
-                                        case Action::W3MMD_FLAGP: 
-                                            $slotPlayer->flags = $action->flag;
-                                        break;
-                                    }
-                                break;
-                            }
-                        }
+                        $this->_importTimeslot ($segment);
                     break;
 
                     case Segment::CHAT_MESSAGE:
@@ -112,11 +75,75 @@ class Parser
                     break;
 
                     case Segment::LEAVE_GAME:
+                        $player = $this->_getPlayerFromSegment ($segment);
 
+                        if (!$player) {
+                            continue;
+                        }
+
+                        $player->leftAt = Parser::$time;
                     break;
                 }
             }
         }
+    }
+
+    private function _importTimeslot (Segment $segment)
+    {
+        $player = $this->_getPlayerFromSegment ($segment);
+
+        if (!$player) {
+            return;
+        }
+
+        foreach ($segment->actions as $action) {
+            switch ($action->id) {
+                default:
+                    $player->actions [] = $action;
+                break;
+
+                case Action::W3MMD:
+                    if (!isset ($action->playerId)) {
+                        continue;
+                    }
+
+                    /* The W3MMD playerIds do not seem to match up with the playerId
+                       found in the segment. That is, they seem to be placed in
+                       whichever segment is being written at the time of the event. */
+                    $slotPlayer = $this->_replay->getPlayerBySlot ($action->playerId);
+
+                    switch ($action->type) {
+                        case Action::W3MMD_VARP:
+                            $slotPlayer->variables [$action->varname] = $action->value;
+                        break;
+                     
+                        case Action::W3MMD_FLAGP: 
+                            $slotPlayer->flags = $action->flag;
+                        break;
+                    }
+                break;
+            }
+        }
+    }
+
+    private function _getPlayerFromSegment (Segment $segment)
+    {
+        if (!isset ($segment->playerId)) {
+            return NULL;
+        }
+        
+        $player = $this->_replay->getPlayerById ($segment->playerId);
+
+        if (!$player) {
+            Logger::warn (
+                'Player referenced in segment but not found: [%d]',
+                $segment->playerId
+            );
+
+            return NULL;
+        }
+
+        return $player;
     }
 }
 

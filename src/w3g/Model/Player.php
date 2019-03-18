@@ -61,6 +61,7 @@ class Player extends Model
     public $addon;
     public $runtime;
     public $race;
+    public $leftAt;
     public $actions;
     public $variables;
     public $flags;

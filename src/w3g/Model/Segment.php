@@ -7,6 +7,7 @@ use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\w3g\Parser;
 
 class Segment extends Model
 {
@@ -29,9 +30,6 @@ class Segment extends Model
     const UNKNOWN_2     = 0x23;
     const GAME_OVER     = 0x2F;
     const LEAVE_GAME    = 0x17;
-
-
-    private static $_time = 0x00;
 
     public function read (Stream $stream)
     {
@@ -68,7 +66,7 @@ class Segment extends Model
                 $this->timeIncrement = $stream->uint16 ();
                 $this->actions       = [];
 
-                self::$_time += $this->timeIncrement / 1000;
+                Parser::$time += $this->timeIncrement / 1000;
 
                 if ($this->length > 0) {
                     $block = new Buffer ($stream->read ($this->length));
@@ -89,7 +87,7 @@ class Segment extends Model
                     // xxd ($actions);
 
                     foreach (Action::unpackAll ($actions) as $action) {
-                        $action->time = self::$_time;
+                        $action->time = Parser::$time;
 
                         /* Actions to ignore. */
                         if (in_array ($action->id, [
@@ -130,7 +128,7 @@ class Segment extends Model
 
             case self::LEAVE_GAME:
                 $this->reason   = $stream->uint32 ();
-                $this->playerId = $stream->char ();
+                $this->playerId = $stream->int8 ();
                 $this->result   = $stream->uint32 ();
 
                 $stream->uint32 ();
