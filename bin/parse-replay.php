@@ -8,7 +8,7 @@ use w3lib\w3g\Replay;
 
 Logger::setup (Monolog::INFO);
 
-$replay = new Replay (__DIR__ . '/AzerothWars-2.w3g');
+$replay = new Replay (__DIR__ . '/AzerothWars-3.w3g');
 
 foreach ($replay->players as $player) {
     Logger::info (
