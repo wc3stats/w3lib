@@ -92,6 +92,7 @@ class Player extends Model
         $this->actions   = [];
         $this->variables = [];
         $this->flags     = 0x00;
+        $this->leftAt    = NULL;
     }
 
     public function apm ($flags = self::APM_AVERAGE, $sInterval = 60)

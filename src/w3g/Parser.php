@@ -59,6 +59,8 @@ class Parser
 
             /* Host player is not included in the regular player list. */
             $this->_replay->game->players [$this->_replay->host->id] = $this->_replay->host;
+
+            /* Bring the players up a level for easier access. */
             $this->_replay->players = $this->_replay->game->players;
 
             /* TODO: (Anders) This could use a lot of cleanup... */
@@ -84,6 +86,16 @@ class Parser
                         $player->leftAt = Parser::$time;
                     break;
                 }
+            }
+        }
+
+        /* Set the leftAt time for each player to the game duration if there was
+           no LEAVE_GAME segment. This is necessary for when the saver is not 
+           the last to leave the game (there will be no LEAVE_GAME segment for 
+           the remaining players). */
+        foreach ($this->_replay->game->players as $player) {
+            if ($player->leftAt === NULL) {
+                $player->leftAt = $this->_replay->header->length;
             }
         }
     }

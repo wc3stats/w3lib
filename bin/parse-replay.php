@@ -8,7 +8,18 @@ use w3lib\w3g\Replay;
 
 Logger::setup (Monolog::INFO);
 
-$replay = new Replay (__DIR__ . '/AzerothWars-3.w3g');
+$replay = new Replay (__DIR__ . '/AzerothWars-4.w3g');
+
+echo PHP_EOL;
+
+Logger::info ("Game Name: [%s]",   $replay->game->name);
+Logger::info ("Number of Players: [%d]",     count ($replay->players));
+Logger::info ("Hash: [%s]",        $replay->getHash ());
+Logger::info ("Map File: [%s]",    $replay->game->map);
+Logger::info ("Map Type: [%s]",    $replay->getMap () [0]);
+Logger::info ("Map Version: [%s]", $replay->getMap () [1]);
+
+echo PHP_EOL;
 
 foreach ($replay->players as $player) {
     Logger::info (

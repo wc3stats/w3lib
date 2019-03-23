@@ -44,7 +44,7 @@ class Game extends Model
 	const CHAT_PAUSED 	 = 0xFE;
 	const CHAT_RESUMED 	 = 0xFF;
 
-    public $gameName;
+    public $name;
     public $speed;
     public $visibility;
     public $observers;
@@ -70,7 +70,7 @@ class Game extends Model
 
     public function read (Stream $stream)
     {
-        $this->gameName = $stream->string ();
+        $this->name = $stream->string ();
 
         /* 1 null byte. */
         $stream->read (1);
