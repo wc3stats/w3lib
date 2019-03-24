@@ -83,7 +83,7 @@ class Parser
                             continue;
                         }
 
-                        $player->leftAt = Parser::$time;
+                        $player->leftAt = floor (Parser::$time);
                     break;
                 }
             }
@@ -95,7 +95,7 @@ class Parser
            the remaining players). */
         foreach ($this->_replay->game->players as $player) {
             if ($player->leftAt === NULL) {
-                $player->leftAt = $this->_replay->header->length;
+                $player->leftAt = floor ($this->_replay->header->length);
             }
         }
     }
