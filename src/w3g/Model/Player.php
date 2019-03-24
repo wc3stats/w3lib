@@ -2,6 +2,7 @@
 
 namespace w3lib\w3g\Model;
 
+use stdClass;
 use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
@@ -146,6 +147,23 @@ class Player extends Model
         }
 
         return $timeSegments;
+    }
+
+    public function jsonSerialize ()
+    {
+        $player = new Stdclass ();
+        $player->apm = $this->apm ();
+
+        foreach (get_object_vars ($this) as $key => $value) {
+            /* Actions are too big to include in json_encode. */
+            if ($key === 'actions') {
+                continue;
+            }
+
+            $player->$key = $value;
+        }
+
+        return $player;
     }
 }
 

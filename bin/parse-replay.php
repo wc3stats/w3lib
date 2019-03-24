@@ -13,7 +13,7 @@ $replay = new Replay (__DIR__ . '/AzerothWars-4.w3g');
 echo PHP_EOL;
 
 Logger::info ("Game Name: [%s]",   $replay->game->name);
-Logger::info ("Number of Players: [%d]",     count ($replay->players));
+Logger::info ("Num Players: [%d]", count ($replay->players));
 Logger::info ("Hash: [%s]",        $replay->getHash ());
 Logger::info ("Map File: [%s]",    $replay->game->map);
 Logger::info ("Map Type: [%s]",    $replay->getMap () [0]);

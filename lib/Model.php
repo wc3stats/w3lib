@@ -4,8 +4,9 @@ namespace w3lib\Library;
 
 use Exception;
 use ReflectionClass;
+use JsonSerializable;
 
-abstract class Model
+abstract class Model implements JsonSerializable
 { 
     private $_ref;
 
@@ -15,6 +16,11 @@ abstract class Model
     } 
 
     public abstract function read (Stream $stream);
+
+    public function jsonSerialize ()
+    {
+        return $this;
+    }
 
     public static function unpack (Stream $stream)
     {
