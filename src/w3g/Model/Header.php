@@ -35,7 +35,7 @@ class Header extends Model
         $this->buildVersion     = $stream->uint16 ();
 
         $this->flags            = $stream->uint16 ();
-        $this->length           = $stream->uint32 () / 1000;
+        $this->length           = floor ($stream->uint32 () / 1000);
         $this->checksum         = $stream->uint32 ();
     }
 }

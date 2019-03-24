@@ -95,7 +95,7 @@ class Parser
            the remaining players). */
         foreach ($this->_replay->game->players as $player) {
             if ($player->leftAt === NULL) {
-                $player->leftAt = floor ($this->_replay->header->length);
+                $player->leftAt = $this->_replay->header->length;
             }
         }
     }

@@ -8,7 +8,7 @@ use w3lib\w3g\Replay;
 
 Logger::setup (Monolog::INFO);
 
-$replay = new Replay (__DIR__ . '/AzerothWars-4.w3g');
+$replay = new Replay (__DIR__ . '/BrokenAlliances-1a.w3g');
 
 echo PHP_EOL;
 
