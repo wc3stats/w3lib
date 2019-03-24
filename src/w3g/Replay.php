@@ -91,7 +91,6 @@ class Replay extends Archive
     {
         $file = $this->game->map;
 
-        $file = basename ($file);
         $file = str_replace ([ '_', '?', '!', '-' ], ' ', $file);
         $file = str_replace ([ '\'' ], '', $file);
         $file = trim ($file);

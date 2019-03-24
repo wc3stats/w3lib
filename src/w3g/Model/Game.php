@@ -123,7 +123,7 @@ class Game extends Model
 
         $this->checksum = $decoded->uint32 ();
 
-        $this->map  = $decoded->string ();
+        $this->map  = basename ($decoded->string ());
         $this->host = $decoded->string ();
         
         // TODO: (Anders) 22 bytes left?
