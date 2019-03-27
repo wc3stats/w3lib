@@ -149,7 +149,7 @@ class Player extends Model
 
         return $timeSegments;
     }
-    
+
     public function __sleep ()
     {   
         /* Refresh APM before serializing. */
@@ -161,6 +161,11 @@ class Player extends Model
         $keys = array_diff ($keys, [ 'actions']);
 
         return $keys;
+    }
+
+    public function __wakeup ()
+    {
+        $this->actions = [];
     }
 }
 

@@ -15,6 +15,11 @@ abstract class Model implements JsonSerializable
         $this->_ref = new ReflectionClass (get_class ($this));
     } 
 
+    public function __sleep ()
+    {
+        return array_keys ((array) $this);
+    }
+
     public abstract function read (Stream $stream);
 
     public static function unpack (Stream $stream)
@@ -77,11 +82,6 @@ abstract class Model implements JsonSerializable
                 $this->__sleep ()
             )
         );
-    }
-
-    public function __sleep ()
-    {
-        return array_keys ((array) $this);
     }
 }
 

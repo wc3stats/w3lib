@@ -25,6 +25,10 @@ class Stream
 
     public function __destruct ()
     {
+        if (!is_resource ($this->_handle)) {
+            return;
+        }
+        
         flock  ($this->_handle, LOCK_UN);
         fclose ($this->_handle);
     }
