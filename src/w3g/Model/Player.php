@@ -64,6 +64,7 @@ class Player extends Model
     public $race;
     public $leftAt;
     public $actions;
+    public $apm;
     public $variables;
     public $flags;
 
@@ -148,22 +149,18 @@ class Player extends Model
 
         return $timeSegments;
     }
+    
+    public function __sleep ()
+    {   
+        /* Refresh APM before serializing. */
+        $this->apm = $this->apm ();
 
-    public function jsonSerialize ()
-    {
-        $player = new Stdclass ();
-        $player->apm = $this->apm ();
+        $keys = array_keys ((array) $this);
 
-        foreach (get_object_vars ($this) as $key => $value) {
-            /* Actions are too big to include in json_encode. */
-            if ($key === 'actions') {
-                continue;
-            }
+        /* Omit actions, there are too many to reasonably serialize. */
+        $keys = array_diff ($keys, [ 'actions']);
 
-            $player->$key = $value;
-        }
-
-        return $player;
+        return $keys;
     }
 }
 

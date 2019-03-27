@@ -17,11 +17,6 @@ abstract class Model implements JsonSerializable
 
     public abstract function read (Stream $stream);
 
-    public function jsonSerialize ()
-    {
-        return $this;
-    }
-
     public static function unpack (Stream $stream)
     {
         $model = get_called_class ();
@@ -68,6 +63,25 @@ abstract class Model implements JsonSerializable
         }
 
         return implode (':', $keys) ?? '?';
+    }
+
+    /** **/
+
+    public function jsonSerialize ()
+    {
+        return array_intersect_key (
+            get_object_vars ($this),
+            
+            array_combine (
+                $this->__sleep (),
+                $this->__sleep ()
+            )
+        );
+    }
+
+    public function __sleep ()
+    {
+        return array_keys ((array) $this);
     }
 }
 
