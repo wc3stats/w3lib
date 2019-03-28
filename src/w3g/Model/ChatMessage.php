@@ -4,6 +4,7 @@ namespace w3lib\w3g\Model;
 
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\w3g\Parser;
 
 class ChatMessage extends Model
 {
@@ -20,6 +21,7 @@ class ChatMessage extends Model
     public $flags;
     public $mode;
     public $message;
+    public $time;
 
     public function read (Stream $stream)
     {
@@ -28,6 +30,7 @@ class ChatMessage extends Model
         $this->flags    = $stream->int8 ();
         $this->mode     = $stream->uint32 ();
         $this->message  = $stream->string ();
+        $this->time     = Parser::getTime ();
     }
 }
 

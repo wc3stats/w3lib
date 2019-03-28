@@ -83,7 +83,7 @@ class Parser
                             continue;
                         }
 
-                        $player->leftAt = floor (Parser::$time);
+                        $player->leftAt = self::getTime ();
                     break;
                 }
             }
@@ -98,6 +98,11 @@ class Parser
                 $player->leftAt = $this->_replay->header->length;
             }
         }
+    }
+
+    public static function getTime ()
+    {
+        return floor (self::$time);
     }
 
     private function _importTimeslot (Segment $segment)
