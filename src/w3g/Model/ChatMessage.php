@@ -11,10 +11,10 @@ class ChatMessage extends Model
     const CHAT_FLAG_DELAYED_SCREEN = 0x10;
     const CHAT_FLAG_NORMAL         = 0x20;
 
-    const CHAT_ALL      = 0x00;
-    const CHAT_ALLIES   = 0x01;
-    const CHAT_OBSERVER = 0x02;
-    const CHAT_PRIVATE  = 0x03; // + N (N = slotNumber)
+    const ALL      = 0x00;
+    const ALLIES   = 0x01;
+    const OBSERVER = 0x02;
+    const PRIVATE  = 0x03; // + N (N = slotNumber)
 
     public $playerId;
     public $length;
@@ -31,6 +31,26 @@ class ChatMessage extends Model
         $this->mode     = $stream->uint32 ();
         $this->message  = $stream->string ();
         $this->time     = Parser::getTime ();
+    }
+
+    public function getTarget ()
+    {
+
+    }
+
+    public function __toString ()
+    {
+        $minutes = str_pad (floor ($this->time / 60), 2, '0', STR_PAD_LEFT);
+        $seconds = str_pad ($this->time % 60, 2, '0', STR_PAD_LEFT);
+
+        return sprintf (
+            "[%s:%s] [mode: %d] [pid: %s] - %s",
+            $minutes,
+            $seconds,
+            $this->mode,
+            $this->playerId,
+            $this->message
+        );
     }
 }
 
