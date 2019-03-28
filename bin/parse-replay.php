@@ -12,6 +12,7 @@ $replay = new Replay (__DIR__ . '/BrokenAlliances-1a.w3g');
 
 echo PHP_EOL;
 
+Logger::info ("File: [%s]",        $replay->getFile ());
 Logger::info ("Game Name: [%s]",   $replay->game->name);
 Logger::info ("Num Players: [%d]", count ($replay->players));
 Logger::info ("Hash: [%s]",        $replay->getHash ());

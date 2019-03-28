@@ -27,6 +27,11 @@ class File extends Stream
 
         parent::__construct ($stream);
     }
+
+    public function getFile ()
+    {
+        return realpath ($this->_filepath);
+    }
 }
 
 ?>

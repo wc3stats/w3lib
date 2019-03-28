@@ -20,6 +20,18 @@ abstract class Model implements JsonSerializable
         return array_keys ((array) $this);
     }
 
+    public function jsonSerialize ()
+    {
+        return array_intersect_key (
+            get_object_vars ($this),
+            
+            array_combine (
+                $this->__sleep (),
+                $this->__sleep ()
+            )
+        );
+    }
+
     public abstract function read (Stream $stream);
 
     public static function unpack (Stream $stream)
@@ -68,20 +80,6 @@ abstract class Model implements JsonSerializable
         }
 
         return implode (':', $keys) ?? '?';
-    }
-
-    /** **/
-
-    public function jsonSerialize ()
-    {
-        return array_intersect_key (
-            get_object_vars ($this),
-            
-            array_combine (
-                $this->__sleep (),
-                $this->__sleep ()
-            )
-        );
     }
 }
 
