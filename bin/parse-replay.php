@@ -17,6 +17,7 @@ Logger::info ("Num Players: [%d]", count ($replay->players));
 Logger::info ("Hash: [%s]",        $replay->getHash ());
 Logger::info ("Map File: [%s]",    $replay->game->map);
 Logger::info ("Map Type: [%s]",    $replay->getMap ());
+Logger::info ("Saver Id: [%s]",    $replay->game->saver);
 
 echo PHP_EOL;
 

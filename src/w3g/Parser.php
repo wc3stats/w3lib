@@ -84,6 +84,8 @@ class Parser
                         }
 
                         $player->leftAt = self::getTime ();
+
+                        $this->_replay->game->saver = $player->id;
                     break;
                 }
             }

@@ -67,6 +67,7 @@ class Game extends Model
     public $randomSeed;
     public $selectMode;
     public $startSpots;
+    public $saver;
 
     public function read (Stream $stream)
     {
