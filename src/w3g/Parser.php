@@ -19,7 +19,7 @@ use w3lib\w3g\Model\ChatLog;
 class Parser
 {
     const MODE_LOW_MEMORY = 0x01;
-    
+
     public static $flags = 0x00;
     public static $time  = 0x00;
     
@@ -84,7 +84,7 @@ class Parser
                         $player = $this->_getPlayerFromSegment ($segment);
 
                         if (!$player) {
-                            continue;
+                            continue 2;
                         }
 
                         $player->leftAt = self::getTime ();
@@ -127,7 +127,7 @@ class Parser
 
                 case Action::W3MMD:
                     if (!isset ($action->playerId)) {
-                        continue;
+                        continue 2;
                     }
 
                     /* The W3MMD playerIds do not seem to match up with the playerId
