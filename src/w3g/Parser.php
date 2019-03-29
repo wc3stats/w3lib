@@ -18,13 +18,17 @@ use w3lib\w3g\Model\ChatLog;
 
 class Parser
 {
-    public static $time = 0x00;
+    const MODE_LOW_MEMORY = 0x01;
+    
+    public static $flags = 0x00;
+    public static $time  = 0x00;
     
     private $_replay;
 
-    public function __construct (Replay $replay)
+    public function __construct (Replay $replay, $flags = 0x00)
     {
         $this->_replay = $replay;
+        self::$flags   = $flags;
     } 
 
     public function parse ()

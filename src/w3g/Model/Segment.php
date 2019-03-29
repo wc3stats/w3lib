@@ -2,6 +2,7 @@
 
 namespace w3lib\w3g\Model;
 
+use stdClass;
 use Exception;
 use w3lib\Library\Logger;
 use w3lib\Library\Model;
@@ -98,6 +99,17 @@ class Segment extends Model
                             Action::PRE_SUBSELECT
                         ])) {
                             continue;
+                        }
+
+                        /* Large replays have thousands of actions and keeping
+                           all of the data consumes a lot of memory. To conserve
+                           memory, we can simply use a timestamp marker indicating
+                           the presence of an action without any details. */
+                        if (Parser::$flags & Parser::MODE_LOW_MEMORY) {
+                            $action = new stdClass ();
+                            
+                            $action->id   = 0x00;
+                            $action->time = Parser::$time;
                         }
 
                         $this->actions [] = $action;

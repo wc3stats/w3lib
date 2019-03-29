@@ -5,10 +5,13 @@ require dirname (__DIR__) . '/vendor/autoload.php';
 use Monolog\Logger as Monolog;
 use w3lib\Library\Logger;
 use w3lib\w3g\Replay;
+use w3lib\w3g\Parser;
 
 Logger::setup (Monolog::INFO);
 
-$replay = new Replay (__DIR__ . '/BrokenAlliances-1a.w3g');
+$replay = new Replay (
+    __DIR__ . '/BrokenAlliances-1a.w3g'
+);
 
 echo PHP_EOL;
 

@@ -11,11 +11,11 @@ class Replay extends Archive
     public $players;
     public $chatlog;
 
-    public function __construct (string $filepath)
+    public function __construct (string $filepath, $flags = 0x00)
     {
         parent::__construct ($filepath);
 
-        $parser = new Parser ($this);
+        $parser = new Parser ($this, $flags);
         $parser->parse ();
     }
 
