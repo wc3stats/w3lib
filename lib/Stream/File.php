@@ -7,11 +7,11 @@ use w3lib\Library\Stream;
 
 class File extends Stream
 {
-    protected $_filepath;
+    protected $filepath;
 
     public function __construct (string $filepath)
     {
-        $this->_filepath = $filepath;
+        $this->filepath = $filepath;
 
         $stream = fopen ($filepath, 'rb');
 
@@ -30,7 +30,7 @@ class File extends Stream
 
     public function getFile ()
     {
-        return realpath ($this->_filepath);
+        return realpath ($this->filepath);
     }
 }
 

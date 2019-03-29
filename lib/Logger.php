@@ -9,20 +9,20 @@ use Bramus\Monolog\Formatter\ColoredLineFormatter;
 
 class Logger
 {
-    private static $_level;
-    private static $_instance;
+    private static $level;
+    private static $instance;
 
     public static function setup ($level)
     {
-        self::$_level = $level;
+        self::$level = $level;
     }
 
     public static function __callStatic ($name, $arguments = [])
     {
-        if (!self::$_instance) {
+        if (!self::$instance) {
             $instance = new Monolog (NULL);
 
-            $handler = new StreamHandler ('php://stdout', self::$_level ?? Monolog::DEBUG);
+            $handler = new StreamHandler ('php://stdout', self::$level ?? Monolog::DEBUG);
 
             $handler->setFormatter (
                 new ColoredLineFormatter (NULL, "[%datetime%] %level_name% - %message% [%extra.file%:%extra.line%]\n")
@@ -39,14 +39,14 @@ class Logger
 
             $instance->pushHandler ($handler);
 
-            self::$_instance = $instance;
+            self::$instance = $instance;
         }
 
-        if (!method_exists (self::$_instance, $name)) {
+        if (!method_exists (self::$instance, $name)) {
             throw new Exception ("Logger method not found: [$name].");
         }
 
-        self::$_instance->$name (
+        self::$instance->$name (
             vsprintf (
                 array_shift ($arguments),
                 $arguments

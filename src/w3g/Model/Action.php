@@ -102,7 +102,7 @@ class Action extends Model
     private const STATE_PAUSED   = 0x01;
     private const STATE_UNPAUSED = 0x02;
 
-    private static $_state = 0x00;
+    private static $state = 0x00;
 
     public function read (Stream $stream)
     {
@@ -126,13 +126,13 @@ class Action extends Model
             break;
 
             case self::PAUSE_GAME:
-                self::$_state |= self::STATE_PAUSED;
-                self::$_state &= ~self::STATE_UNPAUSED;
+                self::$state |= self::STATE_PAUSED;
+                self::$state &= ~self::STATE_UNPAUSED;
             break;
 
             case self::RESUME_GAME:
-                self::$_state |= self::STATE_UNPAUSED;
-                self::$_state &= ~self::STATE_PAUSED;
+                self::$state |= self::STATE_UNPAUSED;
+                self::$state &= ~self::STATE_PAUSED;
             break;
 
             case self::SAVE_GAME:

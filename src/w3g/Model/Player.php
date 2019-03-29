@@ -51,10 +51,10 @@ class Player extends Model
     const EMERALD   = 0x17;
     const PEANUT    = 0x18;
 
-    private const STATE_SELECT   = 0x01;
-    private const STATE_DESELECT = 0x02;
+    // private const STATE_SELECT   = 0x01;
+    // private const STATE_DESELECT = 0x02;
 
-    private $_state = 0x00;
+    // private $state = 0x00;
 
     public $type;
     public $id;
@@ -64,7 +64,7 @@ class Player extends Model
     public $race;
     public $leftAt;
     public $actions;
-    public $apm;
+    public $activity;
     public $variables;
     public $flags;
 
@@ -92,62 +92,69 @@ class Player extends Model
         }
 
         $this->actions   = [];
+        $this->activity  = [];
         $this->variables = [];
         $this->flags     = 0x00;
         $this->leftAt    = NULL;
     }
 
-    public function apm ($flags = self::APM_AVERAGE, $sInterval = 60)
+    public function apm ()
     {
-        $lastActionTime = 0;
-
-        foreach ($this->actions as $action) {
-            $lastActionTime = max ($lastActionTime, $action->time);
-        }
-
-        $numSegments = ceil ($lastActionTime / $sInterval);
-
-        if ($numSegments <= 0) {
+        if (empty ($this->activity)) {
             return 0;
         }
 
-        /* Using array_fill to ensure no holes. */
-        $timeSegments = array_fill (
-            /* Start Index */        0, 
-            /* Number of Elements */ $numSegments, 
-            /* Fill Value */         0
-        );
+        return array_sum ($this->activity) / count ($this->activity);
 
-        /* For every registered action increment the appropriate segment. */
-        foreach ($this->actions as $action) {
-            $segmentIndex = floor ($action->time / $sInterval);
+        // $lastActionTime = 0;
 
-            if ($segmentIndex >= $numSegments) {
-                Logger::warn (
-                    'Segment index [%s] is greater than the number of segments [%s]',
-                    $segmentIndex,
-                    $numSegments
-                );
+        // foreach ($this->actions as $action) {
+        //     $lastActionTime = max ($lastActionTime, $action->time);
+        // }
 
-                continue;
-            }
+        // $numSegments = ceil ($lastActionTime / $sInterval);
 
-            $timeSegments [$segmentIndex]++;
-        }
+        // if ($numSegments <= 0) {
+        //     return 0;
+        // }
 
-        /* Return entire array of segments, useful for charts and detecting action spikes. */
-        if ($flags & self::APM_SEGMENT) {
-            return $timeSegments;
-        }
+        // /* Using array_fill to ensure no holes. */
+        // $timeSegments = array_fill (
+        //     /* Start Index */        0, 
+        //     /* Number of Elements */ $numSegments, 
+        //     /* Fill Value */         0
+        // );
 
-        /* Return average actions per interval over entire game. */
-        if ($flags & self::APM_AVERAGE) {
-            return ceil (
-                array_sum ($timeSegments) / count ($timeSegments)
-            );
-        }
+        // /* For every registered action increment the appropriate segment. */
+        // foreach ($this->actions as $action) {
+        //     $segmentIndex = floor ($action->time / $sInterval);
 
-        return $timeSegments;
+        //     if ($segmentIndex >= $numSegments) {
+        //         Logger::warn (
+        //             'Segment index [%s] is greater than the number of segments [%s]',
+        //             $segmentIndex,
+        //             $numSegments
+        //         );
+
+        //         continue;
+        //     }
+
+        //     $timeSegments [$segmentIndex]++;
+        // }
+
+        // /* Return entire array of segments, useful for charts and detecting action spikes. */
+        // if ($flags & self::APM_SEGMENT) {
+        //     return $timeSegments;
+        // }
+
+        // /* Return average actions per interval over entire game. */
+        // if ($flags & self::APM_AVERAGE) {
+        //     return ceil (
+        //         array_sum ($timeSegments) / count ($timeSegments)
+        //     );
+        // }
+
+        // return $timeSegments;
     }
 
     public function __sleep ()

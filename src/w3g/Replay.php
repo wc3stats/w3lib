@@ -11,23 +11,33 @@ class Replay extends Archive
     public $players;
     public $chatlog;
 
-    public function __construct (string $filepath, $flags = 0x00)
+    public function __construct (string $filepath, Settings $settings = NULL)
     {
         parent::__construct ($filepath);
-
-        $parser = new Parser ($this, $flags);
+        
+        $parser = new Parser ($this, $settings);
         $parser->parse ();
     }
 
-    public function getPlayerById ($playerId)
+    public function getPlayer ($key, $value)
     {
         foreach ($this->players as $player) {
-            if ($player->id === $playerId) {
+            if ($player->$key === $value) {
                 return $player;
             }
         }
 
         return NULL;
+    }
+
+    public function getPlayerById ($playerId)
+    {
+        return $this->getPlayer ('id', $playerId);
+    }
+
+    public function getPlayerByName ($playerName) 
+    {
+        return $this->getPlayer ('name', $playerName);
     }
 
     public function getPlayerBySlot ($slot)
