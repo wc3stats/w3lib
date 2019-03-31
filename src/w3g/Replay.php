@@ -49,6 +49,17 @@ class Replay extends Archive
         return $this->getPlayerById ($slot->playerId);
     }
 
+    public function getSlot ($playerId)
+    {
+        foreach ($this->game->slots as $slot) {
+            if ($slot->playerId === $playerId) {
+                return $slot;
+            }
+        }
+
+        return NULL;
+    }
+
     public function getLength ()
     {
         return $this->header->length;

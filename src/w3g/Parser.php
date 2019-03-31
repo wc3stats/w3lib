@@ -99,28 +99,7 @@ class Parser
             }
         }
 
-        /* Set the leftAt time for each player to the game duration if there was
-           no LEAVE_GAME segment. This is necessary for when the saver is not 
-           the last to leave the game (there will be no LEAVE_GAME segment for 
-           the remaining players). */
-        foreach ($this->replay->players as $player) {
-            if ($player->leftAt === NULL) {
-                $player->leftAt = $this->replay->header->length;
-            }
-
-            /* Fill in any player activity time holes. We have to do this here
-               because we don't know when the player left until all of the
-               actions have been read. */
-            $lastActivityIndex = floor ($player->leftAt / $this->settings->apx);
-
-            for ($i = 0; $i < $lastActivityIndex; $i++) {
-                if (!isset ($player->activity [$i])) {
-                    $player->activity [$i] = 0;
-                }
-            }
-
-            ksort ($player->activity);
-        }
+        $this->postProcess ();
     }
 
     public static function getTime ()
@@ -167,8 +146,8 @@ class Parser
                             $slotPlayer->variables [$action->varname] = $action->value;
                         break;
                      
-                        case Action::W3MMD_FLAGP: 
-                            $slotPlayer->flags = $action->flag;
+                        case Action::W3MMD_FLAGP:
+                            $slotPlayer->isWinner = $action->flag & Action::W3MMD_FLAG_WINNER;
                         break;
                     }
                 break;
@@ -194,6 +173,39 @@ class Parser
         }
 
         return $player;
+    }
+
+    private function postProcess ()
+    {
+        foreach ($this->replay->players as $player) {
+            /* Set the leftAt time for each player to the game duration if there was
+               no LEAVE_GAME segment. This is necessary for when the saver is not 
+               the last to leave the game (there will be no LEAVE_GAME segment for 
+               the remaining players). */
+            if ($player->leftAt === NULL) {
+                $player->leftAt = $this->replay->header->length;
+            }
+
+            $slot = $this->replay->getSlot ($player->id);
+            
+            $player->colour   = $slot->colour;
+            $player->team     = $slot->team;
+            $player->race     = $slot->race;
+            $player->handicap = $slot->handicap;          
+
+            /* Fill in any player activity time holes. We have to do this here
+               because we don't know when the player left until all of the
+               actions have been read. */
+            $lastActivityIndex = floor ($player->leftAt / $this->settings->apx);
+
+            for ($i = 0; $i < $lastActivityIndex; $i++) {
+                if (!isset ($player->activity [$i])) {
+                    $player->activity [$i] = 0;
+                }
+            }
+
+            ksort ($player->activity);
+        }
     }
 }
 

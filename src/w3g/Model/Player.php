@@ -9,9 +9,6 @@ use w3lib\Library\Stream;
 
 class Player extends Model
 {
-    const APM_AVERAGE = 0x01;
-    const APM_SEGMENT = 0x02;
-
     const HOST    = 0x00;
     const PLAYER  = 0x16;
     const CUSTOM  = 0x01;
@@ -62,11 +59,18 @@ class Player extends Model
     public $addon;
     public $runtime;
     public $race;
+
+    /* Deferred */
+
+    public $colour;
+    public $handicap;
     public $leftAt;
+    public $isWinner;
+    public $team;
+    public $score;
     public $actions;
     public $activity;
     public $variables;
-    public $flags;
 
     public function read (Stream $stream)
     {
@@ -91,11 +95,15 @@ class Player extends Model
             break;
         }
 
+        $this->colour    = NULL;
+        $this->handicap  = NULL;
+        $this->leftAt    = NULL;
+        $this->isWinner  = NULL;
+        $this->team      = NULL;
+        $this->score     = NULL;
         $this->actions   = [];
         $this->activity  = [];
         $this->variables = [];
-        $this->flags     = 0x00;
-        $this->leftAt    = NULL;
     }
 
     public function apm ()
@@ -105,56 +113,6 @@ class Player extends Model
         }
 
         return array_sum ($this->activity) / count ($this->activity);
-
-        // $lastActionTime = 0;
-
-        // foreach ($this->actions as $action) {
-        //     $lastActionTime = max ($lastActionTime, $action->time);
-        // }
-
-        // $numSegments = ceil ($lastActionTime / $sInterval);
-
-        // if ($numSegments <= 0) {
-        //     return 0;
-        // }
-
-        // /* Using array_fill to ensure no holes. */
-        // $timeSegments = array_fill (
-        //     /* Start Index */        0, 
-        //     /* Number of Elements */ $numSegments, 
-        //     /* Fill Value */         0
-        // );
-
-        // /* For every registered action increment the appropriate segment. */
-        // foreach ($this->actions as $action) {
-        //     $segmentIndex = floor ($action->time / $sInterval);
-
-        //     if ($segmentIndex >= $numSegments) {
-        //         Logger::warn (
-        //             'Segment index [%s] is greater than the number of segments [%s]',
-        //             $segmentIndex,
-        //             $numSegments
-        //         );
-
-        //         continue;
-        //     }
-
-        //     $timeSegments [$segmentIndex]++;
-        // }
-
-        // /* Return entire array of segments, useful for charts and detecting action spikes. */
-        // if ($flags & self::APM_SEGMENT) {
-        //     return $timeSegments;
-        // }
-
-        // /* Return average actions per interval over entire game. */
-        // if ($flags & self::APM_AVERAGE) {
-        //     return ceil (
-        //         array_sum ($timeSegments) / count ($timeSegments)
-        //     );
-        // }
-
-        // return $timeSegments;
     }
 
     public function __sleep ()
