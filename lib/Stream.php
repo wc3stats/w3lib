@@ -12,8 +12,9 @@ class Stream
     const ENDIAN_BE = 0x00;
     const ENDIAN_LE = 0x01;
 
-    const NUL  = 0x00;
-    const PEEK = 0x01;
+    const NUL   = 0x00;
+    const PEEK  = 0x01;
+    const QUIET = 0x02;
 
     public function __construct ($handle, $endian = self::ENDIAN_LE)
     {
@@ -61,26 +62,39 @@ class Stream
             );
         }
 
+        if (! ($flags & self::QUIET)) {
+            xxd ($block);
+        }
+
         return $block;
     }
 
-    public function append ($s)
+    public function append ($data, $format = NULL)
     {
+        if ($format) {
+            $data = pack ($format, $data);
+        }
+
         $offset = $this->offset ();
 
         fseek ($this->handle, 0, SEEK_END);
-        fwrite ($this->handle, $s);
+        fwrite ($this->handle, $data);
         
         $this->seek ($offset);
     }
 
-    public function prepend ($s)
+    public function prepend ($data, $format = NULL)
     {
+        if ($format) {
+            $data = pack ($format, $data);
+        }
+
         $offset = $this->offset ();
 
-        fseek ($this->handle, 0);
-        fwrite ($this->handle, $s);
+        $remaining = stream_get_contents ($this->handle);
 
+        $this->seek ($offset);
+        fwrite ($this->handle, $data . $remaining);
         $this->seek ($offset);
     }
 
@@ -93,13 +107,15 @@ class Stream
     {
         $s = '';
 
-        while (($c = $this->read (1)) !== FALSE) {
+        while (($c = $this->read (1, self::QUIET)) !== FALSE) {
             if (ord ($c) == $term) {
                 break;
             }
 
             $s .= $c;
         }
+
+        xxd ($s);
 
         return $s;
     }

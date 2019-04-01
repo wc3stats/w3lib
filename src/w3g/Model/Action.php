@@ -80,25 +80,6 @@ class Action extends Model
 
     /** **/
 
-    const W3MMD_PREFIX    = "MMD.Dat";
-    const W3MMD_INIT      = "init";
-    const W3MMD_EVENT     = "event";
-    const W3MMD_DEF_EVENT = "defEvent";
-    const W3MMD_DEF_VARP  = "defVarP";
-    const W3MMD_FLAGP     = "flagP";
-    const W3MMD_VARP      = "varP";
-
-    const W3MMD_CHECK = "chk";
-    const W3MMD_VALUE = "val";
-    
-    const W3MMD_FLAG_DRAWER     = 0x01;
-    const W3MMD_FLAG_LOSER      = 0x02;
-    const W3MMD_FLAG_WINNER     = 0x04;
-    const W3MMD_FLAG_LEAVER     = 0x08;
-    const W3MMD_FLAG_PRACTICING = 0x10;
-
-    /** **/
-
     private const STATE_PAUSED   = 0x01;
     private const STATE_UNPAUSED = 0x02;
 
@@ -108,7 +89,7 @@ class Action extends Model
     {
         $this->id   = $stream->uint8 ();
         $this->key  = $this->keyName ($this->id);
-        $this->time = $context->time;
+        $this->time = $context->getTime ();
 
         Logger::debug (
             'Found action: [0x%2X:%s].',
@@ -146,7 +127,7 @@ class Action extends Model
 
             case self::UNIT_BUILDING_ABILITY_1:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId       = $this->_objectId ($stream);
+                $this->itemId       = $this->objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -154,7 +135,7 @@ class Action extends Model
 
             case self::UNIT_BUILDING_ABILITY_2:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId       = $this->_objectId ($stream);
+                $this->itemId       = $this->objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -165,7 +146,7 @@ class Action extends Model
 
             case self::GIVE_ITEM:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId       = $this->_objectId ($stream);
+                $this->itemId       = $this->objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -173,17 +154,17 @@ class Action extends Model
                 $this->locX = $stream->float ();
                 $this->locY = $stream->float ();
 
-                $this->objectId1 = $this->_objectId ($stream);
-                $this->objectId2 = $this->_objectId ($stream);
+                $this->objectId1 = $this->objectId ($stream);
+                $this->objectId2 = $this->objectId ($stream);
                 $this->grounded  = $this->objectId1 === $this->objectId2;
 
-                $this->itemObjectId1 = $this->_objectId ($stream);
-                $this->itemObjectId2 = $this->_objectId ($stream);
+                $this->itemObjectId1 = $this->objectId ($stream);
+                $this->itemObjectId2 = $this->objectId ($stream);
             break;
 
             case self::UNIT_BUILDING_ABILITY_3:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId       = $this->_objectId ($stream);
+                $this->itemId       = $this->objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -191,14 +172,14 @@ class Action extends Model
                 $this->locX = $stream->float ();
                 $this->locY = $stream->float ();
 
-                $this->objectId1 = $this->_objectId ($stream);
-                $this->objectId2 = $this->_objectId ($stream);
+                $this->objectId1 = $this->objectId ($stream);
+                $this->objectId2 = $this->objectId ($stream);
                 $this->grounded  = $this->objectId1 === $this->objectId2;
             break;
 
             case self::UNIT_BUILDING_ABILITY_4:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId1      = $this->_objectId ($stream);
+                $this->itemId1      = $this->objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -206,7 +187,7 @@ class Action extends Model
                 $this->locX1 = $stream->float ();
                 $this->locY1 = $stream->float ();
 
-                $this->itemId2 = $this->_objectId ($stream);
+                $this->itemId2 = $this->objectId ($stream);
 
                 $stream->read (9);
 
@@ -222,8 +203,8 @@ class Action extends Model
 
                 for ($i = 0; $i < $this->numObjects; $i++) {
                     $this->objects [] = [
-                        $this->_objectId ($stream),
-                        $this->_objectId ($stream)
+                        $this->objectId ($stream),
+                        $this->objectId ($stream)
                     ];
                 }
             break;
@@ -237,8 +218,8 @@ class Action extends Model
 
                 for ($i = 0; $i < $this->numObjects; $i++) {
                     $this->objects [] = [
-                        $this->_objectId ($stream),
-                        $this->_objectId ($stream)
+                        $this->objectId ($stream),
+                        $this->objectId ($stream)
                     ];
                 }
             break;
@@ -253,9 +234,9 @@ class Action extends Model
             case self::SELECT_SUBGROUP:
                 /* ItemId and objectId represent the first unit in the newly
                    selected subgroup. */
-                $this->itemId    = $this->_objectId ($stream);
-                $this->objectId1 = $this->_objectId ($stream);
-                $this->objectId2 = $this->_objectId ($stream);
+                $this->itemId    = $this->objectId ($stream);
+                $this->objectId1 = $this->objectId ($stream);
+                $this->objectId2 = $this->objectId ($stream);
             break;
 
             case self::UNKNOWN_1:
@@ -270,13 +251,13 @@ class Action extends Model
             case self::SELECT_GROUND_ITEM:
                 $stream->int8 ();
 
-                $this->objectId1 = $this->_objectId ($stream);
-                $this->objectId2 = $this->_objectId ($stream);
+                $this->objectId1 = $this->objectId ($stream);
+                $this->objectId2 = $this->objectId ($stream);
             break;
 
             case self::CANCEL_HERO_REVIVE:
-                $this->heroId1 = $this->_objectId ($stream);
-                $this->heroId2 = $this->_objectId ($stream);
+                $this->heroId1 = $this->objectId ($stream);
+                $this->heroId2 = $this->objectId ($stream);
             break;
 
             case self::CANCEL_UNIT:
@@ -353,76 +334,17 @@ class Action extends Model
             break;
 
             case self::W3MMD:
-                $this->intro   = $stream->string ();
-                $this->header  = $stream->string ();
-                $this->message = $stream->string ();
-
-                $toks = $this->_tokenizeW3MMD ($this->message);
-
-                $this->type = $toks [0];
-
-                if (stripos ($this->header, self::W3MMD_CHECK) === 0) {
-                    break;
-                }
-
-                switch ($this->type) {
-                    case self::W3MMD_INIT:
-                        /**
-                         * [0] => init
-                         * [1] => pid
-                         * [2] => {pid}
-                         * [3] => {name}
-                         */
-                        $this->playerId   = (int) $toks [2];
-                        $this->playerName = $toks [3]; 
-                    break;
-
-                    case self::W3MMD_VARP:
-                        /**
-                         * [0] => varP
-                         * [1] => {pid}
-                         * [2] => {varname}
-                         * [3] => {operator}
-                         * [4] => {value}
-                         */
-                        $this->playerId = (int) $toks [1];
-                        $this->varname  = $toks [2];
-                        $this->operator = $toks [3];
-                        $this->value    = trim ($toks [4], ' ",');
-                    break;
-
-                    case self::W3MMD_EVENT:     break;
-                    case self::W3MMD_DEF_EVENT: break;
-
-                    case self::W3MMD_DEF_VARP:  
-                        /**
-                         * [0] => defVarP
-                         * [1] => {varname}
-                         * [2] => {vartype}
-                         * [3] => {goalType}
-                         * [4] => {suggestedType}
-                         */
-                        $this->varname = $toks [1];
-                        $this->vartype = $toks [2];
-                    break;
-
-                    case self::W3MMD_FLAGP: 
-                        /**
-                         * [0] => flagP
-                         * [1] => {pid}
-                         * [2] => {flag}
-                         */
-                        $this->playerId = (int) $toks [1];
-                        $this->flag     = $toks [2];
-                    break;
-                }
-
-                $stream->read (4);
+                // W3mmd stores as a chain of variables which are not necessarily
+                // associated to the current action's playerId. Prepend the ID
+                // so we can unpackAll the chain.
+                $stream->prepend (self::W3MMD, 'c');
+                
+                $this->w3mmd = W3mmd::unpack ($stream, $context);
             break;
         }
     }
 
-    protected function _objectId (Stream $stream)
+    protected function objectId (Stream $stream)
     {
         $data = $stream->char (4);
 
@@ -444,24 +366,6 @@ class Action extends Model
         }
 
         return $data;
-    }
-
-    protected function _tokenizeW3MMD ($string)
-    {
-        $tok  = strtok ($string, " ");
-        $toks = [ ];
-        
-        while ($tok !== FALSE) {
-            /* Space has been escaped, _consume. */
-            while (substr ($tok, -1) === '\\') {
-                $tok = substr ($tok, 0, -1) . ucwords (strtok (" "));
-            }
-
-            $toks [] = lcfirst ($tok);
-            $tok = strtok (" ");
-        }
-
-        return $toks;
     }
 }
 

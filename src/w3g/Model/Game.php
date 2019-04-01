@@ -35,6 +35,7 @@ class Game extends Model
     // Deferred.
 
     public $saver = NULL;
+    public $w3mmd = false;
 
     public function read (Stream $stream, $context = NULL)
     {
@@ -161,6 +162,10 @@ class Game extends Model
         for ($i = 0; $i < $this->slotRecords; $i++) {
             $slot = Slot::unpack ($stream, $context);
 
+            if (!isset ($this->players [$slot->playerId])) {
+                continue;
+            }
+
             $player = $this->players [$slot->playerId];
 
             $player->slot     = $i;
@@ -177,8 +182,6 @@ class Game extends Model
         
         $this->selectMode = $stream->int8 ();
         $this->startSpots = $stream->int8 ();
-
-        $this->saver = NULL;
     }
 }
 

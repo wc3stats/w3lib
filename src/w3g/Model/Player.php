@@ -13,13 +13,11 @@ class Player extends Model
     public $type      = NULL;
     public $id        = NULL;
     public $name      = NULL;
-    public $platform  = NULL;
-    public $runtime   = NULL;
     public $race      = NULL;
 
-    /* Deferred */
+    // Deferred.
 
-    public $isHost    = NULL;
+    public $isHost    = false;
     public $slot      = NULL;
     public $colour    = NULL;
     public $handicap  = NULL;
@@ -27,26 +25,28 @@ class Player extends Model
     public $isWinner  = NULL;
     public $team      = NULL;
     public $score     = NULL;
-    public $actions   = [];
+    public $actions   = NULL;
     public $activity  = [];
     public $variables = NULL;
 
     public function read (Stream $stream, $context = NULL)
     {
-        $this->type     = $stream->uint8 ();
-        $this->id       = $stream->uint8 ();
-        $this->name     = $stream->string ();
-        $this->platform = $stream->uint8 ();
+        $this->type = $stream->uint8 ();
+        $this->id   = $stream->uint8 ();
+        $this->name = $stream->string ();
+        
+        $platform = $stream->uint8 ();
 
-        switch ($this->platform) {
+        switch ($platform) {
             case Lang::CUSTOM:
                 // Null byte
                 $stream->read (1); 
             break;
 
             case Lang::LADDER:
-                $this->runtime = $stream->uint32 ();
-                $this->race    = $stream->uint32 ();
+                // Warcraft III runtime of exe in milliseconds.
+                $stream->uint32 ();
+                $stream->uint32 ();
             break;
 
             case Lang::NETEASE:
@@ -54,16 +54,9 @@ class Player extends Model
             break;
         }
 
-        $this->isHost    = false;
-        $this->colour    = NULL;
-        $this->handicap  = NULL;
-        $this->leftAt    = NULL;
-        $this->isWinner  = NULL;
-        $this->team      = NULL;
-        $this->score     = NULL;
-        $this->actions   = [];
-        $this->activity  = [];
-        $this->variables = [];
+        if ($context->settings->keepActions) {
+            $this->actions = [];
+        }
     }
 
     public function apm ()
@@ -77,20 +70,15 @@ class Player extends Model
 
     public function __sleep ()
     {   
-        /* Refresh APM before serializing. */
+        // Refresh APM before serializing.
         $this->apm = $this->apm ();
 
         $keys = array_keys ((array) $this);
 
-        /* Omit actions, there are too many to reasonably serialize. */
-        $keys = array_diff ($keys, [ 'actions']);
+        // Omit actions, there are too many to reasonably serialize.
+        $keys = array_diff ($keys, [ 'actions' ]);
 
         return $keys;
-    }
-
-    public function __wakeup ()
-    {
-        $this->actions = [];
     }
 }
 

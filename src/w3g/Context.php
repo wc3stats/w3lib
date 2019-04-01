@@ -7,6 +7,11 @@ class Context
     public $settings;
     public $replay;
     public $time;
+
+    public function getTime ()
+    {
+        return floor ($this->time);
+    }
 }
 
 ?>

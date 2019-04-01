@@ -9,12 +9,14 @@ use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\Library\Type;
 use w3lib\w3g\Model\Action;
+use w3lib\w3g\Model\ActionBlock;
 use w3lib\w3g\Model\Header;
 use w3lib\w3g\Model\Block;
 use w3lib\w3g\Model\Player;
 use w3lib\w3g\Model\Game;
 use w3lib\w3g\Model\Segment;
 use w3lib\w3g\Model\ChatLog;
+use w3lib\w3g\Model\W3mmd;
 
 class Parser
 {
@@ -107,7 +109,7 @@ class Parser
             return;
         }
 
-        $player->leftAt = $this->context->time;
+        $player->leftAt = $this->context->getTime ();
 
         // Last leave event is the replay saver.
         $this->replay->game->saver = $player->id;
@@ -115,22 +117,24 @@ class Parser
 
     private function importTimeslot (Segment $segment)
     {
-        foreach ($segment->actions as $action) {
-            switch ($action->id) {
-                default:
-                    $this->importAction ($segment, $action);
-                break;
+        foreach ($segment->blocks as $actionBlock) {
+            foreach ($actionBlock->actions as $action) {
+                switch ($action->id) {
+                    default:
+                        $this->importAction ($actionBlock, $action);
+                    break;
 
-                case Action::W3MMD:
-                    $this->importW3MMD ($action);
-                break;
+                    case Action::W3MMD:
+                        $this->importW3MMD ($action);
+                    break;
+                }
             }
         }
     }
 
-    private function importAction (Segment $segment, Action $action)
+    private function importAction (ActionBlock $actionBlock, Action $action)
     {
-        $player = $this->replay->getPlayerById ($segment->playerId ?? -1);
+        $player = $this->replay->getPlayerById ($actionBlock->playerId ?? -1);
 
         if (!$player) {
             return;
@@ -154,30 +158,37 @@ class Parser
 
     private function importW3MMD (Action $action)
     {
+        if (!isset ($action->w3mmd)) {
+            return;
+        }
+
+        $w3mmd  = $action->w3mmd;
         $player = NULL;
 
-        if (isset ($action->playerId)) {
-            $player = $this->replay->getPlayerBySlot ($action->playerId);
+        if (isset ($w3mmd->playerId)) {
+            $player = $this->replay->getPlayerById ($w3mmd->playerId);
         }
 
-        switch ($action->type) {
-            case Action::W3MMD_INIT:
-                $player->variables = []; 
+        switch ($w3mmd->type) {
+            case W3mmd::W3MMD_INIT_PID:
+                $player->variables = [];
             break;
 
-            case Action::W3MMD_VARP:
-                if (property_exists ($player, $action->varname)) {
-                    $player->{$action->varname} = $action->value;
+            case W3mmd::W3MMD_VARP:
+                if (property_exists ($player, $w3mmd->varname)) {
+                    $player->{$w3mmd->varname} = $w3mmd->value;
                 }
 
-                $player->variables [$action->varname] = $action->value;
+                $player->variables [$w3mmd->varname] = $w3mmd->value;
             break;
 
-            case Action::W3MMD_FLAGP:
-                $player->flags   |= $action->flag;
-                $player->isWinner = $action->flag & Action::W3MMD_FLAG_WINNER;
+            case W3mmd::W3MMD_FLAGP:
+                $player->flags   |= $w3mmd->flag;
+                $player->isWinner = $w3mmd->flag & W3mmd::W3MMD_FLAG_WINNER;
             break;
         }
+
+        $this->replay->game->w3mmd = true;
     }
 
     private function package ()

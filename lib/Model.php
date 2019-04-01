@@ -8,11 +8,11 @@ use JsonSerializable;
 
 abstract class Model implements JsonSerializable
 { 
-    private $_ref;
+    private $ref;
 
     public function __construct ()
     {
-        $this->_ref = new ReflectionClass (get_class ($this));
+        $this->ref = new ReflectionClass (get_class ($this));
     } 
 
     public function __sleep ()
@@ -39,6 +39,11 @@ abstract class Model implements JsonSerializable
         $model = get_called_class ();
         $model = new $model ();
 
+        Logger::debug (
+            'Unpacking [%s]',
+            get_class ($model)
+        );
+
         $offset = $stream->offset ();
 
         try {
@@ -55,12 +60,6 @@ abstract class Model implements JsonSerializable
     {
         for ($i = 1; /* */ ; $i++) {
             try {
-                Logger::debug (
-                    'Unpacking [%d:%s]',
-                    $i,
-                    get_called_class ()
-                );
-
                 yield static::unpack ($stream, $context);
             } catch (Exception $e) {
                 Logger::debug ($e->getMessage ());
@@ -73,7 +72,7 @@ abstract class Model implements JsonSerializable
     {
         $keys = [ ];
 
-        foreach ($this->_ref->getConstants () as $k => $v) {
+        foreach ($this->ref->getConstants () as $k => $v) {
             if ($v === $value) {
                 $keys [] = $k;
             }

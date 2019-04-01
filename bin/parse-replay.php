@@ -7,9 +7,12 @@ use w3lib\Library\Logger;
 use w3lib\w3g\Replay;
 use w3lib\w3g\Settings;
 
-define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-5.0.w3g');
+define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd.w3g');
 
 /** **/
+
+error_reporting (E_ALL);
+ini_set ('display_errors', 1);
 
 Logger::setup (Monolog::INFO);
 
@@ -34,10 +37,13 @@ echo PHP_EOL;
 
 foreach ($replay->game->players as $player) {
     Logger::info (
-        'Player: %-16s | APM: %4d | Left: %6d',
+        'Id: %2d | Slot: %2d | Player: %-16s | APM: %4d | Left: %6d | Vars: %2d',
+        $player->id,
+        $player->slot,
         $player->name,
         $player->apm (),
-        $player->leftAt
+        $player->leftAt,
+        count ($player->variables)
     );
 }
 

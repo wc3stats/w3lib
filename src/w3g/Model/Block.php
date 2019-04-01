@@ -20,7 +20,7 @@ class Block extends Model
     public function read (Stream $stream, $context = NULL)
     {
         Logger::info (
-            "Parsing block %d / %d (%.2f%%)",
+            "Unpacking block %d / %d (%.2f%%)",
             self::$blockIndex,
             $context->replay->header->numBlocks,
             self::$blockIndex++ / $context->replay->header->numBlocks * 100

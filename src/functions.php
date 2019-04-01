@@ -4,6 +4,10 @@ use w3lib\Library\Logger;
 
 function xxd ($block, $width = 16)
 {
+    if (!Logger::isDebug ()) {
+        return;
+    }
+    
     $from = '';
     $to   = '';
 
@@ -20,7 +24,7 @@ function xxd ($block, $width = 16)
     $chars = str_split (strtr ($block, $from, $to), $width);
 
     foreach ($hex as $i => $line) {
-        Logger::info (
+        Logger::debug (
             '%6X : %-s [%-s]',
             $offset,
             str_pad (implode (' ', str_split ($line, 2)), $width * 3 - 1),

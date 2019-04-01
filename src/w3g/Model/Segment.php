@@ -55,42 +55,15 @@ class Segment extends Model
             case self::TIMESLOT_2:
                 $this->length        = $stream->uint16 () - 2;
                 $this->timeIncrement = $stream->uint16 ();
-                $this->actions       = [];
+                $this->blocks        = [];
 
                 $context->time += $this->timeIncrement / 1000;
 
                 if ($this->length > 0) {
                     $block = new Buffer ($stream->read ($this->length));
 
-                    $this->playerId = $block->uint8 ();
-                    $this->length   = $block->uint16 ();
-
-                    Logger::debug (
-                        sprintf (
-                            'Processing actions for player [%d] of length [%d]',
-                            $this->playerId,
-                            $this->length
-                        )
-                    );
-
-                    $actions = new Buffer ($block->read ($this->length));
-                    
-                    // xxd ($actions);
-
-                    foreach (Action::unpackAll ($actions, $context) as $action) {
-
-                        // Actions to ignore.
-                        if (in_array ($action->id, [
-                            Action::UNKNOWN_1,
-                            Action::UNKNOWN_2,
-                            Action::UNKNOWN_3,
-                            Action::SCENARIO_TRIGGER,
-                            Action::PRE_SUBSELECT
-                        ])) {
-                            continue;
-                        }
-
-                        $this->actions [] = $action;
+                    foreach (ActionBlock::unpackAll ($block, $context) as $actionBlock) {
+                        $this->blocks [] = $actionBlock;
                     }
                 }
             break;

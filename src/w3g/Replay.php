@@ -21,7 +21,7 @@ class Replay extends Archive
     public function getPlayer ($key, $value)
     {
         foreach ($this->game->players as $player) {
-            if ($player->$key === $value) {
+            if (strcasecmp ($player->$key, $value) === 0) {
                 return $player;
             }
         }

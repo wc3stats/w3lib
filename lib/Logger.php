@@ -17,6 +17,11 @@ class Logger
         self::$level = $level;
     }
 
+    public static function isDebug ()
+    {
+        return self::$level === Monolog::DEBUG;
+    }
+
     public static function __callStatic ($name, $arguments = [])
     {
         if (!self::$instance) {
