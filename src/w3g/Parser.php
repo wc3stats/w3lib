@@ -18,187 +18,180 @@ use w3lib\w3g\Model\ChatLog;
 
 class Parser
 {
-    public static $time = 0x00;
-    
+    protected $context;
     protected $replay;
     protected $settings;
 
     public function __construct (Replay $replay, Settings $settings = NULL)
     {
+        if (!$settings) {
+            $settings = new Settings ();
+        }
+
+        $context = new Context ();
+
+        $context->settings = $settings;
+        $context->replay   = $replay;
+        $context->time     = 0x00;
+
+        $this->context  = $context;
         $this->replay   = $replay;
         $this->settings = $settings;
-
-        if (!$this->settings) {
-            $this->settings = new Settings ();
-        }
     } 
 
     public function parse ()
     {
-        Logger::debug ('Parsing replay header.');
+        $context = &$this->context;
+        $replay  = &$this->replay;
 
-        $this->replay->header  = Header::unpack ($this->replay);
-        $this->replay->chatlog = [];
+        /** **/
 
-        Logger::debug ('Parsing replay blocks.');
+        $header  = &$replay->header;
+        $game    = &$replay->game;
 
         $buffer = new Buffer ();
 
-        for ($i = 1; $i <= $this->replay->header->numBlocks; $i++) {
-            Logger::info (
-                "Parsing block %d / %d (%.2f%%)",
-                $i,
-                $this->replay->header->numBlocks,
-                $i / $this->replay->header->numBlocks * 100
-            );
+        /** **/
 
-            $block = Block::unpack ($this->replay);
+        $header = Header::unpack ($replay, $context);
+
+        for ($i = 0; $i < $header->numBlocks; $i++) {
+            $block = Block::unpack ($replay, $context);
+
+            /** **/
+
             $buffer->append ($block->body);
 
-            if ($i === 1) {
-                /* 4 unknown bytes. */
-                $buffer->read (4);
-
-                $host = Player::unpack ($buffer);
-
-                $this->replay->game = Game::unpack ($buffer);
-
-                /* Host player is not included in the regular player list. */
-                $this->replay->game->players [$host->id] = $host;
-
-                /* Bring the players up a level for easier access. */
-                $this->replay->players = $this->replay->game->players;
+            if ($i === 0) {
+                $game = Game::unpack ($buffer, $context);
             }
 
-
-            /* TODO: (Anders) This could use a lot of cleanup... */
-            /* Unpack segments and populate the replay container with appropriate values. */
-            foreach (Segment::unpackAll ($buffer) as $k => $segment) {
-                switch ($segment->id) {
-                    case Segment::TIMESLOT_1:
-                    case Segment::TIMESLOT_2:
-                        $this->importTimeslot ($segment);
-                    break;
-
-                    case Segment::CHAT_MESSAGE:
-                        $this->replay->chatlog [] = $segment->message;
-                    break;
-
-                    case Segment::LEAVE_GAME:
-                        $player = $this->getPlayerFromSegment ($segment);
-
-                        if (!$player) {
-                            continue 2;
-                        }
-
-                        $player->leftAt = self::getTime ();
-
-                        $this->replay->game->saver = $player->id;
-                    break;
-                }
-            }
+            $this->desegment ($buffer);
         }
 
-        $this->postProcess ();
+        $this->package ();
     }
 
-    public static function getTime ()
+    private function desegment (Stream $block)
     {
-        return floor (self::$time);
+        foreach (Segment::unpackAll ($block, $this->context) as $segment) {
+            switch ($segment->id) {
+                case Segment::CHAT_MESSAGE:
+                    $this->importChat ($segment);
+                break;
+
+                case Segment::LEAVE_GAME:
+                    $this->importLeaver ($segment);
+                break;
+
+                case Segment::TIMESLOT_1:
+                case Segment::TIMESLOT_2:
+                    $this->importTimeslot ($segment);
+                break;
+            }
+        }
+    }
+
+    /** **/
+
+    private function importChat (Segment $segment)
+    {
+        $this->replay->chatlog [] = $segment->message;
+    }
+
+    private function importLeaver (Segment $segment)
+    {
+        $player = $this->replay->getPlayerById ($segment->playerId ?? -1);
+        
+        if (!$player) {
+            return;
+        }
+
+        $player->leftAt = $this->context->time;
+
+        // Last leave event is the replay saver.
+        $this->replay->game->saver = $player->id;
     }
 
     private function importTimeslot (Segment $segment)
     {
-        $player = $this->getPlayerFromSegment ($segment);
+        foreach ($segment->actions as $action) {
+            switch ($action->id) {
+                default:
+                    $this->importAction ($segment, $action);
+                break;
+
+                case Action::W3MMD:
+                    $this->importW3MMD ($action);
+                break;
+            }
+        }
+    }
+
+    private function importAction (Segment $segment, Action $action)
+    {
+        $player = $this->replay->getPlayerById ($segment->playerId ?? -1);
 
         if (!$player) {
             return;
         }
 
-        foreach ($segment->actions as $action) {
-            switch ($action->id) {
-                default:
-                    $activityIndex = floor (self::$time / $this->settings->apx);
+        $adx = floor (
+            $this->context->time / 
+            $this->settings->apx
+        );
 
-                    if (!isset ($player->activity [$activityIndex])) {
-                        $player->activity [$activityIndex] = 0;
-                    }
+        if (!isset ($player->activity [$adx])) {
+            $player->activity [$adx] = 0;
+        }
 
-                    $player->activity [$activityIndex]++;
+        $player->activity [$adx]++;
 
-                    if ($this->settings->keepActions) {
-                        $player->actions [] = $action;
-                    }
-                break;
-
-                case Action::W3MMD:
-                    if (!isset ($action->playerId)) {
-                        continue 2;
-                    }
-
-                    /* The W3MMD playerIds do not seem to match up with the playerId
-                       found in the segment. That is, they seem to be placed in
-                       whichever segment is being written at the time of the event. */
-                    $slotPlayer = $this->replay->getPlayerBySlot ($action->playerId);
-
-                    switch ($action->type) {
-                        case Action::W3MMD_VARP:
-                            $slotPlayer->variables [$action->varname] = $action->value;
-                        break;
-                     
-                        case Action::W3MMD_FLAGP:
-                            $slotPlayer->isWinner = $action->flag & Action::W3MMD_FLAG_WINNER;
-                        break;
-                    }
-                break;
-            }
+        if ($this->settings->keepActions) {
+            $player->actions [] = $action;
         }
     }
 
-    private function getPlayerFromSegment (Segment $segment)
+    private function importW3MMD (Action $action)
     {
-        if (!isset ($segment->playerId)) {
-            return NULL;
-        }
-        
-        $player = $this->replay->getPlayerById ($segment->playerId);
+        $player = NULL;
 
-        if (!$player) {
-            Logger::warn (
-                'Player referenced in segment but not found: [%d]',
-                $segment->playerId
-            );
-
-            return NULL;
+        if (isset ($action->playerId)) {
+            $player = $this->replay->getPlayerBySlot ($action->playerId);
         }
 
-        return $player;
+        switch ($action->type) {
+            case Action::W3MMD_INIT:
+                $player->variables = []; 
+            break;
+
+            case Action::W3MMD_VARP:
+                if (property_exists ($player, $action->varname)) {
+                    $player->{$action->varname} = $action->value;
+                }
+
+                $player->variables [$action->varname] = $action->value;
+            break;
+
+            case Action::W3MMD_FLAGP:
+                $player->flags   |= $action->flag;
+                $player->isWinner = $action->flag & Action::W3MMD_FLAG_WINNER;
+            break;
+        }
     }
 
-    private function postProcess ()
+    private function package ()
     {
-        foreach ($this->replay->players as $player) {
-            /* Set the leftAt time for each player to the game duration if there was
-               no LEAVE_GAME segment. This is necessary for when the saver is not 
-               the last to leave the game (there will be no LEAVE_GAME segment for 
-               the remaining players). */
+        foreach ($this->replay->game->players as $player) {
+            // If there are players still in the game, must set leave time.
             if ($player->leftAt === NULL) {
                 $player->leftAt = $this->replay->header->length;
-            }
+            }       
 
-            $slot = $this->replay->getSlot ($player->id);
-            
-            $player->colour   = $slot->colour;
-            $player->team     = $slot->team;
-            $player->race     = $slot->race;
-            $player->handicap = $slot->handicap;          
+            // Fill in player activity time holes.
+            $ladx = floor ($player->leftAt / $this->settings->apx);
 
-            /* Fill in any player activity time holes. We have to do this here
-               because we don't know when the player left until all of the
-               actions have been read. */
-            $lastActivityIndex = floor ($player->leftAt / $this->settings->apx);
-
-            for ($i = 0; $i < $lastActivityIndex; $i++) {
+            for ($i = 0; $i < $ladx; $i++) {
                 if (!isset ($player->activity [$i])) {
                     $player->activity [$i] = 0;
                 }

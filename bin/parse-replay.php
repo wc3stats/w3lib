@@ -7,7 +7,7 @@ use w3lib\Library\Logger;
 use w3lib\w3g\Replay;
 use w3lib\w3g\Settings;
 
-define ('REPLAY_FILE', __DIR__ . '/AzerothWars-5.w3g');
+define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-5.0.w3g');
 
 /** **/
 
@@ -23,7 +23,7 @@ echo PHP_EOL;
 
 Logger::info ('File: [%s]',        $replay->getFile ());
 Logger::info ('Game Name: [%s]',   $replay->game->name);
-Logger::info ('Num Players: [%d]', count ($replay->players));
+Logger::info ('Num Players: [%d]', count ($replay->game->players));
 Logger::info ('Hash: [%s]',        $replay->getHash ());
 Logger::info ('Map File: [%s]',    $replay->game->map);
 Logger::info ('Map Type: [%s]',    $replay->getMap ());
@@ -32,7 +32,7 @@ Logger::info ('Host Id: [%s]',     $replay->game->host);
 
 echo PHP_EOL;
 
-foreach ($replay->players as $player) {
+foreach ($replay->game->players as $player) {
     Logger::info (
         'Player: %-16s | APM: %4d | Left: %6d',
         $player->name,

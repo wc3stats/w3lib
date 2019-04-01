@@ -3,19 +3,29 @@
 namespace w3lib\w3g\Model;
 
 use Exception;
+use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 
 class Block extends Model
 {
-    public $compressedSize;
-    public $uncompressedSize;
-    public $checksum;
-    public $body;
+    public static $blockIndex = 1;
 
-    public function read (Stream $stream)
+    public $compressedSize    = NULL;
+    public $uncompressedSize  = NULL;
+    public $checksum          = NULL;
+    public $body              = NULL;
+
+    public function read (Stream $stream, $context = NULL)
     {
+        Logger::info (
+            "Parsing block %d / %d (%.2f%%)",
+            self::$blockIndex,
+            $context->replay->header->numBlocks,
+            self::$blockIndex++ / $context->replay->header->numBlocks * 100
+        );
+
         $this->compressedSize   = $stream->uint16 ();
         $this->uncompressedSize = $stream->uint16 ();
         $this->checksum         = $stream->uint32 ();

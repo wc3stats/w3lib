@@ -32,9 +32,9 @@ abstract class Model implements JsonSerializable
         );
     }
 
-    public abstract function read (Stream $stream);
+    public abstract function read (Stream $stream, $context = NULL);
 
-    public static function unpack (Stream $stream)
+    public static function unpack (Stream $stream, $context = NULL)
     {
         $model = get_called_class ();
         $model = new $model ();
@@ -42,7 +42,7 @@ abstract class Model implements JsonSerializable
         $offset = $stream->offset ();
 
         try {
-            $model->read ($stream);
+            $model->read ($stream, $context);
         } catch (Exception $e) {
             $stream->seek ($offset);
             throw $e;
@@ -51,7 +51,7 @@ abstract class Model implements JsonSerializable
         return $model;
     }
 
-    public static function unpackAll (Stream $stream)
+    public static function unpackAll (Stream $stream, $context = NULL)
     {
         for ($i = 1; /* */ ; $i++) {
             try {
@@ -61,7 +61,7 @@ abstract class Model implements JsonSerializable
                     get_called_class ()
                 );
 
-                yield static::unpack ($stream);
+                yield static::unpack ($stream, $context);
             } catch (Exception $e) {
                 Logger::debug ($e->getMessage ());
                 return;

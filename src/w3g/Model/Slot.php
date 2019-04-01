@@ -7,41 +7,20 @@ use w3lib\Library\Stream;
 
 class Slot extends Model
 {
-    /* $slot->status */
-    const EMPTY  = 0x00;
-    const CLOSED = 0x01;
-    const USED   = 0x02;
+    public $playerId   = NULL;
+    public $status     = NULL;
+    public $isComputer = NULL;
+    public $team       = NULL;
+    public $colour     = NULL;
+    public $race       = NULL;
+    public $aiStrength = NULL;
+    public $handicap   = NULL;
 
-    /* $slot->isComputer */
-    const HUMAN    = 0x00;
-    const COMPUTER = 0x01;
-
-    /* $slot->race */
-    const RACE_HUMAN    = 0x01;
-    const RACE_ORC      = 0x02;
-    const RACE_NIGHTELF = 0x04;
-    const RACE_UNDEAD   = 0x08;
-    const RACE_RANDOM   = 0x20;
-
-    /* slot->aiStrength */
-    const AI_EASY   = 0x01;
-    const AI_NORMAL = 0x02;
-    const AI_INSANE = 0x04;
-
-    public $playerId;
-    public $status;
-    public $isComputer;
-    public $team;
-    public $colour;
-    public $race;
-    public $aiStrength;
-    public $handicap;
-
-    public function read (Stream $stream)
+    public function read (Stream $stream, $context = NULL)
     {
         $this->playerId = $stream->int8 ();
 
-        /* Map download percent (0x64 in custom, 0xFF in ladder) */
+        // Map download percent (0x64 in custom, 0xFF in ladder)
         $stream->int8 ();
 
         $this->status     = $stream->int8 ();

@@ -6,95 +6,55 @@ use stdClass;
 use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\w3g\Lang;
 
 class Player extends Model
 {
-    const HOST    = 0x00;
-    const PLAYER  = 0x16;
-    const CUSTOM  = 0x01;
-    const NETEASE = 0x02;
-    const LADDER  = 0x08;
-
-    const HUMAN    = 0x01;
-    const ORC      = 0x02;
-    const NIGHTELF = 0x04;
-    const UNDEAD   = 0x08;
-    const DAEMON   = 0x10;
-    const RANDOM   = 0x20;
-    const FIXED    = 0x40;
-
-    const RED       = 0x00;
-    const BLUE      = 0x01;
-    const TEAL      = 0x02;
-    const PURPLE    = 0x03;
-    const YELLOW    = 0x04;
-    const ORANGE    = 0x05;
-    const GREEN     = 0x06;
-    const PINK      = 0x07;
-    const GREY      = 0x08;
-    const LIGHTBLUE = 0x09;
-    const DARKGREEN = 0x0A;
-    const BROWN     = 0x0B;
-    const MAROON    = 0x0C;
-    const NAVY      = 0x0D;
-    const TURQUOISE = 0x0F;
-    const VIOLET    = 0x10;
-    const WHEAT     = 0x11;
-    const PEACH     = 0x12;
-    const MINT      = 0x13;
-    const LAVENDER  = 0x14;
-    const COAL      = 0x15;
-    const SNOW      = 0x16;
-    const EMERALD   = 0x17;
-    const PEANUT    = 0x18;
-
-    // private const STATE_SELECT   = 0x01;
-    // private const STATE_DESELECT = 0x02;
-
-    // private $state = 0x00;
-
-    public $type;
-    public $id;
-    public $name;
-    public $addon;
-    public $runtime;
-    public $race;
+    public $type      = NULL;
+    public $id        = NULL;
+    public $name      = NULL;
+    public $platform  = NULL;
+    public $runtime   = NULL;
+    public $race      = NULL;
 
     /* Deferred */
 
-    public $colour;
-    public $handicap;
-    public $leftAt;
-    public $isWinner;
-    public $team;
-    public $score;
-    public $actions;
-    public $activity;
-    public $variables;
+    public $isHost    = NULL;
+    public $slot      = NULL;
+    public $colour    = NULL;
+    public $handicap  = NULL;
+    public $leftAt    = NULL;
+    public $isWinner  = NULL;
+    public $team      = NULL;
+    public $score     = NULL;
+    public $actions   = [];
+    public $activity  = [];
+    public $variables = NULL;
 
-    public function read (Stream $stream)
+    public function read (Stream $stream, $context = NULL)
     {
-        $this->type  = $stream->uint8 ();
-        $this->id    = $stream->uint8 ();
-        $this->name  = $stream->string ();
-        $this->addon = $stream->uint8 ();
+        $this->type     = $stream->uint8 ();
+        $this->id       = $stream->uint8 ();
+        $this->name     = $stream->string ();
+        $this->platform = $stream->uint8 ();
 
-        switch ($this->addon) {
-            case self::CUSTOM:
+        switch ($this->platform) {
+            case Lang::CUSTOM:
                 // Null byte
                 $stream->read (1); 
             break;
 
-            case self::LADDER:
+            case Lang::LADDER:
                 $this->runtime = $stream->uint32 ();
                 $this->race    = $stream->uint32 ();
             break;
 
-            case self::NETEASE:
+            case Lang::NETEASE:
                 $stream->read (2);
             break;
         }
 
+        $this->isHost    = false;
         $this->colour    = NULL;
         $this->handicap  = NULL;
         $this->leftAt    = NULL;

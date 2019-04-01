@@ -16,22 +16,22 @@ class Action extends Model
     const SAVE_GAME          = 0x06;
     const SAVE_GAME_FINISHED = 0x07;
 
-    /* No additional parameters. */
+    // No additional parameters.
     const UNIT_BUILDING_ABILITY_1 = 0x10;
 
-    /* With target position. */
+    // With target position.
     const UNIT_BUILDING_ABILITY_2 = 0x11;
 
-    /* With target position and target object ID. */
+    // With target position and target object ID.
     const UNIT_BUILDING_ABILITY_3 = 0x12;
 
-    /* Give item to unitor drop item on ground. */
+    // Give item to unitor drop item on ground.
     const GIVE_ITEM = 0x13;
 
-    /* With two target positions and two item IDs. */
+    // With two target positions and two item IDs.
     const UNIT_BUILDING_ABILITY_4 = 0x14;
 
-    /* Change selection (unit, building, area). */
+    // Change selection (unit, building, area).
     const CHANGE_SELECTION = 0x16;
 
     const ASSIGN_HOTKEY      = 0x17;
@@ -42,7 +42,7 @@ class Action extends Model
     const SELECT_GROUND_ITEM = 0x1C;
     const CANCEL_HERO_REVIVE = 0x1D;
 
-    /* Remove unit from building queue. */
+    // Remove unit from building queue.
     const CANCEL_UNIT = 0x1E;
 
     const UNKNOWN_2                       = 0x1B;
@@ -54,7 +54,7 @@ class Action extends Model
     const ENTER_CHOOSE_HERO_SKILL_SUBMENU = 0x66;
     const ENTER_CHOOSE_BUILDING_SUBMENU   = 0x67;
 
-    /* Ping. */
+    // Ping.
     const MINIMAP_SIGNAL = 0x68;
 
     const CONTINUE_GAME = 0x6A;
@@ -63,17 +63,17 @@ class Action extends Model
 
     /** **/
 
-    /* Shift held down */
+    // Shift held down.
     const ABILITY_FLAG_WAYPOINT = 0x001;
     
     const ABILITY_FLAG_APPLY_SUBGROUP = 0x002;
     const ABILITY_FLAG_AREA_EFFECT    = 0x004;
     const ABILITY_FLAG_GROUP_COMMAND  = 0x008;
 
-    /* Move group without formation (formation disabled). */
+    // Move group without formation (formation disabled).
     const ABILITY_FLAG_GROUP_MOVE_FREELY = 0x010;
 
-    /* Ctrl held down (subgroup command). */
+    // Ctrl held down (subgroup command).
     const ABILITY_FLAG_SUBGROUP_COMMAND = 0x040;
 
     const ABILITY_FLAG_TOGGLE_AUTOCAST = 0x0100;
@@ -104,10 +104,11 @@ class Action extends Model
 
     private static $state = 0x00;
 
-    public function read (Stream $stream)
+    public function read (Stream $stream, $context = NULL)
     {
-        $this->id  = $stream->uint8 ();
-        $this->key = $this->keyName ($this->id);
+        $this->id   = $stream->uint8 ();
+        $this->key  = $this->keyName ($this->id);
+        $this->time = $context->time;
 
         Logger::debug (
             'Found action: [0x%2X:%s].',

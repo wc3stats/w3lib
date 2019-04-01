@@ -6,22 +6,21 @@ use w3lib\Archive;
 
 class Replay extends Archive
 {
-    public $header;
-    public $game;
-    public $players;
-    public $chatlog;
+    public $header  = NULL;
+    public $game    = NULL;
+    public $chatlog = [];
 
     public function __construct (string $filepath, Settings $settings = NULL)
     {
         parent::__construct ($filepath);
-        
+
         $parser = new Parser ($this, $settings);
         $parser->parse ();
     }
 
     public function getPlayer ($key, $value)
     {
-        foreach ($this->players as $player) {
+        foreach ($this->game->players as $player) {
             if ($player->$key === $value) {
                 return $player;
             }
@@ -42,11 +41,7 @@ class Replay extends Archive
 
     public function getPlayerBySlot ($slot)
     {
-        if (! ($slot = $this->game->slots [$slot])) {
-            return NULL;
-        }
-
-        return $this->getPlayerById ($slot->playerId);
+        return $this->getPlayer ('slot', $slot);
     }
 
     public function getSlot ($playerId)
