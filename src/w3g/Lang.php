@@ -120,7 +120,7 @@ class Lang
     const CHAT_OBSERVER = 0x02;
     const CHAT_PRIVATE  = 0x03; // + N (N = slotNumber)
 
-	public function speed ($value)
+	public static function speed ($value)
 	{
 		return [
 			self::SPEED_SLOW   => 'Slow',
@@ -129,7 +129,7 @@ class Lang
 		] [$value] ?? NULL;
 	}
 
-	public function visibility ($value)
+	public static function visibility ($value)
 	{
 		return [
 			self::VISIBILITY_HIDE_TERRAIN 	=> 'Hide Terrain',
@@ -139,7 +139,7 @@ class Lang
 		] [$value] ?? NULL;
 	}
 
-	public function observer ($value)
+	public static function observer ($value)
 	{
 		return [
 			self::OBSERVER_NONE 	 => 'No Observers',
@@ -149,7 +149,7 @@ class Lang
 		] [$value] ?? NULL;
 	}
 
-	public function gameType ($value)
+	public static function gameType ($value)
 	{
 		return [
 			self::TYPE_LADDER_FFA  => 'Ladder 1v1 / FFA',
@@ -159,37 +159,37 @@ class Lang
 		] [$value] ?? NULL;
 	}
 
-	public function colour ($value)
+	public static function colour ($value)
 	{
 		return [
-			Player::RED 	  => 'Red',
-			Player::BLUE 	  => 'Blue',
-			Player::TEAL 	  => 'Teal',
-			Player::PURPLE 	  => 'Purple',
-			Player::YELLOW 	  => 'Yellow',
-			Player::ORANGE    => 'Orange',
-			Player::GREEN     => 'Green',
-			Player::PINK 	  => 'Pink',
-			Player::GREY 	  => 'Grey',
-			Player::LIGHTBLUE => 'Light Blue',
-			Player::DARKGREEN => 'Dark Green',
-			Player::BROWN 	  => 'Brown',
-			Player::MAROON 	  => 'Maroon',
-			Player::NAVY 	  => 'Navy',
-			Player::TURQUOISE => 'Turquoise',
-			Player::VIOLET 	  => 'Violet',
-			Player::WHEAT 	  => 'Wheat',
-			Player::PEACH 	  => 'Peach',
-			Player::MINT 	  => 'Mint',
-			Player::LAVENDER  => 'Lavender',
-			Player::COAL 	  => 'Coal',
-			Player::SNOW 	  => 'Snow',
-			Player::EMERALD   => 'Emerald',
-			Player::PEANUT    => 'Peanut'
+			self::RED 	    => 'Red',
+			self::BLUE 	    => 'Blue',
+			self::TEAL 	    => 'Teal',
+			self::PURPLE 	=> 'Purple',
+			self::YELLOW 	=> 'Yellow',
+			self::ORANGE    => 'Orange',
+			self::GREEN     => 'Green',
+			self::PINK 	    => 'Pink',
+			self::GREY 	    => 'Grey',
+			self::LIGHTBLUE => 'Light Blue',
+			self::DARKGREEN => 'Dark Green',
+			self::BROWN 	=> 'Brown',
+			self::MAROON 	=> 'Maroon',
+			self::NAVY 	    => 'Navy',
+			self::TURQUOISE => 'Turquoise',
+			self::VIOLET 	=> 'Violet',
+			self::WHEAT 	=> 'Wheat',
+			self::PEACH 	=> 'Peach',
+			self::MINT 	    => 'Mint',
+			self::LAVENDER  => 'Lavender',
+			self::COAL 	    => 'Coal',
+			self::SNOW 	    => 'Snow',
+			self::EMERALD   => 'Emerald',
+			self::PEANUT    => 'Peanut'
 		] [$value] ?? NULL;
 	}
 
-	public function race ($value)
+	public static function race ($value)
 	{
 		return [
 			self::RACE_HUMAN    => 'Human',
@@ -200,7 +200,7 @@ class Lang
 		] [$value] ?? NULL;
 	}
 
-	public function ai ($value)
+	public static function ai ($value)
 	{
 		return [
 			self::AI_EASY   => 'Easy',
@@ -209,7 +209,7 @@ class Lang
 		] [$value] ?? NULL;
 	}
 
-	public function mode ($value)
+	public static function mode ($value)
 	{
 		return [
 			self::MODE_TEAM_RACE_SELECTABLE 	=> 'Team & Race Selectable',
@@ -220,7 +220,7 @@ class Lang
 		] [$value] ?? NULL;
 	}
 
-	public function chat ($value)
+	public static function chat ($value)
 	{
 		return [
 			self::CHAT_ALL       => 'All',

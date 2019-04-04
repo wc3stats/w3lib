@@ -4,10 +4,6 @@ use w3lib\Library\Logger;
 
 function xxd ($block, $width = 16)
 {
-    if (!Logger::isDebug ()) {
-        return;
-    }
-    
     $from = '';
     $to   = '';
 

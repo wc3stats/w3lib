@@ -169,8 +169,12 @@ class Parser
             $player = $this->replay->getPlayerById ($w3mmd->playerId);
         }
 
+        if (!$player) {
+            return;
+        }
+
         switch ($w3mmd->type) {
-            case W3mmd::W3MMD_INIT_PID:
+            case W3mmd::W3MMD_INIT:
                 $player->variables = [];
             break;
 
@@ -183,8 +187,7 @@ class Parser
             break;
 
             case W3mmd::W3MMD_FLAGP:
-                $player->flags   |= $w3mmd->flag;
-                $player->isWinner = $w3mmd->flag & W3mmd::W3MMD_FLAG_WINNER;
+                $player->isWinner = $w3mmd->flag === W3mmd::W3MMD_FLAG_WINNER;
             break;
         }
 
@@ -193,6 +196,8 @@ class Parser
 
     private function package ()
     {
+        $teamScores = [];
+
         foreach ($this->replay->game->players as $player) {
             // If there are players still in the game, must set leave time.
             if ($player->leftAt === NULL) {
@@ -209,6 +214,33 @@ class Parser
             }
 
             ksort ($player->activity);
+
+            if (isset ($teamScores [$player->team])) {
+                continue;
+            }
+
+            $teamScore = 0;
+            $teamPlayers = $this->replay->getPlayersByTeam ($player->team);
+
+            foreach ($teamPlayers as $teamPlayer) {
+                if ($teamPlayer->isWinner) {
+                    $teamScore += INF;
+                }
+
+                $teamScore += rand (500, 1800); // $teamPlayer->score;
+            }
+
+            $teamScores [$player->team] = ceil ($teamScore / count ($teamPlayers));
+        }
+
+        $placement = 1;
+
+        foreach ($teamScores as $teamId => $teamScore) {
+            foreach ($this->replay->getPlayersByTeam ($teamId) as $teamPlayer) {
+                $teamPlayer->placement = $placement;
+            }
+
+            $placement++;
         }
     }
 }

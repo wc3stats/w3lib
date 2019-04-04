@@ -18,30 +18,37 @@ class Replay extends Archive
         $parser->parse ();
     }
 
-    public function getPlayer ($key, $value)
+    public function getPlayers ($key, $value)
     {
+        $players = [];
+
         foreach ($this->game->players as $player) {
             if (strcasecmp ($player->$key, $value) === 0) {
-                return $player;
+                $players [] = $player;
             }
         }
 
-        return NULL;
+        return $players;
     }
 
     public function getPlayerById ($playerId)
     {
-        return $this->getPlayer ('id', $playerId);
+        return current ($this->getPlayers ('id', $playerId)) ?: NULL;
     }
 
     public function getPlayerByName ($playerName) 
     {
-        return $this->getPlayer ('name', $playerName);
+        return current ($this->getPlayers ('name', $playerName)) ?: NULL;
     }
 
     public function getPlayerBySlot ($slot)
     {
-        return $this->getPlayer ('slot', $slot);
+        return current ($this->getPlayers ('slot', $slot)) ?: NULL;
+    }
+
+    public function getPlayersByTeam ($teamId)
+    {
+        return $this->getPlayers ('team', $teamId);
     }
 
     public function getSlot ($playerId)

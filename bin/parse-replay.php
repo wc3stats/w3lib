@@ -5,9 +5,11 @@ require dirname (__DIR__) . '/vendor/autoload.php';
 use Monolog\Logger as Monolog;
 use w3lib\Library\Logger;
 use w3lib\w3g\Replay;
+use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
-define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/AzerothWars-4.w3g');
+define ('REPLAY_FILE', __DIR__ . '/Hellhalt.w3g');
 
 /** **/
 
@@ -37,13 +39,18 @@ echo PHP_EOL;
 
 foreach ($replay->game->players as $player) {
     Logger::info (
-        'Id: %2d | Slot: %2d | Player: %-16s | APM: %4d | Left: %6d | Vars: %2d',
+        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | Score: %4d | Placement: %2d | APM: %4d | Left: %6d | Vars: %2d',
         $player->id,
         $player->slot,
+        $player->colour,
+        Lang::colour ($player->colour),
         $player->name,
+        $player->team,
+        $player->score,
+        $player->placement,
         $player->apm (),
         $player->leftAt,
-        count ($player->variables)
+        count ($player->variables ?? [])
     );
 }
 

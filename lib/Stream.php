@@ -62,7 +62,7 @@ class Stream
             );
         }
 
-        if (! ($flags & self::QUIET)) {
+        if (! ($flags & self::QUIET) && Logger::isDebug ()) {
             xxd ($block);
         }
 

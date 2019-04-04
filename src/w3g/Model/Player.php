@@ -25,6 +25,7 @@ class Player extends Model
     public $isWinner  = NULL;
     public $team      = NULL;
     public $score     = NULL;
+    public $placement = NULL;
     public $actions   = NULL;
     public $activity  = [];
     public $variables = NULL;
