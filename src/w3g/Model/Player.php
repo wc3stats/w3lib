@@ -28,6 +28,7 @@ class Player extends Model
     public $placement = NULL;
     public $actions   = NULL;
     public $activity  = [];
+    public $apm       = 0;
     public $variables = NULL;
 
     public function read (Stream $stream, $context = NULL)
@@ -60,20 +61,8 @@ class Player extends Model
         }
     }
 
-    public function apm ()
-    {
-        if (empty ($this->activity)) {
-            return 0;
-        }
-
-        return array_sum ($this->activity) / count ($this->activity);
-    }
-
     public function __sleep ()
-    {   
-        // Refresh APM before serializing.
-        $this->apm = $this->apm ();
-
+    {
         $keys = array_keys ((array) $this);
 
         // Omit actions, there are too many to reasonably serialize.

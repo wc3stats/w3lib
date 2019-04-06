@@ -6,6 +6,7 @@ use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Lang;
+use w3lib\w3g\Util\Team;
 
 class Game extends Model
 {
@@ -27,7 +28,7 @@ class Game extends Model
     public $recordId      = NULL;
     public $recordLength  = NULL;
     public $slotRecords   = NULL;
-    public $players       = [];
+    public $teams         = [];
     public $randomSeed    = NULL;
     public $selectMode    = NULL;
     public $startSpots    = NULL;
@@ -47,8 +48,8 @@ class Game extends Model
          */
         $host = Player::unpack ($stream, $context);
         $host->isHost = true;
-        
-        $this->players [$host->id] = $host;
+
+        $this->addPlayer ($host);
 
         /**
          * 4.2 [GameName]
@@ -142,8 +143,9 @@ class Game extends Model
          * 4.9 [PlayerList]
          */
         while ($stream->int8 (Stream::PEEK) === Lang::PLAYER) {
-            $player = Player::unpack ($stream, $context);
-            $this->players [$player->id] = $player;
+            $this->addPlayer (
+                Player::unpack ($stream, $context)
+            );
 
             // 4 unknown padding bytes.
             $stream->read (4);
@@ -162,16 +164,14 @@ class Game extends Model
         for ($i = 0; $i < $this->slotRecords; $i++) {
             $slot = Slot::unpack ($stream, $context);
 
-            if (!isset ($this->players [$slot->playerId])) {
+            if (! ($player = $this->getPlayerBy ('id', $slot->playerId))) {
                 continue;
             }
-
-            $player = $this->players [$slot->playerId];
 
             $player->slot     = $i;
             $player->team     = $slot->team;
             $player->colour   = $slot->colour;
-            $player->race     = $this->race ?? $slot->race;
+            $player->race     = $player->race ?? $slot->race;
             $player->handicap = $slot->handicap;
         }
 
@@ -183,6 +183,102 @@ class Game extends Model
         $this->selectMode = $stream->int8 ();
         $this->startSpots = $stream->int8 ();
     }
+
+    /** **/
+
+    public function addPlayer (Player $player)
+    {
+        if (!isset ($this->teams [$player->team])) {
+            $this->teams [$player->team] = new Team ($player->team);
+        }
+
+        $this->teams [$player->team]->add ($player);
+    }
+
+    public function getPlayers ()
+    {
+        $players = [];
+
+        foreach ($this->teams as $team) {
+            foreach ($team->getPlayers () as $player) {
+                $players [] = $player;
+            }
+        }
+
+        return $players;
+    }
+
+    public function getPlayerBy ($key, $value)
+    {
+        return current ($this->getPlayersBy ($key, $value)) ?: NULL;
+    }
+
+    public function getPlayersBy ($key, $value)
+    {
+        $players = [];
+
+        foreach ($this->getPlayers () as $player) {
+            if (strcasecmp ($player->$key, $value) === 0) {
+                $players [] = $player;
+            }
+        }
+
+        return $players;
+    }
+
+    public function rebuild ()
+    {
+        $teams = [];
+
+        foreach ($this->getPlayers () as $player) {
+            if (!isset ($teams [$player->team])) {
+                $teams [$player->team] = new Team ($player->team);
+            }
+
+            $teams [$player->team]->add ($player);
+        }
+
+        $this->teams = $teams;
+
+        $this->sort ();
+    }
+
+    public function sort ()
+    {
+        if (!$this->isSortable ()) {
+            return;
+        }
+
+        uasort ($this->teams, function ($teamX, $teamY) {
+            if ($teamX->isWinner) {
+                return -1;
+            }
+
+            if ($teamY->isWinner) {
+                return 1;
+            }
+
+            return $teamY->score <=> $teamX->score;
+        });
+
+        $placement = 1;
+
+        foreach ($this->teams as $team) {
+            $team->setPlacement ($placement++);
+        }
+    }
+
+    private function isSortable ()
+    {
+        foreach ($this->getPlayers () as $player) {
+            if (is_numeric ($player->score)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
 
 ?>

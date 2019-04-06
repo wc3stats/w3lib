@@ -196,12 +196,10 @@ class Parser
 
     private function package ()
     {
-        $teamScores = [];
-
-        foreach ($this->replay->game->players as $player) {
+        foreach ($this->replay->getPlayers () as $player) {
             // If there are players still in the game, must set leave time.
             if ($player->leftAt === NULL) {
-                $player->leftAt = $this->replay->header->length;
+                $player->leftAt = $this->replay->getLength ();
             }       
 
             // Fill in player activity time holes.
@@ -215,33 +213,12 @@ class Parser
 
             ksort ($player->activity);
 
-            if (isset ($teamScores [$player->team])) {
-                continue;
-            }
-
-            $teamScore = 0;
-            $teamPlayers = $this->replay->getPlayersByTeam ($player->team);
-
-            foreach ($teamPlayers as $teamPlayer) {
-                if ($teamPlayer->isWinner) {
-                    $teamScore += INF;
-                }
-
-                $teamScore += rand (500, 1800); // $teamPlayer->score;
-            }
-
-            $teamScores [$player->team] = ceil ($teamScore / count ($teamPlayers));
+            $player->apm = ceil (
+                array_sum ($player->activity) / count ($player->activity)
+            );
         }
 
-        $placement = 1;
-
-        foreach ($teamScores as $teamId => $teamScore) {
-            foreach ($this->replay->getPlayersByTeam ($teamId) as $teamPlayer) {
-                $teamPlayer->placement = $placement;
-            }
-
-            $placement++;
-        }
+        $this->replay->game->rebuild ();
     }
 }
 
