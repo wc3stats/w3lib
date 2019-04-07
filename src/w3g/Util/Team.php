@@ -30,7 +30,13 @@ class Team
 
     public function get ($playerId) 
     {
-        return $this->players [$playerId];
+        foreach ($this->players as $player) {
+            if ($player->id === $playerId) {
+                return $player;
+            }
+        }
+
+        return NULL;
     }
 
     public function getPlayers ()
