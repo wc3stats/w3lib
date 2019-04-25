@@ -82,347 +82,350 @@ Here is the JSON representation of all of the data that is available in the repl
 * The activity array in the players model is simply a count of the number of actions per the APX value defined in settings. If `$settings->apx = 60` then each number is a count of the number of actions per 60 seconds of game time.
 
 ```
-"header": {
-      "intro": "Warcraft III recorded game",
-      "headerSize": 68,
-      "compressedSize": 743918,
-      "headerVersion": 1,
-      "uncompressedSize": 2957119,
-      "numBlocks": 361,
-      "identification": "PX3W",
-      "majorVersion": 30,
-      "buildVersion": 6061,
-      "flags": 32768,
-      "length": 4745,
-      "checksum": 35026590,
-      "_class": "w3lib\\w3g\\Model\\Header"
-    },
-    "game": {
-      "name": "[ENT] BattleShip Crossfire #18",
-      "speed": 2,
-      "visibility": 3,
-      "observers": 0,
-      "teamsTogether": true,
-      "lockedTeams": true,
-      "fullShare": false,
-      "randomHero": false,
-      "randomRaces": false,
-      "checksum": 1189054958,
-      "map": "Battleships Crossfire4.70.w3x",
-      "host": "GHost++",
-      "numSlots": 12,
-      "type": 1,
-      "private": true,
-      "recordId": 25,
-      "recordLength": 115,
-      "slotRecords": 12,
-      "teams": [
-        {
-          "id": 0,
-          "players": [
-            {
-              "type": 0,
-              "id": 2,
-              "name": "fiberoptik",
-              "race": 4,
-              "isHost": true,
-              "slot": 2,
-              "colour": 2,
-              "handicap": 100,
-              "leftAt": 4771,
-              "isWinner": false,
-              "team": 0,
-              "score": null,
-              "placement": null,
-              "activity": [
-                52,
-                63,
-               ...
-              ],
-              "apm": 85,
-              "variables": {
-                "goldgathered": "61930",
-                "lumbergathered": "0",
-                "shiplist": "custom_H041,custom_H02D",
-                "deaths": "9",
-                "assists": "8",
-                "kickcounter": "0",
-                "kills": "2",
-                "bounty": "9927",
-                "creepkills": "990",
-                "dodosfound": "0",
-                "chatcounter": "2",
-                "bountyfeed": "-12222"
-              },
-              "_class": "w3lib\\w3g\\Model\\Player"
-            },
-            {
-              "type": 22,
-              "id": 6,
-              "name": "Neoauto",
-              "race": 4,
-              "isHost": false,
-              "slot": 4,
-              "colour": 4,
-              "handicap": 100,
-              "leftAt": 4759,
-              "isWinner": false,
-              "team": 0,
-              "score": null,
-              "placement": null,
-              "activity": [
-                38,
-                137,
-                ...
-              ],
-              "apm": 103,
-              "variables": {
-                "kills": "6",
-                "kickcounter": "0",
-                "bounty": "10263",
-                "bountyfeed": "-14257",
-                "goldgathered": "55955",
-                "lumbergathered": "0",
-                "dodosfound": "0",
-                "deaths": "8",
-                "creepkills": "418",
-                "assists": "6",
-                "chatcounter": "515",
-                "shiplist": "custom_H01C,custom_H00J,custom_H000,custom_H03O"
-              },
-              "_class": "w3lib\\w3g\\Model\\Player"
-            },
-            {
-              "type": 22,
-              "id": 3,
-              "name": "chrismokvack",
-              "race": 4,
-              "isHost": false,
-              "slot": 3,
-              "colour": 3,
-              "handicap": 100,
-              "leftAt": 4759,
-              "isWinner": null,
-              "team": 0,
-              "score": null,
-              "placement": null,
-              "activity": [
-                115,
-                139,
-                ...
-              ],
-              "apm": 69,
-              "variables": null,
-              "_class": "w3lib\\w3g\\Model\\Player"
-            },
-            {
-              "type": 22,
-              "id": 8,
-              "name": "Kapuster",
-              "race": 4,
-              "isHost": false,
-              "slot": 5,
-              "colour": 5,
-              "handicap": 100,
-              "leftAt": 4759,
-              "isWinner": null,
-              "team": 0,
-              "score": null,
-              "placement": null,
-              "activity": [
-                61,
-                90,
-                ...
-              ],
-              "apm": 100,
-              "variables": {
-                "deaths": "9",
-                "assists": "0",
-                "dodosfound": "0",
-                "bounty": "5886",
-                "bountyfeed": "-24022",
-                "shiplist": "custom_H013,custom_H000,custom_H02A",
-                "creepkills": "452",
-                "kills": "5",
-                "kickcounter": "0",
-                "goldgathered": "45046",
-                "lumbergathered": "0",
-                "chatcounter": "353"
-              },
-              "_class": "w3lib\\w3g\\Model\\Player"
-            }
-          ],
-          "score": 0,
-          "placement": null,
-          "isWinner": false,
-          "_class": "w3lib\\w3g\\Util\\Team"
-        },
-        {
-          "id": 1,
-          "players": [
-            {
-              "type": 22,
-              "id": 4,
-              "name": "TeoNanks",
-              "race": 4,
-              "isHost": false,
-              "slot": 9,
-              "colour": 9,
-              "handicap": 100,
-              "leftAt": 4766,
-              "isWinner": true,
-              "team": 1,
-              "score": null,
-              "placement": null,
-              "activity": [
-                64,
-                92,
-                ...
-              ],
-              "apm": 152,
-              "variables": {
-                "kills": "10",
-                "assists": "11",
-                "chatcounter": "136",
-                "creepkills": "562",
-                "dodosfound": "0",
-                "kickcounter": "0",
-                "bounty": "23111",
-                "bountyfeed": "-1922"
-              },
-              "_class": "w3lib\\w3g\\Model\\Player"
-            },
-            {
-              "type": 22,
-              "id": 5,
-              "name": "Osama_Hussein",
-              "race": 4,
-              "isHost": false,
-              "slot": 8,
-              "colour": 8,
-              "handicap": 100,
-              "leftAt": 4761,
-              "isWinner": null,
-              "team": 1,
-              "score": null,
-              "placement": null,
-              "activity": [
-                54,
-                58,
-                ...
-              ],
-              "apm": 69,
-              "variables": [],
-              "_class": "w3lib\\w3g\\Model\\Player"
-            },
-            {
-              "type": 22,
-              "id": 7,
-              "name": "Qrtz",
-              "race": 4,
-              "isHost": false,
-              "slot": 6,
-              "colour": 6,
-              "handicap": 100,
-              "leftAt": 4767,
-              "isWinner": true,
-              "team": 1,
-              "score": null,
-              "placement": null,
-              "activity": [
-                39,
-                73,
-                ...
-              ],
-              "apm": 85,
-              "variables": {
-                "kills": "1",
-                "bounty": "4793",
-                "bountyfeed": "-1299",
-                "assists": "4",
-                "kickcounter": "0",
-                "lumbergathered": "0",
-                "chatcounter": "109",
-                "deaths": "2",
-                "dodosfound": "0",
-                "creepkills": "296",
-                "goldgathered": "47515",
-                "shiplist": "custom_H02G,custom_H04I"
-              },
-              "_class": "w3lib\\w3g\\Model\\Player"
-            },
-            {
-              "type": 22,
-              "id": 9,
-              "name": "dyn",
-              "race": 4,
-              "isHost": false,
-              "slot": 7,
-              "colour": 7,
-              "handicap": 100,
-              "leftAt": 4766,
-              "isWinner": true,
-              "team": 1,
-              "score": null,
-              "placement": null,
-              "activity": [
-                178,
-                221,
-                ...
-              ],
-              "apm": 146,
-              "variables": {
-                "chatcounter": "295",
-                "bounty": "30827",
-                "creepkills": "814",
-                "assists": "18",
-                "lumbergathered": "0",
-                "kickcounter": "0",
-                "bountyfeed": "-8466",
-                "shiplist": "custom_H00A",
-                "deaths": "4",
-                "kills": "10",
-                "goldgathered": "84072",
-                "dodosfound": "0"
-              },
-              "_class": "w3lib\\w3g\\Model\\Player"
-            }
-          ],
-          "score": 0,
-          "placement": null,
-          "isWinner": true,
-          "_class": "w3lib\\w3g\\Util\\Team"
-        }
+{
+   "header":{
+      "intro":"Warcraft III recorded game�",
+      "headerSize":68,
+      "compressedSize":743918,
+      "headerVersion":1,
+      "uncompressedSize":2957119,
+      "numBlocks":361,
+      "identification":"PX3W",
+      "majorVersion":30,
+      "buildVersion":6061,
+      "flags":32768,
+      "length":4745,
+      "checksum":35026590,
+      "_class":"w3lib\\w3g\\Model\\Header"
+   },
+   "game":{
+      "name":"[ENT] BattleShip Crossfire #18",
+      "speed":2,
+      "visibility":3,
+      "observers":0,
+      "teamsTogether":true,
+      "lockedTeams":true,
+      "fullShare":false,
+      "randomHero":false,
+      "randomRaces":false,
+      "checksum":1189054958,
+      "map":"Battleships Crossfire4.70.w3x",
+      "host":"GHost++",
+      "numSlots":12,
+      "type":1,
+      "private":true,
+      "recordId":25,
+      "recordLength":115,
+      "slotRecords":12,
+      "teams":[
+         {
+            "id":0,
+            "players":[
+               {
+                  "type":0,
+                  "id":2,
+                  "name":"fiberoptik",
+                  "race":4,
+                  "isHost":true,
+                  "slot":2,
+                  "colour":2,
+                  "handicap":100,
+                  "leftAt":4771,
+                  "isWinner":false,
+                  "team":0,
+                  "score":null,
+                  "placement":null,
+                  "activity":[
+                     52,
+                     63,
+                     ...
+                  ],
+                  "apm":85,
+                  "variables":{
+                     "goldgathered":"61930",
+                     "lumbergathered":"0",
+                     "shiplist":"custom_H041,custom_H02D",
+                     "deaths":"9",
+                     "assists":"8",
+                     "kickcounter":"0",
+                     "kills":"2",
+                     "bounty":"9927",
+                     "creepkills":"990",
+                     "dodosfound":"0",
+                     "chatcounter":"2",
+                     "bountyfeed":"-12222"
+                  },
+                  "_class":"w3lib\\w3g\\Model\\Player"
+               },
+               {
+                  "type":22,
+                  "id":6,
+                  "name":"Neoauto",
+                  "race":4,
+                  "isHost":false,
+                  "slot":4,
+                  "colour":4,
+                  "handicap":100,
+                  "leftAt":4759,
+                  "isWinner":false,
+                  "team":0,
+                  "score":null,
+                  "placement":null,
+                  "activity":[
+                     38,
+                     137,
+                     ...
+                  ],
+                  "apm":103,
+                  "variables":{
+                     "kills":"6",
+                     "kickcounter":"0",
+                     "bounty":"10263",
+                     "bountyfeed":"-14257",
+                     "goldgathered":"55955",
+                     "lumbergathered":"0",
+                     "dodosfound":"0",
+                     "deaths":"8",
+                     "creepkills":"418",
+                     "assists":"6",
+                     "chatcounter":"515",
+                     "shiplist":"custom_H01C,custom_H00J,custom_H000,custom_H03O"
+                  },
+                  "_class":"w3lib\\w3g\\Model\\Player"
+               },
+               {
+                  "type":22,
+                  "id":3,
+                  "name":"chrismokvack",
+                  "race":4,
+                  "isHost":false,
+                  "slot":3,
+                  "colour":3,
+                  "handicap":100,
+                  "leftAt":4759,
+                  "isWinner":null,
+                  "team":0,
+                  "score":null,
+                  "placement":null,
+                  "activity":[
+                     115,
+                     139,
+                     ...
+                  ],
+                  "apm":69,
+                  "variables":null,
+                  "_class":"w3lib\\w3g\\Model\\Player"
+               },
+               {
+                  "type":22,
+                  "id":8,
+                  "name":"Kapuster",
+                  "race":4,
+                  "isHost":false,
+                  "slot":5,
+                  "colour":5,
+                  "handicap":100,
+                  "leftAt":4759,
+                  "isWinner":null,
+                  "team":0,
+                  "score":null,
+                  "placement":null,
+                  "activity":[
+                     61,
+                     90,
+                     ...
+                  ],
+                  "apm":100,
+                  "variables":{
+                     "deaths":"9",
+                     "assists":"0",
+                     "dodosfound":"0",
+                     "bounty":"5886",
+                     "bountyfeed":"-24022",
+                     "shiplist":"custom_H013,custom_H000,custom_H02A",
+                     "creepkills":"452",
+                     "kills":"5",
+                     "kickcounter":"0",
+                     "goldgathered":"45046",
+                     "lumbergathered":"0",
+                     "chatcounter":"353"
+                  },
+                  "_class":"w3lib\\w3g\\Model\\Player"
+               }
+            ],
+            "score":0,
+            "placement":null,
+            "isWinner":false,
+            "_class":"w3lib\\w3g\\Util\\Team"
+         },
+         {
+            "id":1,
+            "players":[
+               {
+                  "type":22,
+                  "id":4,
+                  "name":"TeoNanks",
+                  "race":4,
+                  "isHost":false,
+                  "slot":9,
+                  "colour":9,
+                  "handicap":100,
+                  "leftAt":4766,
+                  "isWinner":true,
+                  "team":1,
+                  "score":null,
+                  "placement":null,
+                  "activity":[
+                     64,
+                     92,
+                     ...
+                  ],
+                  "apm":152,
+                  "variables":{
+                     "kills":"10",
+                     "assists":"11",
+                     "chatcounter":"136",
+                     "creepkills":"562",
+                     "dodosfound":"0",
+                     "kickcounter":"0",
+                     "bounty":"23111",
+                     "bountyfeed":"-1922"
+                  },
+                  "_class":"w3lib\\w3g\\Model\\Player"
+               },
+               {
+                  "type":22,
+                  "id":5,
+                  "name":"Osama_Hussein",
+                  "race":4,
+                  "isHost":false,
+                  "slot":8,
+                  "colour":8,
+                  "handicap":100,
+                  "leftAt":4761,
+                  "isWinner":null,
+                  "team":1,
+                  "score":null,
+                  "placement":null,
+                  "activity":[
+                     54,
+                     58,
+                     ...
+                  ],
+                  "apm":69,
+                  "variables":[
+
+                  ],
+                  "_class":"w3lib\\w3g\\Model\\Player"
+               },
+               {
+                  "type":22,
+                  "id":7,
+                  "name":"Qrtz",
+                  "race":4,
+                  "isHost":false,
+                  "slot":6,
+                  "colour":6,
+                  "handicap":100,
+                  "leftAt":4767,
+                  "isWinner":true,
+                  "team":1,
+                  "score":null,
+                  "placement":null,
+                  "activity":[
+                     39,
+                     73,
+                     ...
+                  ],
+                  "apm":85,
+                  "variables":{
+                     "kills":"1",
+                     "bounty":"4793",
+                     "bountyfeed":"-1299",
+                     "assists":"4",
+                     "kickcounter":"0",
+                     "lumbergathered":"0",
+                     "chatcounter":"109",
+                     "deaths":"2",
+                     "dodosfound":"0",
+                     "creepkills":"296",
+                     "goldgathered":"47515",
+                     "shiplist":"custom_H02G,custom_H04I"
+                  },
+                  "_class":"w3lib\\w3g\\Model\\Player"
+               },
+               {
+                  "type":22,
+                  "id":9,
+                  "name":"dyn",
+                  "race":4,
+                  "isHost":false,
+                  "slot":7,
+                  "colour":7,
+                  "handicap":100,
+                  "leftAt":4766,
+                  "isWinner":true,
+                  "team":1,
+                  "score":null,
+                  "placement":null,
+                  "activity":[
+                     178,
+                     221,
+                     ...
+                  ],
+                  "apm":146,
+                  "variables":{
+                     "chatcounter":"295",
+                     "bounty":"30827",
+                     "creepkills":"814",
+                     "assists":"18",
+                     "lumbergathered":"0",
+                     "kickcounter":"0",
+                     "bountyfeed":"-8466",
+                     "shiplist":"custom_H00A",
+                     "deaths":"4",
+                     "kills":"10",
+                     "goldgathered":"84072",
+                     "dodosfound":"0"
+                  },
+                  "_class":"w3lib\\w3g\\Model\\Player"
+               }
+            ],
+            "score":0,
+            "placement":null,
+            "isWinner":true,
+            "_class":"w3lib\\w3g\\Util\\Team"
+         }
       ],
-      "randomSeed": 2359613021,
-      "selectMode": 3,
-      "startSpots": 12,
-      "saver": 2,
-      "w3mmd": true,
-      "_class": "w3lib\\w3g\\Model\\Game"
-    },
-    "chatlog": {
-      "0": {
-        "playerId": 2,
-        "length": 53,
-        "flags": 32,
-        "mode": 0,
-        "message": "Votestart expired (sixty seconds without pass).",
-        "time": 0,
-        "_class": "w3lib\\w3g\\Model\\ChatMessage"
+      "randomSeed":2359613021,
+      "selectMode":3,
+      "startSpots":12,
+      "saver":2,
+      "w3mmd":true,
+      "_class":"w3lib\\w3g\\Model\\Game"
+   },
+   "chatlog":{
+      "0":{
+         "playerId":2,
+         "length":53,
+         "flags":32,
+         "mode":0,
+         "message":"Votestart expired (sixty seconds without pass).",
+         "time":0,
+         "_class":"w3lib\\w3g\\Model\\ChatMessage"
       },
-      "1": {
-        "playerId": 2,
-        "length": 55,
-        "flags": 32,
-        "mode": 0,
-        "message": "Shortest load by player [Qrtz] was 22.21 seconds.",
-        "time": 0,
-        "_class": "w3lib\\w3g\\Model\\ChatMessage"
+      "1":{
+         "playerId":2,
+         "length":55,
+         "flags":32,
+         "mode":0,
+         "message":"Shortest load by player [Qrtz] was 22.21 seconds.",
+         "time":0,
+         "_class":"w3lib\\w3g\\Model\\ChatMessage"
       },
-    ...
-    },
-    "_class": "w3lib\\w3g\\Replay"
+      ...
+   },
+   "_class":"w3lib\\w3g\\Replay"
 }
 ```
 
