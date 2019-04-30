@@ -6,7 +6,6 @@ use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Lang;
-use w3lib\w3g\Util\Team;
 
 class Game extends Model
 {
@@ -28,7 +27,7 @@ class Game extends Model
     public $recordId      = NULL;
     public $recordLength  = NULL;
     public $slotRecords   = NULL;
-    public $teams         = [];
+    public $players       = [];
     public $randomSeed    = NULL;
     public $selectMode    = NULL;
     public $startSpots    = NULL;
@@ -188,24 +187,12 @@ class Game extends Model
 
     public function addPlayer (Player $player)
     {
-        if (!isset ($this->teams [$player->team])) {
-            $this->teams [$player->team] = new Team ($player->team);
-        }
-
-        $this->teams [$player->team]->add ($player);
+        $this->players [] = $player;
     }
 
     public function getPlayers ()
     {
-        $players = [];
-
-        foreach ($this->teams as $team) {
-            foreach ($team->getPlayers () as $player) {
-                $players [] = $player;
-            }
-        }
-
-        return $players;
+        return $this->players;
     }
 
     public function getPlayerBy ($key, $value)
@@ -225,64 +212,6 @@ class Game extends Model
 
         return $players;
     }
-
-    public function rebuild ()
-    {
-        $teams = [];
-
-        // Recreate teams, necessary for when the player's team was sent through
-        // W3MMD (it may be different than the player slot's team value).
-        foreach ($this->getPlayers () as $player) {
-            if (!isset ($teams [$player->team])) {
-                $teams [$player->team] = new Team ($player->team);
-            }
-
-            $teams [$player->team]->add ($player);
-        }
-
-        if ($this->isSortable ()) {
-            usort ($teams, function ($teamX, $teamY) {
-                if ($teamX->isWinner) {
-                    return -1;
-                }
-
-                if ($teamY->isWinner) {
-                    return 1;
-                }
-
-                return $teamY->score <=> $teamX->score;
-            });
-
-            foreach ($teams as $teamId => $team) {
-                $team->setPlacement ($teamId + 1);
-            }
-        }
-
-        // Reindex teams. Useful for preserving array structure so that no
-        // teamId values are skipped.
-        $teams = array_values ($teams);
-
-        // Update each player team value to reflect new index.
-        foreach ($teams as $teamId => $team) {
-            foreach ($team->getPlayers () as $player) {
-                $player->team = $teamId;
-            }
-        }
-
-        $this->teams = $teams;
-    }
-
-    private function isSortable ()
-    {
-        foreach ($this->getPlayers () as $player) {
-            if (is_numeric ($player->score)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 }
 
 ?>

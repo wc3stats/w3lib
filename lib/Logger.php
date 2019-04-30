@@ -27,7 +27,7 @@ class Logger
         if (!self::$instance) {
             $instance = new Monolog (NULL);
 
-            $handler = new StreamHandler ('php://stdout', self::$level ?? Monolog::DEBUG);
+            $handler = new StreamHandler ('php://stdout', self::$level ?? Monolog::ERROR);
 
             $handler->setFormatter (
                 new ColoredLineFormatter (NULL, "[%datetime%] %level_name% - %message% [%extra.file%:%extra.line%]\n")

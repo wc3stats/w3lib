@@ -8,9 +8,9 @@ use w3lib\w3g\Replay;
 use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
-define ('REPLAY_FILE', __DIR__ . '/AzerothWars-4.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/Hellhalt.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-1.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/AzerothWars-4.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/AzerothWars-events.w3g');
+define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-3.w3g');
 
 /** **/
 
@@ -39,34 +39,19 @@ Logger::info ('W3MMD: [%s]',       $replay->game->w3mmd ? 'Yes' : 'No');
 
 echo PHP_EOL;
 
-foreach ($replay->getTeams () as $teamId => $team) {
+foreach ($replay->getPlayers () as $player) {
     Logger::info (
-        'Team: %d | Score: %4d | Placement: %2d | isWinner: %-3s | Size: %d',
-        $teamId,
-        $team->score,
-        $team->placement,
-        $team->isWinner ? 'Yes' : 'No',
-        $team->getSize ()
+        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Left: %6d | Vars: %2d',
+        $player->id,
+        $player->slot,
+        $player->colour,
+        Lang::colour ($player->colour),
+        $player->name,
+        $player->team,
+        $player->apm,
+        $player->leftAt,
+        count ($player->variables ?? [])
     );
-
-    foreach ($team->getPlayers () as $player) {
-        Logger::info (
-            'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | Score: %4d | Placement: %2d | APM: %4d | Left: %6d | Vars: %2d',
-            $player->id,
-            $player->slot,
-            $player->colour,
-            Lang::colour ($player->colour),
-            $player->name,
-            $player->team,
-            $player->score,
-            $player->placement,
-            $player->apm,
-            $player->leftAt,
-            count ($player->variables ?? [])
-        );
-    }
-
-    echo PHP_EOL;
 }
 
 echo PHP_EOL;

@@ -96,8 +96,12 @@ class W3mmd extends Model
                 $this->value    = trim ($toks [4], ' ",');
             break;
 
-            case self::W3MMD_EVENT:     break;
-            case self::W3MMD_DEF_EVENT: break;
+            case self::W3MMD_EVENT:     
+                var_dump ($toks);
+            break;
+            case self::W3MMD_DEF_EVENT: 
+                var_dump ($toks);
+            break;
 
             case self::W3MMD_DEF_VARP:  
                 /**

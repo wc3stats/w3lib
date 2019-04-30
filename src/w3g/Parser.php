@@ -179,9 +179,9 @@ class Parser
             break;
 
             case W3mmd::W3MMD_VARP:
-                if (property_exists ($player, $w3mmd->varname)) {
-                    $player->{$w3mmd->varname} = $w3mmd->value;
-                }
+                // if (property_exists ($player, $w3mmd->varname)) {
+                //     $player->{$w3mmd->varname} = $w3mmd->value;
+                // }
 
                 $player->variables [$w3mmd->varname] = $w3mmd->value;
             break;
@@ -217,8 +217,6 @@ class Parser
                 array_sum ($player->activity) / count ($player->activity)
             );
         }
-
-        $this->replay->game->rebuild ();
     }
 }
 
