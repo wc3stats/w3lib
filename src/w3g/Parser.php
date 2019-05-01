@@ -16,7 +16,7 @@ use w3lib\w3g\Model\Player;
 use w3lib\w3g\Model\Game;
 use w3lib\w3g\Model\Segment;
 use w3lib\w3g\Model\ChatLog;
-use w3lib\w3g\Model\W3mmd;
+use w3lib\w3g\Model\W3MMD;
 
 class Parser
 {
@@ -165,6 +165,12 @@ class Parser
         $w3mmd  = $action->w3mmd;
         $player = NULL;
 
+        switch ($w3mmd->type) {
+            case W3MMD::W3MMD_EVENT:
+                $this->replay->game->events [] = $w3mmd;
+            break;
+        }
+
         if (isset ($w3mmd->playerId)) {
             $player = $this->replay->getPlayerById ($w3mmd->playerId);
         }
@@ -174,24 +180,20 @@ class Parser
         }
 
         switch ($w3mmd->type) {
-            case W3mmd::W3MMD_INIT:
+            case W3MMD::W3MMD_INIT:
                 $player->variables = [];
             break;
 
-            case W3mmd::W3MMD_VARP:
-                // if (property_exists ($player, $w3mmd->varname)) {
-                //     $player->{$w3mmd->varname} = $w3mmd->value;
-                // }
-
+            case W3MMD::W3MMD_VARP:
                 $player->variables [$w3mmd->varname] = $w3mmd->value;
             break;
 
-            case W3mmd::W3MMD_FLAGP:
-                $player->isWinner = $w3mmd->flag === W3mmd::W3MMD_FLAG_WINNER;
+            case W3MMD::W3MMD_FLAGP:
+                $player->flags [] = $w3mmd->flag;
             break;
         }
 
-        $this->replay->game->w3mmd = true;
+        $this->replay->game->hasW3mmd = true;
     }
 
     private function package ()

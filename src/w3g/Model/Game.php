@@ -31,11 +31,12 @@ class Game extends Model
     public $randomSeed    = NULL;
     public $selectMode    = NULL;
     public $startSpots    = NULL;
+    public $events        = [];
 
     // Deferred.
 
     public $saver = NULL;
-    public $w3mmd = false;
+    public $hasW3mmd = false;
 
     public function read (Stream $stream, $context = NULL)
     {

@@ -26,7 +26,6 @@ class ActionBlock extends Model
         $block = new Buffer ($stream->read ($this->length));
 
         foreach (Action::unpackAll ($block, $context) as $action) {
-
             // Actions to ignore.
             if (in_array ($action->id, [
                 Action::UNKNOWN_1,

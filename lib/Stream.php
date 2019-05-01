@@ -15,6 +15,8 @@ class Stream
     const NUL   = 0x00;
     const PEEK  = 0x01;
     const QUIET = 0x02;
+    
+    const ESCAPE = "\\";
 
     public function __construct ($handle, $endian = self::ENDIAN_LE)
     {
@@ -106,16 +108,27 @@ class Stream
     public function string ($term = self::NUL)
     {
         $s = '';
+        $p = NULL;
 
-        while (($c = $this->read (1, self::QUIET)) !== FALSE) {
-            if (ord ($c) == $term) {
+        while (true) {
+            try {
+                $c = $this->read (1, self::QUIET);
+
+                if (   ord ($c) === $term
+                    && $p !== self::ESCAPE) {
+                    break;
+                }
+
+                $s .= $c;
+                $p  = $c;
+            } catch (Exception $e) {
+                if ($s === '') {
+                    return FALSE;
+                }
+                
                 break;
             }
-
-            $s .= $c;
         }
-
-        xxd ($s);
 
         return $s;
     }

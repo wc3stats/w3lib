@@ -339,7 +339,7 @@ class Action extends Model
                 // so we can unpackAll the chain.
                 $stream->prepend (self::W3MMD, 'c');
                 
-                $this->w3mmd = W3mmd::unpack ($stream, $context);
+                $this->w3mmd = W3MMD::unpack ($stream, $context);
             break;
         }
     }

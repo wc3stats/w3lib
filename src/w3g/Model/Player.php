@@ -22,11 +22,11 @@ class Player extends Model
     public $colour    = NULL;
     public $handicap  = NULL;
     public $leftAt    = NULL;
-    public $isWinner  = NULL;
     public $team      = NULL;
     public $actions   = NULL;
-    public $activity  = [];
     public $apm       = 0;
+    public $activity  = [];
+    public $flags     = [];
     public $variables = NULL;
 
     public function read (Stream $stream, $context = NULL)

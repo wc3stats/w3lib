@@ -5,8 +5,9 @@ namespace w3lib\w3g\Model;
 use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\Library\Stream\Buffer;
 
-class W3mmd extends Model
+class W3MMD extends Model
 {
     const W3MMD_PREFIX    = "MMD.Dat";
     const W3MMD_INIT      = "init";
@@ -22,13 +23,15 @@ class W3mmd extends Model
     const W3MMD_CHECK = "chk";
     const W3MMD_VALUE = "val";
 
-    const W3MMD_FLAG_DRAWER     = 'drawer';
-    const W3MMD_FLAG_LOSER      = 'loser';
-    const W3MMD_FLAG_WINNER     = 'winner';
-    const W3MMD_FLAG_LEAVER     = 'leaver';
-    const W3MMD_FLAG_PRACTICING = 'practicing';
+    const W3MMD_FLAG_DRAWER     = "drawer";
+    const W3MMD_FLAG_LOSER      = "loser";
+    const W3MMD_FLAG_WINNER     = "winner";
+    const W3MMD_FLAG_LEAVER     = "leaver";
+    const W3MMD_FLAG_PRACTICING = "practicing";
 
-    private static $pids = [];
+    private static $pids      = [];
+    private static $events    = [];
+    private static $variables = [];
 
     public function read (Stream $stream, $context = NULL)
     {
@@ -47,22 +50,23 @@ class W3mmd extends Model
         $this->header  = $stream->string ();
         $this->message = $stream->string ();
 
-        $toks = $this->tokenizeW3MMD ($this->message);
-        $this->type = $toks [0];
+        $buffer = new Buffer ($this->message);
+
+        $this->type = lcfirst ($buffer->token ());
 
         switch ($this->type) {
             case self::W3MMD_INIT:
-                $this->subtype = $toks [1];
+                $this->subtype = $buffer->token ();
 
                 switch ($this->subtype) {
                     case self::W3MMD_INIT_VERSION:
                         /**
                          * [0] => init
                          * [1] => version
-                         * [2] => {version}
-                         * [3] => {version}
+                         * [2] => {minimumParserVersion}
+                         * [3] => {standardVersion}
                          */
-                        $this->version = $toks [2];
+                        $this->version = $buffer->token ();
                     break;
 
                     case self::W3MMD_INIT_PID:
@@ -72,8 +76,8 @@ class W3mmd extends Model
                          * [2] => {pid}
                          * [3] => {name}
                          */
-                        $this->playerId   = (int) $toks [2];
-                        $this->playerName = $toks [3];
+                        $this->playerId   = $buffer->token ();
+                        $this->playerName = $buffer->token ();
 
                         $player = $context->replay->getPlayerByName ($this->playerName);
 
@@ -82,25 +86,48 @@ class W3mmd extends Model
                 }
             break;
 
-            case self::W3MMD_VARP:
+            case self::W3MMD_DEF_EVENT: 
                 /**
-                 * [0] => varP
-                 * [1] => {pid}
-                 * [2] => {varname}
-                 * [3] => {operator}
-                 * [4] => {value}
+                 * [0] => defEvent
+                 * [1] => {eventName}
+                 * [2] => {numArgs}
+                 * [ [3] => {arg1} ]
+                 * [ [4] => {arg2} ]
+                 * [ [5] => {arg3} ]
+                 * [6] => {format}
                  */
-                $this->playerId = self::$pids [(int) $toks [1]];
-                $this->varname  = $toks [2];
-                $this->operator = $toks [3];
-                $this->value    = trim ($toks [4], ' ",');
+                $this->eventName = $buffer->token ();
+                $this->numParams = $buffer->token ();
+
+                $this->params = [];
+
+                for ($i = 0; $i < $this->numParams; $i++) {
+                    $this->params [] = $buffer->token ();
+                }
+
+                $this->format = $buffer->token ();
+
+                self::$events [$this->eventName] = $this;
             break;
 
-            case self::W3MMD_EVENT:     
-                var_dump ($toks);
-            break;
-            case self::W3MMD_DEF_EVENT: 
-                var_dump ($toks);
+            case self::W3MMD_EVENT:
+                /**
+                 * [0] => event
+                 * [1] => eventName
+                 * [ [2] => {arg1} ]
+                 * [ [3] => {arg2} ]
+                 * [ [4] => {arg3} ]
+                 */
+
+                $this->eventName = $buffer->token ();
+                $this->event     = self::get ('events', $this->eventName);
+                $this->time      = $context->getTime ();
+
+                $this->args = [];
+
+                for ($i = 0; $i < $this->event->numParams; $i++) {
+                    $this->args [] = $buffer->token ();
+                }
             break;
 
             case self::W3MMD_DEF_VARP:  
@@ -111,8 +138,28 @@ class W3mmd extends Model
                  * [3] => {goalType}
                  * [4] => {suggestedType}
                  */
-                $this->varname = $toks [1];
-                $this->vartype = $toks [2];
+                $this->varname       = $buffer->token ();
+                $this->varType       = $buffer->token ();
+                $this->goalType      = $buffer->token ();
+                $this->suggestedType = $buffer->token (); 
+            
+                self::$variables [$this->varname] = $this;
+            break;
+
+            case self::W3MMD_VARP:
+                /**
+                 * [0] => varP
+                 * [1] => {pid}
+                 * [2] => {varname}
+                 * [3] => {operator}
+                 * [4] => {value}
+                 */
+                $this->playerId = self::get ('pid', $buffer->token ());
+                $this->varname  = $buffer->token ();
+                $this->operator = $buffer->token ();
+                $this->value    = trim ($buffer->token (), ' ",');
+
+                $this->variable = self::get ('variables', $this->varname);
             break;
 
             case self::W3MMD_FLAGP: 
@@ -121,8 +168,8 @@ class W3mmd extends Model
                  * [1] => {pid}
                  * [2] => {flag}
                  */
-                $this->playerId = self::$pids [(int) $toks [1]];
-                $this->flag     = $toks [2];
+                $this->playerId = self::get ('id', $buffer->token ());
+                $this->flag     = $buffer->token ();
             break;
         }
 
@@ -130,22 +177,19 @@ class W3mmd extends Model
         $stream->read (4);
     }
 
-    private function tokenizeW3MMD ($string)
+    public static function get ($type, $id)
     {
-        $tok  = strtok ($string, " ");
-        $toks = [ ];
-        
-        while ($tok !== FALSE) {
-            /* Space has been escaped, _consume. */
-            while (substr ($tok, -1) === '\\') {
-                $tok = substr ($tok, 0, -1) . ucwords (strtok (" "));
-            }
-
-            $toks [] = lcfirst ($tok);
-            $tok = strtok (" ");
+        if (!isset (self::$$type [$id])) {
+            throw new Exception (
+                sprintf (
+                    'Encountered undefined [%s]: [%s]',
+                    $type,
+                    $id
+                )
+            );
         }
 
-        return $toks;
+        return self::$$type [$id];
     }
 }
 

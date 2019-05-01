@@ -10,7 +10,7 @@ use w3lib\w3g\Settings;
 
 // define ('REPLAY_FILE', __DIR__ . '/AzerothWars-4.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/AzerothWars-events.w3g');
-define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-3.w3g');
+define ('REPLAY_FILE', __DIR__ . '/LastReplay.w3g');
 
 /** **/
 
@@ -27,15 +27,16 @@ $replay = new Replay (REPLAY_FILE, $settings);
 
 echo PHP_EOL;
 
-Logger::info ('File: [%s]',        $replay->getFile ());
-Logger::info ('Game Name: [%s]',   $replay->game->name);
-Logger::info ('Num Players: [%d]', count ($replay->getPlayers ()));
-Logger::info ('Hash: [%s]',        $replay->getHash ());
-Logger::info ('Map File: [%s]',    $replay->game->map);
-Logger::info ('Map Type: [%s]',    $replay->getMap ());
-Logger::info ('Saver Id: [%s]',    $replay->game->saver);
-Logger::info ('Host Id: [%s]',     $replay->game->host);
-Logger::info ('W3MMD: [%s]',       $replay->game->w3mmd ? 'Yes' : 'No');
+Logger::info ('File: [%s]',         $replay->getFile ());
+Logger::info ('Game Name: [%s]',    $replay->game->name);
+Logger::info ('Num Players: [%d]',  count ($replay->getPlayers ()));
+Logger::info ('Hash: [%s]',         $replay->getHash ());
+Logger::info ('Map File: [%s]',     $replay->game->map);
+Logger::info ('Map Type: [%s]',     $replay->getMap ());
+Logger::info ('Saver Id: [%s]',     $replay->game->saver);
+Logger::info ('Host Id: [%s]',      $replay->game->host);
+Logger::info ('W3MMD: [%s]',        $replay->game->hasW3mmd ? 'Yes' : 'No');
+Logger::info ('W3MMD Events: [%s]', count ($replay->game->events));
 
 echo PHP_EOL;
 
