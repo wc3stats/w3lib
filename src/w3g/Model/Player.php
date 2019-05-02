@@ -59,6 +59,15 @@ class Player extends Model
         }
     }
 
+    public function getVar ($varname, $default = NULL)
+    {
+        if (!isset ($this->variables [$varname])) {
+            return $default;
+        }
+
+        return $this->variables [$varname];
+    }
+
     public function __sleep ()
     {
         $keys = array_keys ((array) $this);
