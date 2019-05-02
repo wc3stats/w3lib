@@ -17,7 +17,7 @@ class Player extends Model
 
     // Deferred.
 
-    public $isHost    = false;
+    public $isHost    = FALSE;
     public $slot      = NULL;
     public $colour    = NULL;
     public $handicap  = NULL;

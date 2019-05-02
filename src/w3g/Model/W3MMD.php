@@ -154,7 +154,7 @@ class W3MMD extends Model
                  * [3] => {operator}
                  * [4] => {value}
                  */
-                $this->playerId = self::get ('pid', $buffer->token ());
+                $this->playerId = self::get ('pids', $buffer->token ());
                 $this->varname  = $buffer->token ();
                 $this->operator = $buffer->token ();
                 $this->value    = trim ($buffer->token (), ' ",');
@@ -168,7 +168,7 @@ class W3MMD extends Model
                  * [1] => {pid}
                  * [2] => {flag}
                  */
-                $this->playerId = self::get ('id', $buffer->token ());
+                $this->playerId = self::get ('pids', $buffer->token ());
                 $this->flag     = $buffer->token ();
             break;
         }
