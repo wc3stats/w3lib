@@ -20,16 +20,6 @@ class Replay extends Archive
 
     /** **/
 
-    public function getTeam ($teamId)
-    {
-        return $this->getTeams () [$teamId] ?: NULL;
-    }
-
-    public function getTeams ()
-    {
-        return $this->game->teams;
-    }
-
     public function getPlayers ()
     {
         return $this->game->getPlayers ();
@@ -137,6 +127,36 @@ class Replay extends Archive
         $map = ucfirst ($map);
 
         return $map;
+    }
+
+    /**
+     * $replay->merge ($replay);
+     *
+     * Merges the chatlog of the passed replay with that of the existing replay
+     * and chooses the longer replay as the "master" replay file.
+     */
+    private function merge (Replay $replay)
+    {
+        $chatlog = array_merge (
+            $replay->chatlog,
+            $this->chatlog
+        );
+
+        // Remove duplicate messages.
+        $chatlog = array_unique ($chatlog);
+
+        // Sort chatlog by time.
+        uasort ($chatlog, function ($cX, $cY) {
+            return $cX->time <=> $cY->time;
+        });
+
+        // Choose the longer of the two replays.
+        if ($replay->getLength () >= $this->getLength ()) {
+            $this->header = $replay->header;
+            $this->game   = $replay->game;
+        }
+
+        $this->chatlog = $chatlog;
     }
 }
 
