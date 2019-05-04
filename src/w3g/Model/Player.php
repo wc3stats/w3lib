@@ -68,6 +68,11 @@ class Player extends Model
         return $this->variables [$varname];
     }
 
+    public function hasFlag ($flag)
+    {
+        return in_array ($flag, $this->flags);
+    }
+
     public function __sleep ()
     {
         $keys = array_keys ((array) $this);

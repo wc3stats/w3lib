@@ -35,6 +35,13 @@ class Replay extends Archive
         return $this->game->getPlayerBy ('name', $playerName);
     }
 
+    public function getSaver ()
+    {
+        return $this->getPlayerById (
+            $this->game->saver
+        );
+    }
+
     /** **/
 
     public function getLength ()
@@ -135,7 +142,7 @@ class Replay extends Archive
      * Merges the chatlog of the passed replay with that of the existing replay
      * and chooses the longer replay as the "master" replay file.
      */
-    private function merge (Replay $replay)
+    public function merge (Replay $replay)
     {
         $chatlog = array_merge (
             $replay->chatlog,

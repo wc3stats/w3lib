@@ -23,11 +23,11 @@ class W3MMD extends Model
     const W3MMD_CHECK = "chk";
     const W3MMD_VALUE = "val";
 
-    const W3MMD_FLAG_DRAWER     = "drawer";
-    const W3MMD_FLAG_LOSER      = "loser";
-    const W3MMD_FLAG_WINNER     = "winner";
-    const W3MMD_FLAG_LEAVER     = "leaver";
-    const W3MMD_FLAG_PRACTICING = "practicing";
+    const FLAG_DRAWER     = "drawer";
+    const FLAG_LOSER      = "loser";
+    const FLAG_WINNER     = "winner";
+    const FLAG_LEAVER     = "leaver";
+    const FLAG_PRACTICING = "practicing";
 
     private static $pids      = [];
     private static $events    = [];
