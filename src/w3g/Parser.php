@@ -215,9 +215,15 @@ class Parser
 
             ksort ($player->activity);
 
-            $player->apm = ceil (
-                array_sum ($player->activity) / count ($player->activity)
-            );
+            $cc = count ($player->activity);
+
+            if ($cc === 0) {
+                $player->apm = 0;
+            } else {
+                $player->apm = ceil (
+                    array_sum ($player->activity) / count ($player->activity)
+                );
+            }
         }
     }
 }
