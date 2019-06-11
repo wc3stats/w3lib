@@ -71,6 +71,21 @@ class Stream
         return $block;
     }
 
+    public function readAll ()
+    {
+        $buffer = '';
+
+        while (true) {
+            try {
+                $buffer .= $this->read (1);
+            } catch (Exception $e) {
+                break;
+            }
+        }
+
+        return $buffer;
+    }
+
     public function append ($data, $format = NULL)
     {
         if ($format) {
@@ -103,6 +118,11 @@ class Stream
     public function eof ()
     {
         return feof ($this->handle);
+    }
+
+    public function fh ()
+    {
+        return $this->handle;
     }
 
     public function string ($term = self::NUL)

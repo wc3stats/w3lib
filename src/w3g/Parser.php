@@ -64,6 +64,8 @@ class Parser
 
             $buffer->append ($block->body);
 
+            /** **/
+
             if ($i === 0) {
                 $game = Game::unpack ($buffer, $context);
             }
@@ -168,22 +170,32 @@ class Parser
         switch ($w3mmd->type) {
             case W3MMD::W3MMD_EVENT:
                 $this->replay->game->events [] = $w3mmd;
+            break;            
+
+            case W3MMD::W3MMD_DEF_VARP:
+                // var_dump ($w3mmd);
+                // die ();
+                foreach ($this->replay->getPlayers () as $player) {
+                    if (!is_array ($player->variables)) {
+                        $player->variables = [];
+                    }
+
+                    $player->variables [$w3mmd->varname] = NULL;
+                }
             break;
         }
 
-        if (isset ($w3mmd->playerId)) {
-            $player = $this->replay->getPlayerById ($w3mmd->playerId);
-        }
-
+        $player = $this->replay->getPlayer (
+            // $w3mmd->playerName ?? 
+            $w3mmd->playerId   ?? 
+            NULL
+        );
+    
         if (!$player) {
             return;
         }
 
         switch ($w3mmd->type) {
-            case W3MMD::W3MMD_INIT:
-                $player->variables = [];
-            break;
-
             case W3MMD::W3MMD_VARP:
                 $player->variables [$w3mmd->varname] = $w3mmd->value;
             break;

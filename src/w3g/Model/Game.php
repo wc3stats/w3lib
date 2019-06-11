@@ -2,6 +2,7 @@
 
 namespace w3lib\w3g\Model;
 
+use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
@@ -62,16 +63,8 @@ class Game extends Model
         /**
          * 4.3 [Encoded String]
          */
-        $decoded = new Buffer ();
         $encoded = $stream->string ();
-
-        for ($i = 0, $cc = strlen ($encoded); $i < $cc; $i++) {
-        	if ($i % 8 === 0) {
-        		$mask = ord ($encoded [$i]);
-        	} else {
-        		$decoded->append (chr (ord ($encoded [$i]) - !($mask & (1 << $i % 8))));
-        	}
-        }
+        $decoded = $this->decode ($encoded);
 
         /**
          * 4.4 [GameSettings]
@@ -118,6 +111,7 @@ class Game extends Model
         $this->map = $decoded->string ();
 
         // Fix for windows download paths.
+
         $this->map = str_replace ('\\', '/', $this->map);
         $this->map = basename ($this->map);
 
@@ -212,6 +206,60 @@ class Game extends Model
         }
 
         return $players;
+    }
+
+    /** **/
+
+    protected function decode ($encoded)
+    {
+        $decoded = new Buffer ();
+        
+        for ($i = 0, $cc = strlen ($encoded); $i < $cc; $i++) {
+            if ($i % 8 === 0) {
+                $mask = ord ($encoded [$i]);
+            } else {
+                $decoded->append (chr (ord ($encoded [$i]) - !($mask & (1 << $i % 8))));
+            }
+        }
+
+        return $decoded;
+    }
+
+    protected function encode (Stream $stream)
+    {
+        $encoded = '';
+
+        /**
+         * Every even byte value incremented by 1 so all encoded bytes are odd.
+         * A control-byte stores the transformations for the next 7 bytes.
+         */
+        $data  = $stream->readAll ();
+        $mask  = 1;
+        $bytes = [];
+
+        $dataLength = strlen ($data);
+
+        for ($i = 0; $i < $dataLength; ++$i) {
+            $x = ord ($data [$i]);
+
+            if ($x % 2 === 0) {
+                $bytes [] = $x + 1;
+            } else {
+                $bytes [] = $x;
+                $mask |= 1 << (($i % 7) + 1);
+            }
+
+            if ($i % 7 === 6 || $i === $dataLength - 1) {
+                array_splice ($bytes, count ($bytes) - 1 - ($i % 7), 0, $mask);
+                $mask = 1;
+            }
+        }
+
+        foreach ($bytes as $byte) {
+            $encoded .= chr ($byte);
+        }
+
+        return $encoded;
     }
 }
 

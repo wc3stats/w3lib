@@ -13,7 +13,7 @@ class File extends Stream
     {
         $this->filepath = $filepath;
 
-        $stream = fopen ($filepath, 'rb');
+        $stream = fopen ($filepath, 'rb+');
 
         if (!$stream) {
             throw new Exception (

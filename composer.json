@@ -16,6 +16,7 @@
             "w3lib\\" : "src/"
         },
         "files" : [
+	    "lib/binary.php",
             "src/functions.php"
         ]
     }

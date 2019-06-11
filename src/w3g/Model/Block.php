@@ -15,6 +15,7 @@ class Block extends Model
     public $compressedSize    = NULL;
     public $uncompressedSize  = NULL;
     public $checksum          = NULL;
+    public $compressed        = NULL;
     public $body              = NULL;
 
     public function read (Stream $stream, $context = NULL)
@@ -30,12 +31,22 @@ class Block extends Model
         $this->uncompressedSize = $stream->uint16 ();
         $this->checksum         = $stream->uint32 ();
 
-        $body = $stream->read ($this->compressedSize);
-        $body = substr ($body, 2, -4);
+        $this->compressed = $stream->read ($this->compressedSize);
+
+        if (uint32 ($this->checksum) !== uint32 ($this->crc ())) {
+            xxd (uint32 ($this->checksum));
+            xxd (uint32 ($this->crc ()));
+
+            throw new Exception (
+                'Block checksum mismatch.'
+            );
+        }
+
+        $body = substr ($this->compressed, 2, -4); 
 
         /* Last bit in the first byte needs to be set. */
         $body [0] = chr (ord ($body [0]) | 1);
-        
+
         /* Decompress body. */
         $body = gzinflate ($body);
 
@@ -56,6 +67,24 @@ class Block extends Model
         }
 
         $this->body = new Buffer ($body);
+    }
+
+    public function crc ()
+    {
+        $crc1 = crc32 (
+            pack ('v', $this->compressedSize) . 
+            pack ('v', $this->uncompressedSize) . 
+            pack ('V', 0)
+        );
+
+        $crc1 = $crc1 ^ ($crc1 >> 16);
+
+        $crc2 = crc32 ($this->compressed);
+        $crc2 = $crc2 ^ ($crc2 >> 16);
+
+        $crc = ($crc1 & 0xFFFF) | ($crc2 << 16);
+
+        return $crc;
     }
 }
 

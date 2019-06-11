@@ -25,6 +25,15 @@ class Replay extends Archive
         return $this->game->getPlayers ();
     }
 
+    public function getPlayer ($search)
+    {
+        if (is_numeric ($search)) {
+            return $this->getPlayerById ($search);
+        }
+
+        return $this->getPlayerByName ($search);
+    }
+
     public function getPlayerById ($playerId)
     {
         return $this->game->getPlayerBy ('id', $playerId);
