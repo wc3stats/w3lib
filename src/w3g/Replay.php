@@ -106,7 +106,7 @@ class Replay extends Archive
         $file = $this->game->map;
 
         $file = str_replace ([ '_', '?', '!', '-' ], ' ', $file);
-        $file = str_replace ([ '\'' ], '', $file);
+        $file = str_replace ([ '\'', '.w3g', '.w3x', '.w3m' ], '', $file);
         $file = trim ($file);
 
         /* Remove anything between brackets or parentheses if there are numbers. */
