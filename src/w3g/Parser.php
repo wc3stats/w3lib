@@ -208,6 +208,8 @@ class Parser
         $this->replay->game->hasW3mmd = true;
     }
 
+    /** **/
+
     private function package ()
     {
         foreach ($this->replay->getPlayers () as $player) {
@@ -237,6 +239,10 @@ class Parser
                 );
             }
         }
+
+        usort ($this->replay->game->players, function ($p1, $p2) {
+            return $p1->team <=> $p2->team;
+        });
     }
 }
 

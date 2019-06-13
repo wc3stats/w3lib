@@ -8,7 +8,7 @@ use w3lib\w3g\Replay;
 use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
-define ('REPLAY_FILE', __DIR__ . '/AzerothWars-7.w3g');
+define ('REPLAY_FILE', __DIR__ . '/AzerothWars-3.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/AzerothWars-events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/AzerothWars-w3mmd-2.w3g');
 
@@ -58,7 +58,7 @@ foreach ($replay->getPlayers () as $player) {
         count ($player->variables ?? [])
     );
 
-    var_dump ($player->variables);
+    // var_dump ($player->variables);
 }
 
 echo PHP_EOL;
