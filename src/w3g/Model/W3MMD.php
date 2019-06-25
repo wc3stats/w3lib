@@ -7,6 +7,8 @@ use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 
+use function w3lib\Library\camelCase;
+
 class W3MMD extends Model
 {
     const W3MMD_PREFIX    = "MMD.Dat";

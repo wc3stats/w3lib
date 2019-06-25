@@ -34,8 +34,8 @@ class Block extends Model
         $this->compressed = $stream->read ($this->compressedSize);
 
         if (uint32 ($this->checksum) !== uint32 ($this->crc ())) {
-            xxd (uint32 ($this->checksum));
-            xxd (uint32 ($this->crc ()));
+            // xxd (uint32 ($this->checksum));
+            // xxd (uint32 ($this->crc ()));
 
             throw new Exception (
                 'Block checksum mismatch.'

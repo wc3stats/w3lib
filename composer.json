@@ -17,7 +17,7 @@
         },
         "files" : [
 	    "lib/binary.php",
-            "src/functions.php"
+            "lib/functions.php"
         ]
     }
 }

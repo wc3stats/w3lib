@@ -1,5 +1,7 @@
 <?php
 
+namespace w3lib\Library;
+
 use w3lib\Library\Logger;
 
 function xxd ($block, $width = 16)

@@ -4,6 +4,8 @@ namespace w3lib\Library;
 
 use Exception;
 
+use function w3lib\Library\xxd;
+
 class Stream
 {
     protected $handle;
