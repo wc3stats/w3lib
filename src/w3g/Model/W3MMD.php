@@ -96,7 +96,7 @@ class W3MMD extends Model
                  * [ [5] => {arg3} ]
                  * [6] => {format}
                  */
-                $this->eventName = $buffer->token ();
+                $this->eventName = $this->normalizeKey ($buffer->token ());
                 $this->numParams = $buffer->token ();
 
                 $this->params = [];
@@ -119,7 +119,7 @@ class W3MMD extends Model
                  * [ [4] => {arg3} ]
                  */
 
-                $this->eventName = $buffer->token ();
+                $this->eventName = $this->normalizeKey ($buffer->token ());
                 $this->event     = self::get ('events', $this->eventName);
                 $this->time      = $context->getTime ();
 
@@ -138,7 +138,7 @@ class W3MMD extends Model
                  * [3] => {goalType}
                  * [4] => {suggestedType}
                  */
-                $this->varname       = $buffer->token ();
+                $this->varname       = $this->normalizeKey ($buffer->token ());
                 $this->varType       = $buffer->token ();
                 $this->goalType      = $buffer->token ();
                 $this->suggestedType = $buffer->token (); 
@@ -155,9 +155,9 @@ class W3MMD extends Model
                  * [4] => {value}
                  */
                 $this->playerId = self::get ('pids', $buffer->token ());
-                $this->varname  = $buffer->token ();
+                $this->varname  = $this->normalizeKey ($buffer->token ());
                 $this->operator = $buffer->token ();
-                $this->value    = trim ($buffer->token (), ' ",');
+                $this->value    = $this->normalizeValue ($buffer->token ());
 
                 $this->variable = self::get ('variables', $this->varname);
             break;
@@ -190,6 +190,21 @@ class W3MMD extends Model
         }
 
         return self::$$type [$id];
+    }
+
+    private function normalizeValue ($s)
+    {
+        $s = str_replace ([ '\\ ' ], ' ', $s);
+        $s = trim ($s, ' ",');
+
+        return $s;
+    }
+
+    private function normalizeKey ($s) 
+    {
+        return camelCase (
+            $this->normalizeValue ($s)
+        );
     }
 }
 

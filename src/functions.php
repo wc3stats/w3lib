@@ -31,4 +31,15 @@ function xxd ($block, $width = 16)
     }
 }
 
+function camelCase ($s)
+{
+    $s = preg_replace ('/[^a-z0-9]+/i', ' ', $s);
+    $s = trim ($s);
+    $s = ucwords ($s);
+    $s = str_replace (" ", "", $s);
+    $s = lcfirst ($s);
+
+    return $s;
+}
+
 ?>
