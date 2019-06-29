@@ -216,7 +216,12 @@ class Parser
             // If there are players still in the game, must set leave time.
             if ($player->leftAt === NULL) {
                 $player->leftAt = $this->replay->getLength ();
-            }       
+            }
+
+            $player->leftAt = min (
+                $player->leftAt,
+                $this->replay->getLength ()
+            );
 
             // Fill in player activity time holes.
             $ladx = floor ($player->leftAt / $this->settings->apx);
