@@ -171,8 +171,8 @@ class Lang
 			self::GREEN     => 'Green',
 			self::PINK 	    => 'Pink',
 			self::GREY 	    => 'Grey',
-			self::LIGHTBLUE => 'Light Blue',
-			self::DARKGREEN => 'Dark Green',
+			self::LIGHTBLUE => 'Light-Blue',
+			self::DARKGREEN => 'Dark-Green',
 			self::BROWN 	=> 'Brown',
 			self::MAROON 	=> 'Maroon',
 			self::NAVY 	    => 'Navy',
@@ -223,11 +223,14 @@ class Lang
 	public static function chat ($value)
 	{
 		return [
-			self::CHAT_ALL       => 'All',
-			self::CHAT_ALLIES    => 'Allies',
-			self::CHAT_OBSERVERS => 'Observers',
-			self::CHAT_PASUED    => 'Paused',
-			self::CHAT_RESUMED   => 'Resumed'
+			self::CHAT_ALL      => 'All',
+			self::CHAT_ALLIES   => 'Allies',
+			self::CHAT_OBSERVER => 'Observers'
 		] [$value] ?? 'Private';
 	}
+
+    public static function boolean ($value) 
+    {
+        return $value ? 'Yes' : 'No';
+    }
 }

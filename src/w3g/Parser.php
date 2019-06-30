@@ -84,7 +84,7 @@ class Parser
                     $this->importChat ($segment);
                 break;
 
-                case Segment::LEAVE_GAME:
+                case Segment::LEAVE_GAME: 
                     $this->importLeaver ($segment);
                 break;
 
