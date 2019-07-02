@@ -172,7 +172,7 @@ class Replay extends Archive
             $this->game   = $replay->game;
         }
 
-        $this->chatlog = $chatlog;
+        $this->chatlog = array_values ($chatlog);
     }
 
     public function toDisplay ()
