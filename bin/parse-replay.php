@@ -46,7 +46,7 @@ echo PHP_EOL;
 
 foreach ($replay->getPlayers () as $player) {
     Logger::info (
-        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Left: %6d | Vars: %2d',
+        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Left: %6d | | Stayed: %3.2f | Vars: %2d',
         $player->id,
         $player->slot,
         $player->colour,
@@ -55,13 +55,10 @@ foreach ($replay->getPlayers () as $player) {
         $player->team,
         $player->apm,
         $player->leftAt,
+        $player->stayPercent,
         count ($player->variables ?? [])
     );
 }
-
-$replay->toDisplay ();
-var_dump ($replay);
-die ();
 
 echo PHP_EOL;
 

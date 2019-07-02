@@ -212,16 +212,16 @@ class Parser
 
     private function package ()
     {
+        $replayLength = $this->replay->getLength ();
+
         foreach ($this->replay->getPlayers () as $player) {
             // If there are players still in the game, must set leave time.
             if ($player->leftAt === NULL) {
-                $player->leftAt = $this->replay->getLength ();
+                $player->leftAt = $replayLength;
             }
 
-            $player->leftAt = min (
-                $player->leftAt,
-                $this->replay->getLength ()
-            );
+            $player->leftAt = min ($player->leftAt, $replayLength);
+            $player->stayPercent = round ($player->leftAt / $replayLength * 100, 2);
 
             // Fill in player activity time holes.
             $ladx = floor ($player->leftAt / $this->settings->apx);
