@@ -8,7 +8,7 @@ use w3lib\w3g\Replay;
 use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
-define ('REPLAY_FILE', __DIR__ . '/AzerothWars-9.w3g');
+define ('REPLAY_FILE', __DIR__ . '/krur-krur21.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/AzerothWars-events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
 

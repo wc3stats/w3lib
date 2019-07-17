@@ -173,8 +173,6 @@ class Parser
             break;            
 
             case W3MMD::W3MMD_DEF_VARP:
-                // var_dump ($w3mmd);
-                // die ();
                 foreach ($this->replay->getPlayers () as $player) {
                     if (!is_array ($player->variables)) {
                         $player->variables = [];

@@ -68,7 +68,7 @@ abstract class Model implements JsonSerializable
         }
     }
 
-    protected function keyName ($value)
+    public function keyName ($value)
     {
         $keys = [ ];
 

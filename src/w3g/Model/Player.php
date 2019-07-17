@@ -82,6 +82,11 @@ class Player extends Model
         return in_array ($flag, $this->flags);
     }
 
+    public function isVoid ()
+    {
+        return (int) $this->leftAt === 0;
+    }
+
     public function __sleep ()
     {
         $keys = array_keys ((array) $this);
