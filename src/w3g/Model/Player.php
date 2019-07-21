@@ -35,13 +35,13 @@ class Player extends Model
         $this->type = $stream->uint8 ();
         $this->id   = $stream->uint8 ();
         $this->name = $stream->string ();
-        
+
         $platform = $stream->uint8 ();
 
         switch ($platform) {
             case Lang::CUSTOM:
                 // Null byte
-                $stream->read (1); 
+                $stream->read (1);
             break;
 
             case Lang::LADDER:
@@ -84,7 +84,23 @@ class Player extends Model
 
     public function isVoid ()
     {
-        return (int) $this->leftAt === 0;
+        if ((int) $this->leftAt === 0) {
+            return TRUE;
+        }
+
+        if (!$this->variables) {
+            return FALSE;
+        }
+
+        foreach ($this->variables as $varname => $value) {
+            if ($value === NULL) {
+                continue;
+            }
+
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
     public function __sleep ()

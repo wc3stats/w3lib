@@ -39,7 +39,7 @@ class Parser
         $this->context  = $context;
         $this->replay   = $replay;
         $this->settings = $settings;
-    } 
+    }
 
     public function parse ()
     {
@@ -84,7 +84,7 @@ class Parser
                     $this->importChat ($segment);
                 break;
 
-                case Segment::LEAVE_GAME: 
+                case Segment::LEAVE_GAME:
                     $this->importLeaver ($segment);
                 break;
 
@@ -106,7 +106,7 @@ class Parser
     private function importLeaver (Segment $segment)
     {
         $player = $this->replay->getPlayerById ($segment->playerId ?? -1);
-        
+
         if (!$player) {
             return;
         }
@@ -143,7 +143,7 @@ class Parser
         }
 
         $adx = floor (
-            $this->context->time / 
+            $this->context->time /
             $this->settings->apx
         );
 
@@ -170,7 +170,7 @@ class Parser
         switch ($w3mmd->type) {
             case W3MMD::W3MMD_EVENT:
                 $this->replay->game->events [] = $w3mmd;
-            break;            
+            break;
 
             case W3MMD::W3MMD_DEF_VARP:
                 foreach ($this->replay->getPlayers () as $player) {
@@ -184,11 +184,11 @@ class Parser
         }
 
         $player = $this->replay->getPlayer (
-            // $w3mmd->playerName ?? 
-            $w3mmd->playerId   ?? 
+            // $w3mmd->playerName ??
+            $w3mmd->playerId   ??
             NULL
         );
-    
+
         if (!$player) {
             return;
         }

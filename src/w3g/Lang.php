@@ -79,16 +79,16 @@ class Lang
     const BROWN     = 0x0B;
     const MAROON    = 0x0C;
     const NAVY      = 0x0D;
-    const TURQUOISE = 0x0F;
-    const VIOLET    = 0x10;
-    const WHEAT     = 0x11;
-    const PEACH     = 0x12;
-    const MINT      = 0x13;
-    const LAVENDER  = 0x14;
-    const COAL      = 0x15;
-    const SNOW      = 0x16;
-    const EMERALD   = 0x17;
-    const PEANUT    = 0x18;
+    const TURQUOISE = 0x0E;
+    const VIOLET    = 0x0F;
+    const WHEAT     = 0x10;
+    const PEACH     = 0x11;
+    const MINT      = 0x12;
+    const LAVENDER  = 0x13;
+    const COAL      = 0x14;
+    const SNOW      = 0x15;
+    const EMERALD   = 0x16;
+    const PEANUT    = 0x17;
 
     // 4.11 [SlotRecord] - Player Race (Map Defined)
     const RACE_HUMAN    = 0x01;
@@ -229,7 +229,7 @@ class Lang
 		] [$value] ?? 'Private';
 	}
 
-    public static function boolean ($value) 
+    public static function boolean ($value)
     {
         return $value ? 'Yes' : 'No';
     }
