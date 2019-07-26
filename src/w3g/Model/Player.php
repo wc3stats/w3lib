@@ -82,32 +82,6 @@ class Player extends Model
         return in_array ($flag, $this->flags);
     }
 
-    public function isVoid ()
-    {
-        if (!$this->variables) {
-            return FALSE;
-        }
-
-        if ((int) $this->leftAt === 0) {
-            return TRUE;
-        }
-
-        if (   isset ($this->variables ['team'])
-            && $this->variables ['team'] === NULL) {
-            return TRUE;
-        }
-
-        foreach ($this->variables as $varname => $value) {
-            if ($value === NULL) {
-                continue;
-            }
-
-            return FALSE;
-        }
-
-        return TRUE;
-    }
-
     public function __sleep ()
     {
         $keys = array_keys ((array) $this);

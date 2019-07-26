@@ -241,6 +241,8 @@ class Parser
                     array_sum ($player->activity) / count ($player->activity)
                 );
             }
+
+            $player->isVoid = $player->isVoid ();
         }
 
         usort ($this->replay->game->players, function ($p1, $p2) {
