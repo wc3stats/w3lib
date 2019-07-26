@@ -84,12 +84,17 @@ class Player extends Model
 
     public function isVoid ()
     {
+        if (!$this->variables) {
+            return FALSE;
+        }
+
         if ((int) $this->leftAt === 0) {
             return TRUE;
         }
 
-        if (!$this->variables) {
-            return FALSE;
+        if (   isset ($this->variables ['team'])
+            && $this->variables ['team'] === NULL) {
+            return TRUE;
         }
 
         foreach ($this->variables as $varname => $value) {
