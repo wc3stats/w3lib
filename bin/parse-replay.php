@@ -9,7 +9,7 @@ use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
 // define ('REPLAY_FILE', __DIR__ . '/krur-krur21.w3g');
-define ('REPLAY_FILE', __DIR__ . '/BrokenMap.w3g');
+define ('REPLAY_FILE', __DIR__ . '/LocalGame.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/AzerothWars-events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
 
@@ -33,6 +33,7 @@ Logger::info ('Compressed Size: [%s]',   $replay->header->compressedSize);
 Logger::info ('Uncompressed Size: [%s]', $replay->header->uncompressedSize);
 
 Logger::info ('Game Name: [%s]',    $replay->game->name);
+Logger::info ('Is Local: [%s]',     $replay->game->isLocal ? 'Yes' : 'No');
 Logger::info ('Num Players: [%d]',  count ($replay->getPlayers ()));
 Logger::info ('Hash: [%s]',         $replay->getHash ());
 Logger::info ('Map File: [%s]',     $replay->game->map);

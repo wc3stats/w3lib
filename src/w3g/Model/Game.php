@@ -39,9 +39,18 @@ class Game extends Model
     public $saver = NULL;
     public $hasW3mmd = false;
 
+    const LOCAL_GAMES = [
+        "Local Game",
+        "Lokales Spiel",
+        "Partida Local",
+        "Partie Locale",
+        "Partita Locale",
+        "Gra Lokalna"
+    ];
+
     public function read (Stream $stream, $context = NULL)
     {
-        // 4 unknown bytes. 
+        // 4 unknown bytes.
         $stream->read (4);
 
         /**
@@ -116,15 +125,17 @@ class Game extends Model
         $this->map = basename ($this->map);
 
         $this->host = $decoded->string ();
-        
+
         /**
          * 4.6 [PlayerCount]
          */
         $this->numSlots = $stream->uint32 ();
-        
+
         /**
          * 4.7 [GameType]
          */
+
+
         $this->type     = $stream->int8 ();
         $this->private  = $stream->bool ();
 
@@ -173,9 +184,20 @@ class Game extends Model
          * 4.12 [RandomSeed]
          */
         $this->randomSeed = $stream->uint32 ();
-        
+
         $this->selectMode = $stream->int8 ();
         $this->startSpots = $stream->int8 ();
+
+        /** **/
+
+        $this->isLocal = FALSE;
+
+        foreach (self::LOCAL_GAMES as $gameName) {
+            if (stripos ($this->name, $gameName) !== FALSE) {
+                $this->isLocal = TRUE;
+                break;
+            }
+        }
     }
 
     /** **/
@@ -213,7 +235,7 @@ class Game extends Model
     protected function decode ($encoded)
     {
         $decoded = new Buffer ();
-        
+
         for ($i = 0, $cc = strlen ($encoded); $i < $cc; $i++) {
             if ($i % 8 === 0) {
                 $mask = ord ($encoded [$i]);

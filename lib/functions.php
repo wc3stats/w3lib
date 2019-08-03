@@ -44,4 +44,15 @@ function camelCase ($s)
     return $s;
 }
 
+function inArrayInsensitive ($needle, $haystack)
+{
+    foreach ($haystack as $hay) {
+        if (strcasecmp ($needle, $hay) === 0) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
 ?>
