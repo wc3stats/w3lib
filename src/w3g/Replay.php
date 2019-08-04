@@ -39,7 +39,7 @@ class Replay extends Archive
         return $this->game->getPlayerBy ('id', $playerId);
     }
 
-    public function getPlayerByName ($playerName) 
+    public function getPlayerByName ($playerName)
     {
         return $this->game->getPlayerBy ('name', $playerName);
     }
@@ -57,7 +57,7 @@ class Replay extends Archive
     {
         return $this->header->length;
     }
-    
+
     /**
      * $replay->getHash ()
      *
@@ -66,8 +66,8 @@ class Replay extends Archive
      * times.
      *
      * if ($replayA->getHash () === $replayB->getHash ()) {
-     *     // They are of the same game. 
-     * 
+     *     // They are of the same game.
+     *
      *     if ($replayA->getLength () > $replayB->getLength ()) {
      *         // Use data from replayA but merge the chatlog from replayB.
      *     } else {
@@ -78,7 +78,7 @@ class Replay extends Archive
     public function getHash ()
     {
         return md5 (
-            $this->game->name . 
+            $this->game->name .
             $this->game->randomSeed
         );
     }
@@ -88,7 +88,7 @@ class Replay extends Archive
      *
      * Attempts to extract the map basename (without the version number).
      *
-     * For example: 
+     * For example:
      *     War in the Plaguelands [24] B6b
      *  => War in the Plaguelands
      *
@@ -140,7 +140,7 @@ class Replay extends Archive
 
         $map = implode (' ', $toks);
         $map = trim ($map);
-        $map = ucfirst ($map);
+        $map = ucwords ($map);
 
         return $map;
     }
