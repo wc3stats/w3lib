@@ -9,8 +9,8 @@ use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
 // define ('REPLAY_FILE', __DIR__ . '/krur-krur21.w3g');
-define ('REPLAY_FILE', __DIR__ . '/LocalGame.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/AzerothWars-events.w3g');
+define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
 
 /** **/
@@ -60,9 +60,11 @@ foreach ($replay->getPlayers () as $player) {
         $player->stayPercent,
         count ($player->variables ?? [])
     );
+    // var_dump($player->variables);
 }
 
-echo PHP_EOL;
+// var_dump($replay->game->events);die();
+// echo PHP_EOL;
 
 Logger::info ('Memory usage: [%d]', memory_get_usage ());
 

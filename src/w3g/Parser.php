@@ -20,6 +20,8 @@ use w3lib\w3g\Model\W3MMD;
 
 class Parser
 {
+    const VERSION = 2.1;
+
     protected $context;
     protected $replay;
     protected $settings;
@@ -168,11 +170,11 @@ class Parser
         $player = NULL;
 
         switch ($w3mmd->type) {
-            case W3MMD::W3MMD_EVENT:
+            case W3MMD::EVENT:
                 $this->replay->game->events [] = $w3mmd;
             break;
 
-            case W3MMD::W3MMD_DEF_VARP:
+            case W3MMD::DEF_VARP:
                 foreach ($this->replay->getPlayers () as $player) {
                     if (!is_array ($player->variables)) {
                         $player->variables = [];
@@ -194,11 +196,11 @@ class Parser
         }
 
         switch ($w3mmd->type) {
-            case W3MMD::W3MMD_VARP:
+            case W3MMD::VARP:
                 $player->variables [$w3mmd->varname] = $w3mmd->value;
             break;
 
-            case W3MMD::W3MMD_FLAGP:
+            case W3MMD::FLAGP:
                 $player->flags [] = $w3mmd->flag;
             break;
         }

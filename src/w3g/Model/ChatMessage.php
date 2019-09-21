@@ -15,7 +15,7 @@ class ChatMessage extends Model
     public $message  = NULL;
     public $time     = NULL;
 
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         $this->playerId = $stream->int8 ();
         $this->length   = $stream->uint16 ();
@@ -25,7 +25,7 @@ class ChatMessage extends Model
         $this->flags    = $block->int8 ();
         $this->mode     = $block->uint32 ();
         $this->message  = $block->string ();
-        
+
         $this->time     = $context->getTime ();
     }
 

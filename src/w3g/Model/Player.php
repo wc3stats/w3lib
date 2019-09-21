@@ -30,7 +30,7 @@ class Player extends Model
     public $flags       = [];
     public $variables   = NULL;
 
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         $this->type = $stream->uint8 ();
         $this->id   = $stream->uint8 ();
@@ -75,6 +75,11 @@ class Player extends Model
         }
 
         return $this->variables [$varname];
+    }
+
+    public function hasVar ($varname)
+    {
+        return isset ($this->variables [$varname]);
     }
 
     public function hasFlag ($flag)

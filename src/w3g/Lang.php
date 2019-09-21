@@ -2,6 +2,8 @@
 
 namespace w3lib\w3g;
 
+use w3lib\Library\Stream;
+use w3lib\w3g\Data\Actions;
 use w3lib\w3g\Model\Game;
 use w3lib\w3g\Model\Player;
 
@@ -232,5 +234,29 @@ class Lang
     public static function boolean ($value)
     {
         return $value ? 'Yes' : 'No';
+    }
+
+    public static function objectId (Stream $stream)
+    {
+        $data = $stream->char (4);
+
+        $code = unpack ('N', $data);
+        $code = current ($code);
+
+        if (isset (Actions::$codes [$code])) {
+            return Actions::$codes [$code];
+        }
+
+        if (!ctype_alnum ($data)) {
+            $unknown = '';
+
+            for ($i = 0, $cc = strlen ($data); $i < $cc; $i++) {
+                $unknown .= str_pad (bin2hex ($data [$i]), 2, '0', STR_PAD_LEFT) . ' ';
+            }
+
+            return trim ($unknown);
+        }
+
+        return $data;
     }
 }

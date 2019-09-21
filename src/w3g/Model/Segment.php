@@ -22,7 +22,7 @@ class Segment extends Model
     const GAME_OVER     = 0x2F;
     const LEAVE_GAME    = 0x17;
 
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         $this->id  = $stream->int8 ();
         $this->key = $this->keyName ($this->id);
@@ -30,7 +30,7 @@ class Segment extends Model
         Logger::debug (
             sprintf (
                 'Found segment: [0x%2X:%s].',
-                $this->id, 
+                $this->id,
                 $this->key
             )
         );

@@ -7,13 +7,13 @@ use ReflectionClass;
 use JsonSerializable;
 
 abstract class Model implements JsonSerializable
-{ 
+{
     private $ref;
 
     public function __construct ()
     {
         $this->ref = new ReflectionClass (get_class ($this));
-    } 
+    }
 
     public function __sleep ()
     {
@@ -24,7 +24,7 @@ abstract class Model implements JsonSerializable
     {
         return array_intersect_key (
             get_object_vars ($this),
-            
+
             array_combine (
                 $this->__sleep (),
                 $this->__sleep ()
@@ -32,9 +32,9 @@ abstract class Model implements JsonSerializable
         );
     }
 
-    public abstract function read (Stream $stream, $context = NULL);
+    public abstract function read (Stream &$stream, $context = NULL);
 
-    public static function unpack (Stream $stream, $context = NULL)
+    public static function unpack (Stream &$stream, $context = NULL)
     {
         $model = get_called_class ();
         $model = new $model ();
@@ -56,7 +56,7 @@ abstract class Model implements JsonSerializable
         return $model;
     }
 
-    public static function unpackAll (Stream $stream, $context = NULL)
+    public static function unpackAll (Stream &$stream, $context = NULL)
     {
         for ($i = 1; /* */ ; $i++) {
             try {

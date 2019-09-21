@@ -7,7 +7,7 @@ use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
-use w3lib\w3g\Data\Actions;
+use w3lib\w3g\Lang;
 
 class Action extends Model
 {
@@ -65,7 +65,7 @@ class Action extends Model
 
     // Shift held down.
     const ABILITY_FLAG_WAYPOINT = 0x001;
-    
+
     const ABILITY_FLAG_APPLY_SUBGROUP = 0x002;
     const ABILITY_FLAG_AREA_EFFECT    = 0x004;
     const ABILITY_FLAG_GROUP_COMMAND  = 0x008;
@@ -85,7 +85,7 @@ class Action extends Model
 
     private static $state = 0x00;
 
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         $this->id   = $stream->uint8 ();
         $this->key  = $this->keyName ($this->id);
@@ -93,7 +93,7 @@ class Action extends Model
 
         Logger::debug (
             'Found action: [0x%2X:%s].',
-            $this->id, 
+            $this->id,
             $this->key
         );
 
@@ -127,7 +127,7 @@ class Action extends Model
 
             case self::UNIT_BUILDING_ABILITY_1:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId       = $this->objectId ($stream);
+                $this->itemId       = Lang::objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -135,7 +135,7 @@ class Action extends Model
 
             case self::UNIT_BUILDING_ABILITY_2:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId       = $this->objectId ($stream);
+                $this->itemId       = Lang::objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -146,7 +146,7 @@ class Action extends Model
 
             case self::GIVE_ITEM:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId       = $this->objectId ($stream);
+                $this->itemId       = Lang::objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -154,17 +154,17 @@ class Action extends Model
                 $this->locX = $stream->float ();
                 $this->locY = $stream->float ();
 
-                $this->objectId1 = $this->objectId ($stream);
-                $this->objectId2 = $this->objectId ($stream);
+                $this->objectId1 = Lang::objectId ($stream);
+                $this->objectId2 = Lang::objectId ($stream);
                 $this->grounded  = $this->objectId1 === $this->objectId2;
 
-                $this->itemObjectId1 = $this->objectId ($stream);
-                $this->itemObjectId2 = $this->objectId ($stream);
+                $this->itemObjectId1 = Lang::objectId ($stream);
+                $this->itemObjectId2 = Lang::objectId ($stream);
             break;
 
             case self::UNIT_BUILDING_ABILITY_3:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId       = $this->objectId ($stream);
+                $this->itemId       = Lang::objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -172,14 +172,14 @@ class Action extends Model
                 $this->locX = $stream->float ();
                 $this->locY = $stream->float ();
 
-                $this->objectId1 = $this->objectId ($stream);
-                $this->objectId2 = $this->objectId ($stream);
+                $this->objectId1 = Lang::objectId ($stream);
+                $this->objectId2 = Lang::objectId ($stream);
                 $this->grounded  = $this->objectId1 === $this->objectId2;
             break;
 
             case self::UNIT_BUILDING_ABILITY_4:
                 $this->abilityFlags = $stream->uint16 ();
-                $this->itemId1      = $this->objectId ($stream);
+                $this->itemId1      = Lang::objectId ($stream);
 
                 $stream->uint32 ();
                 $stream->uint32 ();
@@ -187,24 +187,24 @@ class Action extends Model
                 $this->locX1 = $stream->float ();
                 $this->locY1 = $stream->float ();
 
-                $this->itemId2 = $this->objectId ($stream);
+                $this->itemId2 = Lang::objectId ($stream);
 
                 $stream->read (9);
 
                 $this->locX2 = $stream->float ();
-                $this->locY2 = $stream->float (); 
+                $this->locY2 = $stream->float ();
             break;
 
             case self::CHANGE_SELECTION:
                 $this->mode       = $stream->int8 ();
                 $this->numObjects = $stream->uint16 ();
-                
+
                 $this->objects = [];
 
                 for ($i = 0; $i < $this->numObjects; $i++) {
                     $this->objects [] = [
-                        $this->objectId ($stream),
-                        $this->objectId ($stream)
+                        Lang::objectId ($stream),
+                        Lang::objectId ($stream)
                     ];
                 }
             break;
@@ -218,25 +218,25 @@ class Action extends Model
 
                 for ($i = 0; $i < $this->numObjects; $i++) {
                     $this->objects [] = [
-                        $this->objectId ($stream),
-                        $this->objectId ($stream)
+                        Lang::objectId ($stream),
+                        Lang::objectId ($stream)
                     ];
                 }
             break;
 
             case self::SELECT_HOTKEY:
                 $this->group  = $stream->int8 ();
-                $this->hotkey = ($this->group + 1) % 10; 
-                
+                $this->hotkey = ($this->group + 1) % 10;
+
                 $stream->read (1);
             break;
 
             case self::SELECT_SUBGROUP:
                 /* ItemId and objectId represent the first unit in the newly
                    selected subgroup. */
-                $this->itemId    = $this->objectId ($stream);
-                $this->objectId1 = $this->objectId ($stream);
-                $this->objectId2 = $this->objectId ($stream);
+                $this->itemId    = Lang::objectId ($stream);
+                $this->objectId1 = Lang::objectId ($stream);
+                $this->objectId2 = Lang::objectId ($stream);
             break;
 
             case self::UNKNOWN_1:
@@ -251,13 +251,13 @@ class Action extends Model
             case self::SELECT_GROUND_ITEM:
                 $stream->int8 ();
 
-                $this->objectId1 = $this->objectId ($stream);
-                $this->objectId2 = $this->objectId ($stream);
+                $this->objectId1 = Lang::objectId ($stream);
+                $this->objectId2 = Lang::objectId ($stream);
             break;
 
             case self::CANCEL_HERO_REVIVE:
-                $this->heroId1 = $this->objectId ($stream);
-                $this->heroId2 = $this->objectId ($stream);
+                $this->heroId1 = Lang::objectId ($stream);
+                $this->heroId2 = Lang::objectId ($stream);
             break;
 
             case self::CANCEL_UNIT:
@@ -338,34 +338,10 @@ class Action extends Model
                 // associated to the current action's playerId. Prepend the ID
                 // so we can unpackAll the chain.
                 $stream->prepend (self::W3MMD, 'c');
-                
+
                 $this->w3mmd = W3MMD::unpack ($stream, $context);
             break;
         }
-    }
-
-    protected function objectId (Stream $stream)
-    {
-        $data = $stream->char (4);
-
-        $code = unpack ('N', $data);
-        $code = current ($code);
-
-        if (isset (Actions::$codes [$code])) {
-            return Actions::$codes [$code];
-        }
-
-        if (!ctype_alnum ($data)) {
-            $unknown = '';
-
-            for ($i = 0, $cc = strlen ($data); $i < $cc; $i++) {
-                $unknown .= str_pad (bin2hex ($data [$i]), 2, '0', STR_PAD_LEFT) . ' ';
-            }
-
-            return trim ($unknown);
-        }
-
-        return $data;
     }
 }
 
