@@ -17,7 +17,7 @@ class Stream
     const NUL   = 0x00;
     const PEEK  = 0x01;
     const QUIET = 0x02;
-    
+
     const ESCAPE = "\\";
 
     public function __construct ($handle, $endian = self::ENDIAN_LE)
@@ -33,7 +33,7 @@ class Stream
         if (!is_resource ($this->handle)) {
             return;
         }
-        
+
         flock  ($this->handle, LOCK_UN);
         fclose ($this->handle);
     }
@@ -54,7 +54,7 @@ class Stream
             $this->seek ($offset);
         }
 
-        if (($actual = mb_strlen ($block, '8bit')) != $bytes) { 
+        if (($actual = mb_strlen ($block, '8bit')) != $bytes) {
             $this->seek ($offset);
 
             throw new Exception (
@@ -91,21 +91,21 @@ class Stream
     public function append ($data, $format = NULL)
     {
         if ($format) {
-            $data = pack ($format, $data);
+            $data = $this->pack ($format, $data);
         }
 
         $offset = $this->offset ();
 
         fseek ($this->handle, 0, SEEK_END);
         fwrite ($this->handle, $data);
-        
+
         $this->seek ($offset);
     }
 
     public function prepend ($data, $format = NULL)
     {
         if ($format) {
-            $data = pack ($format, $data);
+            $data = $this->pack ($format, $data);
         }
 
         $offset = $this->offset ();
@@ -115,6 +115,18 @@ class Stream
         $this->seek ($offset);
         fwrite ($this->handle, $data . $remaining);
         $this->seek ($offset);
+    }
+
+    public function startsWith ($s)
+    {
+        return strcmp (
+            $this->read (
+                strlen ($s),
+                self::PEEK
+            ),
+
+            $s
+        ) === 0;
     }
 
     public function eof ()
@@ -147,7 +159,7 @@ class Stream
                 if ($s === '') {
                     return FALSE;
                 }
-                
+
                 break;
             }
         }
@@ -216,6 +228,11 @@ class Stream
         fseek ($this->handle, $offset);
     }
 
+    protected function pack ($format, $data = NULL)
+    {
+        return $data ? pack ($format, $data) : pack ($format);
+    }
+
     protected function unpack ($le, $be, $size)
     {
         $data = unpack ($this->endian ? $le : $be, $this->read ($size));
@@ -225,7 +242,7 @@ class Stream
     public function __toString ()
     {
         $buffer = '';
-        
+
         $offset = $this->offset ();
 
         while (!feof ($this->handle)) {

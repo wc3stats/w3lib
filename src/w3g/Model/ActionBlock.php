@@ -9,7 +9,7 @@ use w3lib\Library\Stream\Buffer;
 
 class ActionBlock extends Model
 {
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         $this->playerId = $stream->uint8 ();
         $this->length   = $stream->uint16 ();

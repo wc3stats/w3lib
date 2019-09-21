@@ -18,7 +18,7 @@ class Block extends Model
     public $compressed        = NULL;
     public $body              = NULL;
 
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         Logger::info (
             "Unpacking block %d / %d (%.2f%%)",
@@ -42,7 +42,7 @@ class Block extends Model
             );
         }
 
-        $body = substr ($this->compressed, 2, -4); 
+        $body = substr ($this->compressed, 2, -4);
 
         /* Last bit in the first byte needs to be set. */
         $body [0] = chr (ord ($body [0]) | 1);
@@ -72,8 +72,8 @@ class Block extends Model
     public function crc ()
     {
         $crc1 = crc32 (
-            pack ('v', $this->compressedSize) . 
-            pack ('v', $this->uncompressedSize) . 
+            pack ('v', $this->compressedSize) .
+            pack ('v', $this->uncompressedSize) .
             pack ('V', 0)
         );
 

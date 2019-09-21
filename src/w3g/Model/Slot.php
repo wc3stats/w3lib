@@ -16,7 +16,7 @@ class Slot extends Model
     public $aiStrength = NULL;
     public $handicap   = NULL;
 
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         $this->playerId = $stream->int8 ();
 

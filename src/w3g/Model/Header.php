@@ -19,8 +19,8 @@ class Header extends Model
     public $flags            = NULL;
     public $length           = NULL;
     public $checksum         = NULL;
-    
-    public function read (Stream $stream, $context = NULL)
+
+    public function read (Stream &$stream, $context = NULL)
     {
         /**
          * 2.0 [Header]

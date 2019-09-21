@@ -48,7 +48,7 @@ class Game extends Model
         "Gra Lokalna"
     ];
 
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         // 4 unknown bytes.
         $stream->read (4);

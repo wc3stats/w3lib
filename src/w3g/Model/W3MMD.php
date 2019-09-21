@@ -6,24 +6,28 @@ use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\w3g\Translator\Dota;
 
 use function w3lib\Library\camelCase;
+use function w3lib\Library\xxd;
 
 class W3MMD extends Model
 {
-    const W3MMD_PREFIX    = "MMD.Dat";
-    const W3MMD_INIT      = "init";
-    const W3MMD_EVENT     = "event";
-    const W3MMD_DEF_EVENT = "defEvent";
-    const W3MMD_DEF_VARP  = "defVarP";
-    const W3MMD_FLAGP     = "flagP";
-    const W3MMD_VARP      = "varP";
+    const VERSION = 2.1;
 
-    const W3MMD_INIT_VERSION = "version";
-    const W3MMD_INIT_PID     = "pid";
+    const PREFIX    = "MMD.Dat";
+    const INIT      = "init";
+    const EVENT     = "event";
+    const DEF_EVENT = "defEvent";
+    const DEF_VARP  = "defVarP";
+    const FLAGP     = "flagP";
+    const VARP      = "varP";
 
-    const W3MMD_CHECK = "chk";
-    const W3MMD_VALUE = "val";
+    const INIT_VERSION = "version";
+    const INIT_PID     = "pid";
+
+    const CHECK = "chk";
+    const VALUE = "val";
 
     const FLAG_DRAWER     = "drawer";
     const FLAG_LOSER      = "loser";
@@ -31,11 +35,15 @@ class W3MMD extends Model
     const FLAG_LEAVER     = "leaver";
     const FLAG_PRACTICING = "practicing";
 
+    private static $translators = [
+        Dota::class
+    ];
+
     private static $pids      = [];
     private static $events    = [];
     private static $variables = [];
 
-    public function read (Stream $stream, $context = NULL)
+    public function read (Stream &$stream, $context = NULL)
     {
         $this->id = $stream->uint8 ();
 
@@ -48,6 +56,22 @@ class W3MMD extends Model
             );
         }
 
+        // xxd ($stream);
+
+        /** **/
+
+        /**
+         * Translate the message if it uses a custom w3mmd format.
+         */
+        foreach (self::$translators as $translator) {
+            if ($translator::understands ($stream)) {
+                $translator::translate ($stream, $context);
+            }
+        }
+
+
+        /** **/
+
         $this->intro   = $stream->string ();
         $this->header  = $stream->string ();
         $this->message = $stream->string ();
@@ -57,11 +81,11 @@ class W3MMD extends Model
         $this->type = lcfirst ($buffer->token ());
 
         switch ($this->type) {
-            case self::W3MMD_INIT:
+            case self::INIT:
                 $this->subtype = $buffer->token ();
 
                 switch ($this->subtype) {
-                    case self::W3MMD_INIT_VERSION:
+                    case self::INIT_VERSION:
                         /**
                          * [0] => init
                          * [1] => version
@@ -71,7 +95,7 @@ class W3MMD extends Model
                         $this->version = $buffer->token ();
                     break;
 
-                    case self::W3MMD_INIT_PID:
+                    case self::INIT_PID:
                         /**
                          * [0] => init
                          * [1] => pid
@@ -88,7 +112,7 @@ class W3MMD extends Model
                 }
             break;
 
-            case self::W3MMD_DEF_EVENT: 
+            case self::DEF_EVENT:
                 /**
                  * [0] => defEvent
                  * [1] => {eventName}
@@ -112,7 +136,7 @@ class W3MMD extends Model
                 self::$events [$this->eventName] = $this;
             break;
 
-            case self::W3MMD_EVENT:
+            case self::EVENT:
                 /**
                  * [0] => event
                  * [1] => eventName
@@ -132,7 +156,7 @@ class W3MMD extends Model
                 }
             break;
 
-            case self::W3MMD_DEF_VARP:  
+            case self::DEF_VARP:
                 /**
                  * [0] => defVarP
                  * [1] => {varname}
@@ -143,12 +167,12 @@ class W3MMD extends Model
                 $this->varname       = $this->normalizeKey ($buffer->token ());
                 $this->varType       = $buffer->token ();
                 $this->goalType      = $buffer->token ();
-                $this->suggestedType = $buffer->token (); 
-            
+                $this->suggestedType = $buffer->token ();
+
                 self::$variables [$this->varname] = $this;
             break;
 
-            case self::W3MMD_VARP:
+            case self::VARP:
                 /**
                  * [0] => varP
                  * [1] => {pid}
@@ -164,7 +188,7 @@ class W3MMD extends Model
                 $this->variable = self::get ('variables', $this->varname);
             break;
 
-            case self::W3MMD_FLAGP: 
+            case self::FLAGP:
                 /**
                  * [0] => flagP
                  * [1] => {pid}
@@ -202,7 +226,7 @@ class W3MMD extends Model
         return $s;
     }
 
-    private function normalizeKey ($s) 
+    private function normalizeKey ($s)
     {
         return camelCase (
             $this->normalizeValue ($s)
