@@ -114,10 +114,46 @@ def set_dota_player_values(dota_players, w3mmd_data, start, end):
 /**
  * Dota replays use a modified w3mmd message format. This translator converts
  * the modified messages to the standard w3mmd message format.
+ *
+ * Unknown:
+ *   [type:1-5] [key:id] [value:1-5]
+ *   [type:9] [key:9] [value:1432510828]
  */
 class Dota
 {
-    const PREFIX = "dr.x";
+    const PREFIX = 'dr.x';
+
+    const TYPE_GLOBAL = 'Global';
+    const TYPE_DATA   = 'Data';
+
+    // DefEvent settings {argc} [{param1}, {param2}, ...] {format}
+    const EVENTS = [
+        // Data Modecd 0
+        'mode',
+
+        // Data Pool{pid} {oid}
+        // 'pool',
+
+        // Data Ban{pid} {oid}
+        'ban',
+
+        // Data Pick{pid} {oid}
+        'pick',
+
+        // Data PUI_{pid} {oid}
+        // 'pickupItem',
+
+        // Data DRI_{pid} {pid}
+        // 'dropItem',
+
+
+    ];
+
+    // DefVarP {varname} {type} {goal} {suggestion}
+    const VARIABLES = [
+        // {pid} 9 {oid}
+        'hero'
+    ];
 
     /**
      * The first time we translate a message the W3MMD init messages need to
@@ -173,11 +209,48 @@ class Dota
         $key   = $stream->string ();
         $value = $stream->uint32 ();
 
-        var_dump ($intro);
-        var_dump ($type);
-        var_dump ($key);
-        var_dump ($value);
-        die ();
+        $key = new Buffer ($key);
+
+        var_dump ($type . ' ' . $key . ' ' . $value);
+
+        switch ($type) {
+            case self::TYPE_GLOBAL:
+                // var_dump ('GLOBAL ' . $key . ' ' . $value);
+            break;
+
+            case self::TYPE_DATA:
+                // var_dump ('DATA ' . $key . ' ' . $value);
+            break;
+
+            /**
+             * {pid} {type} {int|oid}
+             *
+             * Types:
+             *   1   - Kills
+             *   2   - Deaths
+             *   3   - Creep Kills
+             *   4   - Creep Denies
+             *   5   - Assists
+             *   6   - Gold
+             *   7   - Neutral Kills
+             *   8_0 - Item 1
+             *   8_1 - Item 2
+             *   8_3 - Item 3
+             *   8_4 - Item 4
+             *   8_5 - Item 5
+             *   8_6 - Item 6
+             *   9   - Hero
+             */
+            default:
+                // var_dump ('OTHER ' . $type . ' ' . $key . ' ' . $value);
+            break;
+        }
+
+        // var_dump ($intro);
+        // var_dump ($type);
+        // var_dump ($key);
+        // var_dump ($value);
+        // die ();
 
         $stream->prepend ($buffer);
     }

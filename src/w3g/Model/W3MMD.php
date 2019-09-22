@@ -78,6 +78,8 @@ class W3MMD extends Model
 
         $buffer = new Buffer ($this->message);
 
+        xxd ($this->message);
+
         $this->type = lcfirst ($buffer->token ());
 
         switch ($this->type) {

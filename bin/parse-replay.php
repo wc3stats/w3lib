@@ -9,8 +9,9 @@ use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
 // define ('REPLAY_FILE', __DIR__ . '/krur-krur21.w3g');
-define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/AzerothWars-events.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
+define ('REPLAY_FILE', __DIR__ . '/mzi-1.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
 
 /** **/
