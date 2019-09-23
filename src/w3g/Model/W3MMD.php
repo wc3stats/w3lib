@@ -6,6 +6,7 @@ use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\Library\Exception\RecoverableException;
 use w3lib\w3g\Translator\Dota;
 
 use function w3lib\Library\camelCase;
@@ -93,7 +94,12 @@ class W3MMD extends Model
         $this->header  = $stream->string ();
         $this->message = $stream->string ();
 
+        // 4 unknown bytes.
+        $stream->read (4);
+
         $buffer = new Buffer ($this->message);
+
+        // xxd ($buffer);
 
         // xxd ($this->message);
 
@@ -218,15 +224,12 @@ class W3MMD extends Model
 
             break;
         }
-
-        // 4 unknown bytes.
-        $stream->read (4);
     }
 
     public static function get ($type, $id)
     {
         if (!isset (self::$$type [$id])) {
-            throw new Exception (
+            throw new RecoverableException (
                 sprintf (
                     'Encountered undefined [%s]: [%s]',
                     $type,

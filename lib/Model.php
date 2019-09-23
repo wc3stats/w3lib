@@ -5,6 +5,8 @@ namespace w3lib\Library;
 use Exception;
 use ReflectionClass;
 use JsonSerializable;
+use w3lib\Library\Exception\RecoverableException;
+use w3lib\Library\Exception\StreamEmptyException;
 
 abstract class Model implements JsonSerializable
 {
@@ -48,6 +50,8 @@ abstract class Model implements JsonSerializable
 
         try {
             $model->read ($stream, $context);
+        } catch (RecoverableException $e) {
+            Logger::debug ('Recoverable Exception: ' . $e->getMessage ());
         } catch (Exception $e) {
             $stream->seek ($offset);
             throw $e;
@@ -61,8 +65,11 @@ abstract class Model implements JsonSerializable
         for ($i = 1; /* */ ; $i++) {
             try {
                 yield static::unpack ($stream, $context);
+            } catch (StreamEmptyException $e) {
+                Logger::debug ('Stream Empty Exception: ' . $e->getMessage ());
+                return;
             } catch (Exception $e) {
-                Logger::debug ('Exception: ' . $e->getMessage ());
+                Logger::error ('Non-Recoverable Exception: ' . $e->getMessage ());
                 return;
             }
         }

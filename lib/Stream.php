@@ -3,6 +3,7 @@
 namespace w3lib\Library;
 
 use Exception;
+use w3lib\Library\Exception\StreamEmptyException;
 
 use function w3lib\Library\xxd;
 
@@ -62,7 +63,7 @@ class Stream
         if (($actual = mb_strlen ($block, '8bit')) != $bytes) {
             $this->seek ($offset);
 
-            throw new Exception (
+            throw new StreamEmptyException (
                 sprintf (
                     "%sExpecting stream size [%d] but found size [%d]",
                     $actual !== 0 ? "\033[31m" : "",
