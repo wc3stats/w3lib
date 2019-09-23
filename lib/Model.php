@@ -39,10 +39,10 @@ abstract class Model implements JsonSerializable
         $model = get_called_class ();
         $model = new $model ();
 
-        Logger::debug (
-            'Unpacking [%s]',
-            get_class ($model)
-        );
+        // Logger::debug (
+        //     'Unpacking [%s]',
+        //     get_class ($model)
+        // );
 
         $offset = $stream->offset ();
 
@@ -62,7 +62,7 @@ abstract class Model implements JsonSerializable
             try {
                 yield static::unpack ($stream, $context);
             } catch (Exception $e) {
-                Logger::debug ($e->getMessage ());
+                Logger::debug ('Exception: ' . $e->getMessage ());
                 return;
             }
         }

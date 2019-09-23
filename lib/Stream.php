@@ -40,6 +40,11 @@ class Stream
 
     public function read ($bytes, $flags = 0x00)
     {
+        if (    is_string ($bytes)
+            && !is_numeric ($bytes)) {
+            $bytes = strlen ($bytes);
+        }
+
         if ($bytes <= 0) {
             return '';
         }
@@ -59,15 +64,17 @@ class Stream
 
             throw new Exception (
                 sprintf (
-                    'Expecting stream size [%d] but found size [%d]',
+                    "%sExpecting stream size [%d] but found size [%d]",
+                    $actual !== 0 ? "\033[31m" : "",
                     $bytes,
-                    $actual
+                    $actual,
+                    "\033[0m"
                 )
             );
         }
 
         if (! ($flags & self::QUIET) && Logger::isDebug ()) {
-            xxd ($block);
+            // xxd ($block);
         }
 
         return $block;
@@ -119,6 +126,10 @@ class Stream
 
     public function startsWith ($s)
     {
+        if (strlen ($s) > strlen ('' . $this)) {
+            return FALSE;
+        }
+
         return strcmp (
             $this->read (
                 strlen ($s),

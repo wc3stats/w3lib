@@ -29,11 +29,27 @@ class W3MMD extends Model
     const CHECK = "chk";
     const VALUE = "val";
 
-    const FLAG_DRAWER     = "drawer";
-    const FLAG_LOSER      = "loser";
-    const FLAG_WINNER     = "winner";
-    const FLAG_LEAVER     = "leaver";
+    const OP_ADD = "+=";
+    const OP_SUB = "-=";
+    const OP_SET = "=";
+
+    const TYPE_INT  = "int";
+    const TYPE_REAL = "real";
+    const TYPE_STRING = "string";
+
+    const GOAL_NONE = "none";
+    const GOAL_HIGH = "high";
+    const GOAL_LOW  = "low";
+
+    const FLAG_DRAWER = "drawer";
+    const FLAG_LOSER  = "loser";
+    const FLAG_WINNER = "winner";
+    const FLAG_LEAVER = "leaver";
     const FLAG_PRACTICING = "practicing";
+
+    const SUGGEST_NONE  = "none";
+    const SUGGEST_TRACK = "track";
+    const SUGGEST_LEADERBOARD = "leaderboard";
 
     private static $translators = [
         Dota::class
@@ -69,6 +85,7 @@ class W3MMD extends Model
             }
         }
 
+        // xxd ($stream);
 
         /** **/
 
@@ -78,7 +95,7 @@ class W3MMD extends Model
 
         $buffer = new Buffer ($this->message);
 
-        xxd ($this->message);
+        // xxd ($this->message);
 
         $this->type = lcfirst ($buffer->token ());
 
@@ -198,6 +215,7 @@ class W3MMD extends Model
                  */
                 $this->playerId = self::get ('pids', $buffer->token ());
                 $this->flag     = $buffer->token ();
+
             break;
         }
 

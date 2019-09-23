@@ -3,6 +3,7 @@
 namespace w3lib\w3g;
 
 use w3lib\Library\Stream;
+use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Data\Actions;
 use w3lib\w3g\Model\Game;
 use w3lib\w3g\Model\Player;
@@ -236,8 +237,14 @@ class Lang
         return $value ? 'Yes' : 'No';
     }
 
-    public static function objectId (Stream $stream)
+    public static function objectId ($stream)
     {
+        if (! ($stream instanceof Stream)) {
+            $stream = new Buffer (
+                pack ('N', $stream)
+            );
+        }
+
         $data = $stream->char (4);
 
         $code = unpack ('N', $data);

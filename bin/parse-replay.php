@@ -9,8 +9,9 @@ use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
 // define ('REPLAY_FILE', __DIR__ . '/krur-krur21.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
-define ('REPLAY_FILE', __DIR__ . '/mzi-1.w3g');
+define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/Dota-2.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/mzi-3.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
 
@@ -20,6 +21,7 @@ error_reporting (E_ALL);
 ini_set ('display_errors', 1);
 
 Logger::setup (Monolog::INFO);
+// Logger::setup (Monolog::DEBUG);
 
 $settings = new Settings ();
 
@@ -61,10 +63,12 @@ foreach ($replay->getPlayers () as $player) {
         $player->stayPercent,
         count ($player->variables ?? [])
     );
-    // var_dump($player->variables);
+
+    var_dump($player->flags);
+    var_dump($player->variables);
 }
 
-// var_dump($replay->game->events);die();
+// var_dump($replay->game->events);
 // echo PHP_EOL;
 
 Logger::info ('Memory usage: [%d]', memory_get_usage ());

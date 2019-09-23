@@ -187,7 +187,7 @@ class Parser
 
         $player = $this->replay->getPlayer (
             // $w3mmd->playerName ??
-            $w3mmd->playerId   ??
+            $w3mmd->playerId ??
             NULL
         );
 
@@ -197,7 +197,23 @@ class Parser
 
         switch ($w3mmd->type) {
             case W3MMD::VARP:
-                $player->variables [$w3mmd->varname] = $w3mmd->value;
+                if (!isset ($player->variables [$w3mmd->varname])) {
+                    $player->variables [$w3mmd->varname] = 0;
+                }
+
+                switch ($w3mmd->operator) {
+                    case W3MMD::OP_ADD:
+                        $player->variables [$w3mmd->varname] += $w3mmd->value;
+                    break;
+
+                    case W3MMD::OP_SUB:
+                        $player->variables [$w3mmd->varname] -= $w3mmd->value;
+                    break;
+
+                    case W3MMD::OP_SET:
+                        $player->variables [$w3mmd->varname] = $w3mmd->value;
+                    break;
+                }
             break;
 
             case W3MMD::FLAGP:

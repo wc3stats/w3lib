@@ -2,114 +2,16 @@
 
 namespace w3lib\w3g\Translator;
 
+use w3lib\Library\Logger;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Parser;
+use w3lib\w3g\Lang;
 use w3lib\w3g\Model\Action;
 use w3lib\w3g\Model\W3MMD;
 use w3lib\w3g\Translator;
 
 use function w3lib\Library\xxd;
-
-/**
-
-    mode_map = {
-        'mm': 'mirror_match',
-        'em': 'easy_mode',
-        'ar': 'all_random',
-        'sp': 'shuffle_players',
-        'nb': 'no_bottom',
-        'nt': 'no_top',
-        'ap': 'all_pick',
-    }
-def set_dota_player_values(dota_players, w3mmd_data, start, end):
-    for index in range(start, end+1, 1):
-        w3mmd = w3mmd_data[index]
-        player_id_value = int(w3mmd[0].decode('utf-8'))
-        key = w3mmd[1].decode('utf-8')
-        value = w3mmd[2]
-
-        if player_id_value > 5:
-            player_id_value -= 1
-
-        dota_player = dota_players[player_id_value-1]
-
-        if key == '1':
-            dota_player.kills = b2i(value)
-        elif key == '2':
-            dota_player.deaths = b2i(value)
-        elif key == '3':
-            dota_player.cskills = b2i(value)
-        elif key == '4':
-            dota_player.csdenies = b2i(value)
-        elif key == '5':
-            dota_player.assists = b2i(value)
-        elif key == '6':
-            dota_player.current_gold = b2i(value)
-        elif key == '7':
-            dota_player.neutral_kills = b2i(value)
-        elif key == '8_0':
-            dota_player.item1 = value
-        elif key == '8_1':
-            dota_player.item2 = value
-        elif key == '8_2':
-            dota_player.item3 = value
-        elif key == '8_3':
-            dota_player.item4 = value
-        elif key == '8_4':
-            dota_player.item5 = value
-        elif key == '8_5':
-            dota_player.item6 = value
-        elif key == '9':
-            dota_player.hero = value
-        elif key == 'id':
-            player_id_end = b2i(value)
-            if player_id_end < 6:
-                team = 1
-            else:
-                team = 2
-
-            dota_player.player_id_end = player_id_end
-            dota_player.team = team
-        else:
-            raise Exception("Not recognized key:", key)
-
-    return dota_players
-
-    dri = DROP ITEM
-    pui = PICKUP ITEM
-
-
-     for ts, (a, b, c) in replay_data['dota_events']:
-        if a=='Data' and b.startswith('Mode'):
-            global_data['modeline'] = b[4:]
-        if a=='Data' and b.startswith('Hero'):
-            victim_id = int(b.replace('Hero',''))
-            killer_id = int(c)
-            hero_data[killer_id]['kill_log'].append((ts, victim_id))
-            hero_data[victim_id]['death_log'].append((ts, killer_id))
-        if a=='Data' and b.startswith('Assist'):
-            killer_id = int(b.replace('Assist', ''))
-            victim_id = int(c)
-            hero_data[killer_id]['assist_log'].append((ts, victim_id))
-            hero_data[victim_id]['death_log_assist'].append((ts, killer_id))
-        elif a=='Data' and b.startswith('Level'):
-            hero_level = int(b.replace('Level', ''))
-            hero_data[int(c)]['level_log'].append((ts, hero_level))
-        elif a=='Data' and b.startswith('PUI_'):
-            hero_id = int(b.replace('PUI_', ''))
-            hero_data[hero_id]['item_log'].append((ts, 'PUI', c))
-        elif a=='Data' and b.startswith('DRI_'):
-            hero_id = int(b.replace('DRI_', ''))
-            hero_data[hero_id]['item_log'].append((ts, 'DRI', c))
-        elif a.isnumeric():
-            hero_data[int(a)][key_names[str(b)]] = c
-        elif a=='Global': # very rare
-            global_data[b] = c
-
-
-**/
-
 
 /**
  * Dota replays use a modified w3mmd message format. This translator converts
@@ -118,6 +20,12 @@ def set_dota_player_values(dota_players, w3mmd_data, start, end):
  * Unknown:
  *   [type:1-5] [key:id] [value:1-5]
  *   [type:9] [key:9] [value:1432510828]
+ *   Data Tower010 10
+ *   Data Roshan 1
+ *   Data AegisOn 7
+ *   Data AegisOff 7
+ *   Data Rax000 8
+ *   Data Rax001 7
  */
 class Dota
 {
@@ -126,33 +34,158 @@ class Dota
     const TYPE_GLOBAL = 'Global';
     const TYPE_DATA   = 'Data';
 
-    // DefEvent settings {argc} [{param1}, {param2}, ...] {format}
+    const E_MODE = 'Mode';
+    const E_POOL = 'Pool';
+    const E_BAN  = 'Ban';
+    const E_PICK = 'Pick';
+    const E_PUI  = 'PUI_';
+    const E_DRI  = 'DRI_';
+    const E_START = 'GameStart';
+    const E_RUNE = 'RuneUse';
+    const E_LEVEL = 'Level';
+    const E_ASSIST = 'Assist';
+    const E_HERO_KILL = 'Hero';
+
+    const V_CSK = 'CSK';
+    const V_CSD = 'CSD';
+    const V_NK = 'NK';
+
+    const G_WINNER = 'Winner';
+
+    const V_KILLS   = 'Kills';
+    const V_DEATHS  = 'Deaths';
+    const V_ASSISTS = 'Assists';
+
+    /** **/
+
+    // DefEvent {name} {argc} [{param1} {param2} ...] {format}
     const EVENTS = [
+
         // Data Modecd 0
-        'mode',
+        self::E_MODE => [
+            'name' => 'mode',
+            'argv' => [ 'value' ]
+        ],
 
         // Data Pool{pid} {oid}
-        // 'pool',
+        // self::E_POOL => [
+        //     'name' => 'pool',
+        //     'argv' => [ 'pid', 'oid' ]
+        // ],
 
         // Data Ban{pid} {oid}
-        'ban',
+        self::E_BAN => [
+            'name' => 'ban',
+            'argv' => [ 'player', 'hero' ]
+        ],
 
         // Data Pick{pid} {oid}
-        'pick',
+        self::E_PICK => [
+            'name' => 'pick',
+            'argv' => [ 'player', 'hero' ]
+        ],
 
         // Data PUI_{pid} {oid}
-        // 'pickupItem',
+        // self::E_PUI => [
+        //     'name' => 'pickupItem',
+        //     'argv' => [ 'pid', 'oid' ]
+        // ],
 
-        // Data DRI_{pid} {pid}
-        // 'dropItem',
+        // Data DRI_{pid} {oid}
+        // self::E_DRI => [
+        //     'name' => 'dropItem',
+        //     'argv' => [ 'pid', 'oid' ]
+        // ],
 
+        // Data GameStart 1
+        self::E_START => [
+            'name' => 'gameStart',
+            'argv' => []
+        ],
 
+        // Data RuneUse{rune} {pid}
+        self::E_RUNE => [
+            'name' => 'runeUse',
+            'argv' => [ 'player', 'rune' ]
+        ],
+
+        // Data Level{level} {pid}
+        self::E_LEVEL => [
+            'name' => 'levelUp',
+            'argv' => [ 'player', 'level' ]
+        ],
+
+        // Data Assist{assisterPid} {assistedPid}
+        self::E_ASSIST => [
+            'name' => 'assist',
+            'argv' => [ 'player', 'assisted' ]
+        ],
+
+        // Data Hero{pidKilled} {pidKiller}
+        self::E_HERO_KILL => [
+            'name' => 'heroKill',
+            'argv' => [ 'killed', 'killer' ]
+        ]
     ];
 
     // DefVarP {varname} {type} {goal} {suggestion}
     const VARIABLES = [
+
+        // {pid} 1 {int}
+        '1' => 'kills',
+
+        // {pid} 2 {int}
+        '2' => 'deaths',
+
+        // Data CSK{pid} {int}
+        // {pid} 3 {int}
+        '3' => 'creepKills',
+
+        // Data CSD{pid} {int}
+        // {pid} 4 {int}
+        '4' => 'creepDenies',
+
+        // {pid} 5 {int}
+        '5' => 'assists',
+
+        // {pid} 6 {int}
+        '6' => 'gold',
+
+        // Data NK{pid} {int}
+        // {pid} 7 {int}
+        '7' => 'neutralKills',
+
+        // {pid} 8_{slot} {oid}
+        '8_0' => 'item1',
+        '8_1' => 'item2',
+        '8_2' => 'item3',
+        '8_3' => 'item4',
+        '8_4' => 'item5',
+        '8_5' => 'item6',
+
         // {pid} 9 {oid}
-        'hero'
+        '9' => 'hero',
+
+        // < 6 = team 1, >= 6 = team 2
+        // {pid} id {spawnId}
+        'id' => 'team'
+
+    ];
+
+    const MODES = [
+        'mm' => 'Mirror Match',
+        'em' => 'Easy Mode',
+        'ar' => 'All Random',
+        'sp' => 'Shuffle Players',
+        'nb' => 'No Bottom',
+        'nt' => 'No Top',
+        'ap' => 'All Pick',
+        'cd' => 'Captain Draft'
+    ];
+
+    private static $teams = [
+        '1' => [],
+        '2' => []
     ];
 
     /**
@@ -171,88 +204,318 @@ class Dota
         $buffer = new Buffer ();
 
         if (!self::$initialized) {
-            /* W3MMD::INIT_VERSION */
-            self::pack (
-                $buffer,
-
-                sprintf (
-                    'init version %d %d',
-                    Parser::VERSION,
-                    W3MMD::VERSION
-                )
-            );
-
-            /* W3MMD::INIT_PID */
-            foreach ($context->replay->getPlayers () as $player) {
-                self::pack (
-                    $buffer,
-
-                    sprintf (
-                        'init pid %d %s',
-                        $player->slot,
-                        $player->name
-                    )
-                );
-            }
-
+            self::init ($buffer, $context);
             self::$initialized = TRUE;
         }
 
         /**
          * [0] => dr.x
-         * [1] => Data
+         * [1] => Data|Global|{pid}
          * [2] => {key}
          * [3] => uint32
          */
-        $intro = $stream->string ();
-        $type  = $stream->string ();
-        $key   = $stream->string ();
-        $value = $stream->uint32 ();
+        $intro   = $stream->string ();
+        $type    = $stream->string ();
+        $varname = $stream->string ();
+        $value   = $stream->uint32 ();
 
-        $key = new Buffer ($key);
+        $varname = new Buffer ($varname);
 
-        var_dump ($type . ' ' . $key . ' ' . $value);
+        // var_dump ($type . ' ' . $varname . ' ' . $value);
 
         switch ($type) {
+
+            /** **/
+
             case self::TYPE_GLOBAL:
-                // var_dump ('GLOBAL ' . $key . ' ' . $value);
+                switch ($varname) {
+                    case self::G_WINNER:
+                        // FlagPlayer
+
+                        foreach (self::$teams as $team => $pids) {
+                            foreach ($pids as $pid) {
+                                self::pack (
+                                    $buffer,
+
+                                    sprintf (
+                                        '%s %d %s',
+                                        W3MMD::FLAGP,
+                                        $pid,
+                                        $team === $value ?
+                                            W3MMD::FLAG_WINNER :
+                                            W3MMD::FLAG_LOSER
+                                    )
+                                );
+                            }
+                        }
+                    break;
+                }
             break;
 
+            /** **/
+
             case self::TYPE_DATA:
-                // var_dump ('DATA ' . $key . ' ' . $value);
+                if ($varname->startsWith (self::E_MODE)) {
+                    $varname->read (self::E_MODE);
+
+                    $value = $varname->string ();
+                    $modes = [];
+
+                    foreach (self::MODES as $code => $display) {
+                        if (stripos ($value, $code) !== FALSE) {
+                            $modes [] = $display;
+                        }
+                    }
+
+                    self::event (
+                        $buffer,
+                        self::E_MODE,
+                        implode (', ', $modes)
+                    );
+                } else if ($varname->startsWith (self::E_BAN)) {
+                    self::event (
+                        $buffer,
+                        $varname->read (self::E_BAN),
+                        $varname, // {pid}
+                        Lang::objectId ($value)
+                    );
+                } else if ($varname->startsWith (self::E_PICK)) {
+                    self::event (
+                        $buffer,
+                        $varname->read (self::E_PICK),
+                        $varname, // {pid}
+                        Lang::objectId ($value)
+                    );
+                } else if ($varname->startsWith (self::E_START)) {
+                    self::event (
+                        $buffer,
+                        $varname->read (self::E_START)
+                    );
+                } else if ($varname->startsWith (self::E_RUNE)) {
+                    self::event (
+                        $buffer,
+                        $varname->read (self::E_RUNE),
+                        $value,  // {pid}
+                        $varname // {rune}
+                    );
+                } else if ($varname->startsWith (self::E_LEVEL)) {
+                    self::event (
+                        $buffer,
+                        $varname->read (self::E_LEVEL),
+                        $value,  // {pid}
+                        $varname // {level}
+                    );
+                } else if ($varname->startsWith (self::E_ASSIST)) {
+                    self::event (
+                        $buffer,
+                        $varname->read (self::E_ASSIST),
+                        $varname, // {assister}
+                        $value    // {assisted}
+                    );
+
+                    self::var (
+                        $buffer,
+                        $varname,
+                        self::V_ASSISTS,
+                        W3MMD::OP_ADD,
+                        1
+                    );
+                } else if ($varname->startsWith (self::E_HERO_KILL)) {
+                    self::event (
+                        $buffer,
+                        $varname->read (self::E_HERO_KILL),
+                        $value,  // {killer}
+                        $varname // {killed}
+                    );
+
+                    self::var (
+                        $buffer,
+                        $value,
+                        self::V_KILLS,
+                        W3MMD::OP_ADD,
+                        1
+                    );
+
+                    self::var (
+                        $buffer,
+                        $varname,
+                        self::V_DEATHS,
+                        W3MMD::OP_ADD,
+                        1
+                    );
+                } else if ($varname->startsWith (self::V_CSK)) {
+                    $varname->read (self::V_CSK);
+
+                    self::var (
+                        $buffer,
+                        $varname, // {pid}
+                        '3',      // creepKills
+                        W3MMD::OP_ADD,
+                        $value
+                    );
+                } else if ($varname->startsWith (self::V_CSD)) {
+                    $varname->read (self::V_CSD);
+
+                    self::var (
+                        $buffer,
+                        $varname, // {pid}
+                        '4',      // creepDenies
+                        W3MMD::OP_ADD,
+                        $value
+                    );
+                } else if ($varname->startsWith (self::V_NK)) {
+                    $varname->read (self::V_NK);
+
+                    self::var (
+                        $buffer,
+                        $varname, // {pid}
+                        '7',      // neutralKills
+                        W3MMD::OP_ADD,
+                        $value
+                    );
+                } else if (
+                    $varname->startsWith (self::E_POOL)
+                 || $varname->startsWith (self::E_PUI)
+                 || $varname->startsWith (self::E_DRI)
+                ) {
+                    Logger::debug ('Skipping known data event: [%s]', $varname);
+                } else {
+                    Logger::warn ('Skipping unknown data event: [%s]', $varname);
+                }
             break;
 
             /**
-             * {pid} {type} {int|oid}
-             *
-             * Types:
-             *   1   - Kills
-             *   2   - Deaths
-             *   3   - Creep Kills
-             *   4   - Creep Denies
-             *   5   - Assists
-             *   6   - Gold
-             *   7   - Neutral Kills
-             *   8_0 - Item 1
-             *   8_1 - Item 2
-             *   8_3 - Item 3
-             *   8_4 - Item 4
-             *   8_5 - Item 5
-             *   8_6 - Item 6
-             *   9   - Hero
+             * {pid} {code} {int|oid}
              */
             default:
-                // var_dump ('OTHER ' . $type . ' ' . $key . ' ' . $value);
+                $pid = $type;
+
+                if (   $varname->startsWith ('8_')
+                    || $varname->startsWith ('9')) {
+                    $value = Lang::objectId ($value);
+                } else if ($varname->startsWith ('id')) {
+                    $value = $value < 6 ? 1 : 2;
+
+                    if (!in_array ($pid, self::$teams [$value])) {
+                        self::$teams [$value] [] = $pid;
+                    }
+                }
+
+                self::var (
+                    $buffer,
+                    $pid,
+                    '' . $varname,
+                    W3MMD::OP_SET,
+                    $value
+                );
             break;
         }
 
-        // var_dump ($intro);
-        // var_dump ($type);
-        // var_dump ($key);
-        // var_dump ($value);
-        // die ();
-
         $stream->prepend ($buffer);
+    }
+
+    protected static function init (Stream $stream, $context = NULL)
+    {
+        /* W3MMD::INIT_VERSION */
+        self::pack (
+            $stream,
+
+            sprintf (
+                '%s %s %d %d',
+                W3MMD::INIT,
+                W3MMD::INIT_VERSION,
+                Parser::VERSION,
+                W3MMD::VERSION
+            )
+        );
+
+        /* W3MMD::INIT_PID */
+        foreach ($context->replay->getPlayers () as $player) {
+            self::pack (
+                $stream,
+
+                sprintf (
+                    '%s %s %d %s',
+                    W3MMD::INIT,
+                    W3MMD::INIT_PID,
+                    $player->colour,
+                    $player->name
+                )
+            );
+        }
+
+        /* Initialize events. */
+        foreach (self::EVENTS as $const => $event) {
+            self::pack (
+                $stream,
+
+                // DefEvent {name} {argc} [{param1} {param2} ...] {format}
+                sprintf (
+                    '%s %s %d %s',
+                    W3MMD::DEF_EVENT,
+                    $event ['name'],
+                    count ($event ['argv']),
+                    implode (' ', $event ['argv'])
+
+                    // Skip format for now...
+                )
+            );
+        }
+
+        /* Initialize variables. */
+        foreach (self::VARIABLES as $code => $varname) {
+            self::pack (
+                $stream,
+
+                // DefVarP {varname} {type} {goal} {suggestion}
+                sprintf (
+                    '%s %s %s %s %s',
+                    W3MMD::DEF_VARP,
+                    $varname,
+                    W3MMD::TYPE_STRING,
+                    W3MMD::GOAL_NONE,
+                    W3MMD::SUGGEST_NONE
+                )
+            );
+        }
+    }
+
+    protected static function event (Stream &$stream, $eventName, ... $argv)
+    {
+        if (in_array ($eventName, self::EVENTS)) {
+            $eventName = self::EVENTS [$eventName] ['name'];
+        }
+
+        self::pack (
+            $stream,
+
+            sprintf (
+                '%s %s %s',
+                W3MMD::EVENT,
+                $eventName,
+                implode (' ', $argv)
+            )
+        );
+    }
+
+    protected static function var (Stream &$stream, $pid, $varname, $operator, $value)
+    {
+        if (isset (self::VARIABLES [$varname])) {
+            $varname = self::VARIABLES [$varname];
+        }
+
+        self::pack (
+            $stream,
+
+            sprintf (
+                '%s %s %s %s %s',
+                W3MMD::VARP,
+                $pid,
+                $varname,
+                $operator,
+                $value
+            )
+        );
     }
 
     protected static function pack (Stream $stream, $action)

@@ -15,13 +15,13 @@ class ActionBlock extends Model
         $this->length   = $stream->uint16 ();
         $this->actions  = [];
 
-        Logger::debug (
-            sprintf (
-                'Processing action block for player [%d] of length [%d]',
-                $this->playerId,
-                $this->length
-            )
-        );
+        // Logger::debug (
+        //     sprintf (
+        //         'Processing action block for player [%d] of length [%d]',
+        //         $this->playerId,
+        //         $this->length
+        //     )
+        // );
 
         $block = new Buffer ($stream->read ($this->length));
 
@@ -39,6 +39,14 @@ class ActionBlock extends Model
 
             $this->actions [] = $action;
         }
+
+        Logger::debug (
+            'Found [%d] action%s in blocksize [%d] for player [%s].',
+            count ($this->actions),
+            count ($this->actions) === 1 ? '' : 's',
+            $this->length,
+            $this->playerId
+        );
     }
 }
 
