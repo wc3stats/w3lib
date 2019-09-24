@@ -5,8 +5,10 @@ namespace w3lib\w3g\Translator;
 use w3lib\Library\Logger;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\Library\Exception\RecoverableException;
 use w3lib\w3g\Parser;
 use w3lib\w3g\Lang;
+use w3lib\w3g\Replay;
 use w3lib\w3g\Model\Action;
 use w3lib\w3g\Model\W3MMD;
 use w3lib\w3g\Translator;
@@ -18,8 +20,6 @@ use function w3lib\Library\xxd;
  * the modified messages to the standard w3mmd message format.
  *
  * Unknown:
- *   [type:1-5] [key:id] [value:1-5]
- *   [type:9] [key:9] [value:1432510828]
  *   Data Tower010 10
  *   Data Roshan 1
  *   Data AegisOn 7
@@ -214,6 +214,8 @@ class Dota
          * [2] => {key}
          * [3] => uint32
          */
+        // xxd ($stream);
+
         $intro   = $stream->string ();
         $type    = $stream->string ();
         $varname = $stream->string ();
@@ -276,14 +278,14 @@ class Dota
                     self::event (
                         $buffer,
                         $varname->read (self::E_BAN),
-                        $varname, // {pid}
+                        self::getPlayerName ($context->replay, $varname), // {pid}
                         Lang::objectId ($value)
                     );
                 } else if ($varname->startsWith (self::E_PICK)) {
                     self::event (
                         $buffer,
                         $varname->read (self::E_PICK),
-                        $varname, // {pid}
+                        self::getPlayerName ($context->replay, $varname), // {pid}
                         Lang::objectId ($value)
                     );
                 } else if ($varname->startsWith (self::E_START)) {
@@ -295,22 +297,22 @@ class Dota
                     self::event (
                         $buffer,
                         $varname->read (self::E_RUNE),
-                        $value,  // {pid}
+                        self::getPlayerName ($context->replay, $value),  // {pid}
                         $varname // {rune}
                     );
                 } else if ($varname->startsWith (self::E_LEVEL)) {
                     self::event (
                         $buffer,
                         $varname->read (self::E_LEVEL),
-                        $value,  // {pid}
+                        self::getPlayerName ($context->replay, $value),  // {pid}
                         $varname // {level}
                     );
                 } else if ($varname->startsWith (self::E_ASSIST)) {
                     self::event (
                         $buffer,
                         $varname->read (self::E_ASSIST),
-                        $varname, // {assister}
-                        $value    // {assisted}
+                        self::getPlayerName ($context->replay, $varname), // {assister}
+                        self::getPlayerName ($context->replay, $value)    // {assisted}
                     );
 
                     self::var (
@@ -324,8 +326,8 @@ class Dota
                     self::event (
                         $buffer,
                         $varname->read (self::E_HERO_KILL),
-                        $value,  // {killer}
-                        $varname // {killed}
+                        self::getPlayerName ($context->replay, $value),  // {killer}
+                        self::getPlayerName ($context->replay, $varname) // {killed}
                     );
 
                     self::var (
@@ -378,9 +380,23 @@ class Dota
                  || $varname->startsWith (self::E_PUI)
                  || $varname->startsWith (self::E_DRI)
                 ) {
-                    Logger::debug ('Skipping known data event: [%s]', $varname);
+                    // Logger::debug ('Skipping known data event: [%s]', $varname);
+
+                    throw new RecoverableException (
+                        sprintf (
+                            'Skipping known data event: [%s]',
+                            $varname
+                        )
+                    );
                 } else {
-                    Logger::warn ('Skipping unknown data event: [%s]', $varname);
+                    // Logger::warn ('Skipping unknown data event: [%s]', $varname);
+
+                    throw new RecoverableException (
+                        sprintf (
+                            'Skipping unknown data event: [%s]',
+                            $varname
+                        )
+                    );
                 }
             break;
 
@@ -482,7 +498,7 @@ class Dota
 
     protected static function event (Stream &$stream, $eventName, ... $argv)
     {
-        if (in_array ($eventName, self::EVENTS)) {
+        if (isset (self::EVENTS [$eventName])) {
             $eventName = self::EVENTS [$eventName] ['name'];
         }
 
@@ -516,6 +532,17 @@ class Dota
                 $value
             )
         );
+    }
+
+    protected static function getPlayerName (Replay $replay, $pid)
+    {
+        $player = $replay->getPlayerByColour ($pid);
+
+        if (!$player) {
+            return $pid;
+        }
+
+        return $player->name;
     }
 
     protected static function pack (Stream $stream, $action)

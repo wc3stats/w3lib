@@ -52,6 +52,7 @@ abstract class Model implements JsonSerializable
             $model->read ($stream, $context);
         } catch (RecoverableException $e) {
             Logger::debug ('Recoverable Exception: ' . $e->getMessage ());
+            return NULL;
         } catch (Exception $e) {
             $stream->seek ($offset);
             throw $e;
@@ -64,11 +65,19 @@ abstract class Model implements JsonSerializable
     {
         for ($i = 1; /* */ ; $i++) {
             try {
-                yield static::unpack ($stream, $context);
+                $model = static::unpack ($stream, $context);
+
+                if ($model) {
+                    yield $model;
+                }
             } catch (StreamEmptyException $e) {
-                Logger::debug ('Stream Empty Exception: ' . $e->getMessage ());
+                // Logger::debug ('Stream Empty Exception: ' . $e->getMessage ());
                 return;
             } catch (Exception $e) {
+                if (Logger::isDebug ()) {
+                    xxd ($stream);
+                }
+
                 Logger::error ('Non-Recoverable Exception: ' . $e->getMessage ());
                 return;
             }

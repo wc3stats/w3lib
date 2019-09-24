@@ -4,6 +4,7 @@ namespace w3lib\w3g\Model;
 
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\Library\Exception\FatalException;
 
 class Header extends Model
 {
@@ -43,6 +44,10 @@ class Header extends Model
         $this->flags            = $stream->uint16 ();
         $this->length           = ceil ($stream->uint32 () / 1000);
         $this->checksum         = $stream->uint32 ();
+
+        if ($this->numBlocks <= 0) {
+            throw new FatalException ('Malformed or empty replay.');
+        }
     }
 }
 

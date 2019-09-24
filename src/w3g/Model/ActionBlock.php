@@ -7,6 +7,8 @@ use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 
+use function w3lib\Library\xxd;
+
 class ActionBlock extends Model
 {
     public function read (Stream &$stream, $context = NULL)
@@ -23,7 +25,12 @@ class ActionBlock extends Model
         //     )
         // );
 
+
         $block = new Buffer ($stream->read ($this->length));
+
+        if (Logger::isDebug ()) {
+            xxd ($block);
+        }
 
         foreach (Action::unpackAll ($block, $context) as $action) {
             // Actions to ignore.
@@ -40,13 +47,13 @@ class ActionBlock extends Model
             $this->actions [] = $action;
         }
 
-        Logger::debug (
-            'Found [%d] action%s in blocksize [%d] for player [%s].',
-            count ($this->actions),
-            count ($this->actions) === 1 ? '' : 's',
-            $this->length,
-            $this->playerId
-        );
+        // Logger::debug (
+        //     'Found [%d] action%s in blocksize [%d] for player [%s].',
+        //     count ($this->actions),
+        //     count ($this->actions) === 1 ? '' : 's',
+        //     $this->length,
+        //     $this->playerId
+        // );
     }
 }
 

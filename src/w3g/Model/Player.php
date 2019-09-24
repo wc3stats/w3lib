@@ -79,7 +79,7 @@ class Player extends Model
 
     public function hasVar ($varname)
     {
-        return isset ($this->variables [$varname]);
+        return !empty ($this->variables [$varname]);
     }
 
     public function hasFlag ($flag)

@@ -65,11 +65,9 @@ class Stream
 
             throw new StreamEmptyException (
                 sprintf (
-                    "%sExpecting stream size [%d] but found size [%d]",
-                    $actual !== 0 ? "\033[31m" : "",
+                    "Expecting stream size [%d] but found size [%d]",
                     $bytes,
-                    $actual,
-                    "\033[0m"
+                    $actual
                 )
             );
         }

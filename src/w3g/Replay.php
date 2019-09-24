@@ -44,11 +44,21 @@ class Replay extends Archive
         return $this->game->getPlayerBy ('name', $playerName);
     }
 
+    public function getPlayerByColour ($colour)
+    {
+        return $this->game->getPlayerBy ('colour', $colour);
+    }
+
     public function getSaver ()
     {
         return $this->getPlayerById (
             $this->game->saver
         );
+    }
+
+    public function getEvents ()
+    {
+        return $this->game->events;
     }
 
     /** **/
