@@ -7,6 +7,7 @@ use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use function \w3lib\Library\xxd;
 
 class Block extends Model
 {

@@ -205,11 +205,16 @@ class W3MMD extends Model
                  * [4] => {value}
                  */
                 $this->playerId = self::get ('pids', $buffer->token ());
+
                 $this->varname  = $this->normalizeKey ($buffer->token ());
                 $this->operator = $buffer->token ();
                 $this->value    = $this->normalizeValue ($buffer->token ());
 
-                $this->variable = self::get ('variables', $this->varname);
+                try {
+                    $this->variable = self::get ('variables', $this->varname);
+                } catch (Exception $e) {
+                    // No-op.
+                }
             break;
 
             case self::FLAGP:
