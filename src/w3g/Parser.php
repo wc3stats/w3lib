@@ -217,6 +217,18 @@ class Parser
             break;
 
             case W3MMD::FLAGP:
+                // if (!isset ($player->flags [$w3mmd->flag])) {
+                //     $player->flags [$w3mmd->flag] = 0;
+                // }
+
+                // $player->flags [$w3mmd->flag]++;
+
+                if ($w3mmd->flag === W3MMD::FLAG_WINNER) {
+                    $player->isWinner = true;
+                } else if ($w3mmd->flag === W3MMD::FLAG_LOSER) {
+                    $player->isWinner = false;
+                }
+
                 $player->flags [] = $w3mmd->flag;
             break;
         }

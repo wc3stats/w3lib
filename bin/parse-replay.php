@@ -13,7 +13,7 @@ use w3lib\w3g\Settings;
 // define ('REPLAY_FILE', __DIR__ . '/Dota-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/broken.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/risk-2.w3g');
-define ('REPLAY_FILE', __DIR__ . '/ltd-2.w3g');
+define ('REPLAY_FILE', __DIR__ . '/lihl3.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
 
