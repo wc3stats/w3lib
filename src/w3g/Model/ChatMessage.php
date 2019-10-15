@@ -5,6 +5,7 @@ namespace w3lib\w3g\Model;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\w3g\Context;
 
 class ChatMessage extends Model
 {
@@ -15,7 +16,7 @@ class ChatMessage extends Model
     public $message  = NULL;
     public $time     = NULL;
 
-    public function read (Stream &$stream, $context = NULL)
+    public function read (Stream &$stream)
     {
         $this->playerId = $stream->int8 ();
         $this->length   = $stream->uint16 ();
@@ -26,7 +27,7 @@ class ChatMessage extends Model
         $this->mode     = $block->uint32 ();
         $this->message  = $block->string ();
 
-        $this->time     = $context->getTime ();
+        $this->time     = Context::getTime ();
     }
 
     public function __toString ()

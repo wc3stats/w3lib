@@ -8,9 +8,11 @@ use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\w3g\Context;
 
 class Segment extends Model
 {
+    const END_BUFFER    = 0x00;
     const START_BLOCK_A = 0x1A;
     const START_BLOCK_B = 0x1B;
     const START_BLOCK_C = 0x1C;
@@ -22,7 +24,7 @@ class Segment extends Model
     const GAME_OVER     = 0x2F;
     const LEAVE_GAME    = 0x17;
 
-    public function read (Stream &$stream, $context = NULL)
+    public function read (Stream &$stream)
     {
         $this->id  = $stream->int8 ();
         $this->key = $this->keyName ($this->id);
@@ -57,19 +59,19 @@ class Segment extends Model
                 $this->timeIncrement = $stream->uint16 ();
                 $this->blocks        = [];
 
-                $context->time += $this->timeIncrement / 1000;
+                Context::$time += $this->timeIncrement / 1000;
 
                 if ($this->length > 0) {
                     $block = new Buffer ($stream->read ($this->length));
 
-                    foreach (ActionBlock::unpackAll ($block, $context) as $actionBlock) {
+                    foreach (ActionBlock::unpackAll ($block) as $actionBlock) {
                         $this->blocks [] = $actionBlock;
                     }
                 }
             break;
 
             case self::CHAT_MESSAGE:
-                $this->message = ChatMessage::unpack ($stream, $context);
+                $this->message = ChatMessage::unpack ($stream);
             break;
 
             case self::UNKNOWN_1:
@@ -95,6 +97,10 @@ class Segment extends Model
                 $this->result   = $stream->uint32 ();
 
                 $stream->uint32 ();
+            break;
+
+            case self::END_BUFFER:
+                while ($stream->read (1) === self::END_BUFFER);
             break;
         }
     }

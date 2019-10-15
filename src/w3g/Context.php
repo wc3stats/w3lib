@@ -4,13 +4,18 @@ namespace w3lib\w3g;
 
 class Context
 {
-    public $settings;
-    public $replay;
-    public $time;
+    public static $settings;
+    public static $replay;
+    public static $time;
 
-    public function getTime ()
+    public static function majorVersion ()
     {
-        return floor ($this->time);
+        return self::$replay->header->majorVersion;
+    }
+
+    public static function getTime ()
+    {
+        return floor (self::$time);
     }
 }
 

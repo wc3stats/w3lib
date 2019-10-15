@@ -34,9 +34,9 @@ abstract class Model implements JsonSerializable
         );
     }
 
-    public abstract function read (Stream &$stream, $context = NULL);
+    public abstract function read (Stream &$stream);
 
-    public static function unpack (Stream &$stream, $context = NULL)
+    public static function unpack (Stream &$stream)
     {
         $model = get_called_class ();
         $model = new $model ();
@@ -49,7 +49,7 @@ abstract class Model implements JsonSerializable
         $offset = $stream->offset ();
 
         try {
-            $model->read ($stream, $context);
+            $model->read ($stream);
         } catch (RecoverableException $e) {
             Logger::debug ('Recoverable Exception: ' . $e->getMessage ());
             return NULL;
@@ -61,11 +61,11 @@ abstract class Model implements JsonSerializable
         return $model;
     }
 
-    public static function unpackAll (Stream &$stream, $context = NULL)
+    public static function unpackAll (Stream &$stream)
     {
         for ($i = 1; /* */ ; $i++) {
             try {
-                $model = static::unpack ($stream, $context);
+                $model = static::unpack ($stream);
 
                 if ($model) {
                     yield $model;

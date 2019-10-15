@@ -7,6 +7,7 @@ use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\w3g\Context;
 use w3lib\w3g\Lang;
 
 class Action extends Model
@@ -59,6 +60,8 @@ class Action extends Model
 
     const CONTINUE_GAME = 0x6A;
     const UNKNOWN_3     = 0x75;
+    const UNKNOWN_4     = 0x7B;
+    const UNKNOWN_5     = 0x69;
     const W3MMD         = 0x6B;
 
     /** **/
@@ -85,11 +88,11 @@ class Action extends Model
 
     private static $state = 0x00;
 
-    public function read (Stream &$stream, $context = NULL)
+    public function read (Stream &$stream)
     {
         $this->id   = $stream->uint8 ();
         $this->key  = $this->keyName ($this->id);
-        $this->time = $context->getTime ();
+        $this->time = Context::getTime ();
 
         Logger::debug (
             'Found action: [0x%2X:%s].',
@@ -333,6 +336,22 @@ class Action extends Model
                 $stream->int8 ();
             break;
 
+            case self::UNKNOWN_4:
+                // 7b [51 33 00 00] [51 33 00 00]
+                $stream->int8 ();
+                $stream->uint32 ();
+                $stream->uint32 ();
+            break;
+
+            case self::UNKNOWN_5:
+                // 69 [0b 33 00 00] [b5 33 00 00] [0a 33 00 00] [b4 33 00 00]
+                $stream->int8 ();
+                $stream->uint32 ();
+                $stream->uint32 ();
+                $stream->uint32 ();
+                $stream->uint32 ();
+            break;
+
             case self::W3MMD:
                 // W3mmd stores as a chain of variables which are not necessarily
                 // associated to the current action's playerId. Prepend the ID
@@ -340,7 +359,7 @@ class Action extends Model
 
                 $stream->prepend (self::W3MMD, 'c');
 
-                $this->w3mmd = W3MMD::unpack ($stream, $context);
+                $this->w3mmd = W3MMD::unpack ($stream);
             break;
         }
     }

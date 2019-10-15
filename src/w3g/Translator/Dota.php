@@ -12,6 +12,7 @@ use w3lib\w3g\Replay;
 use w3lib\w3g\Model\Action;
 use w3lib\w3g\Model\W3MMD;
 use w3lib\w3g\Translator;
+use w3lib\w3g\Context;
 
 use function w3lib\Library\xxd;
 
@@ -199,12 +200,12 @@ class Dota
         return $stream->startsWith (self::PREFIX);
     }
 
-    public static function translate (Stream &$stream, $context = NULL)
+    public static function translate (Stream &$stream)
     {
         $buffer = new Buffer ();
 
         if (!self::$initialized) {
-            self::init ($buffer, $context);
+            self::init ($buffer);
             self::$initialized = TRUE;
         }
 
@@ -278,14 +279,14 @@ class Dota
                     self::event (
                         $buffer,
                         $varname->read (self::E_BAN),
-                        self::getPlayerName ($context->replay, $varname), // {pid}
+                        self::getPlayerName (Context::$replay, $varname), // {pid}
                         Lang::objectId ($value)
                     );
                 } else if ($varname->startsWith (self::E_PICK)) {
                     self::event (
                         $buffer,
                         $varname->read (self::E_PICK),
-                        self::getPlayerName ($context->replay, $varname), // {pid}
+                        self::getPlayerName (Context::$replay, $varname), // {pid}
                         Lang::objectId ($value)
                     );
                 } else if ($varname->startsWith (self::E_START)) {
@@ -297,22 +298,22 @@ class Dota
                     self::event (
                         $buffer,
                         $varname->read (self::E_RUNE),
-                        self::getPlayerName ($context->replay, $value),  // {pid}
+                        self::getPlayerName (Context::$replay, $value),  // {pid}
                         $varname // {rune}
                     );
                 } else if ($varname->startsWith (self::E_LEVEL)) {
                     self::event (
                         $buffer,
                         $varname->read (self::E_LEVEL),
-                        self::getPlayerName ($context->replay, $value),  // {pid}
+                        self::getPlayerName (Context::$replay, $value),  // {pid}
                         $varname // {level}
                     );
                 } else if ($varname->startsWith (self::E_ASSIST)) {
                     self::event (
                         $buffer,
                         $varname->read (self::E_ASSIST),
-                        self::getPlayerName ($context->replay, $varname), // {assister}
-                        self::getPlayerName ($context->replay, $value)    // {assisted}
+                        self::getPlayerName (Context::$replay, $varname), // {assister}
+                        self::getPlayerName (Context::$replay, $value)    // {assisted}
                     );
 
                     self::var (
@@ -326,8 +327,8 @@ class Dota
                     self::event (
                         $buffer,
                         $varname->read (self::E_HERO_KILL),
-                        self::getPlayerName ($context->replay, $value),  // {killer}
-                        self::getPlayerName ($context->replay, $varname) // {killed}
+                        self::getPlayerName (Context::$replay, $value),  // {killer}
+                        self::getPlayerName (Context::$replay, $varname) // {killed}
                     );
 
                     self::var (
@@ -430,7 +431,7 @@ class Dota
         $stream->prepend ($buffer);
     }
 
-    protected static function init (Stream $stream, $context = NULL)
+    protected static function init (Stream $stream)
     {
         /* W3MMD::INIT_VERSION */
         self::pack (
@@ -446,7 +447,7 @@ class Dota
         );
 
         /* W3MMD::INIT_PID */
-        foreach ($context->replay->getPlayers () as $player) {
+        foreach (Context::$replay->getPlayers () as $player) {
             self::pack (
                 $stream,
 

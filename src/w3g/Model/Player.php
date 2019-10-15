@@ -7,6 +7,7 @@ use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\w3g\Lang;
+use w3lib\w3g\Context;
 
 class Player extends Model
 {
@@ -31,7 +32,7 @@ class Player extends Model
     public $flags       = [];
     public $variables   = NULL;
 
-    public function read (Stream &$stream, $context = NULL)
+    public function read (Stream &$stream)
     {
         $this->type = $stream->uint8 ();
         $this->id   = $stream->uint8 ();
@@ -56,7 +57,7 @@ class Player extends Model
             break;
         }
 
-        if ($context->settings->keepActions) {
+        if (Context::$settings->keepActions) {
             $this->actions = [];
         }
     }

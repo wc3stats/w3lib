@@ -7,6 +7,8 @@ use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\w3g\Context;
+use w3lib\w3g\Parser;
 use function \w3lib\Library\xxd;
 
 class Block extends Model
@@ -19,24 +21,30 @@ class Block extends Model
     public $compressed        = NULL;
     public $body              = NULL;
 
-    public function read (Stream &$stream, $context = NULL)
+    public function read (Stream &$stream)
     {
         Logger::info (
             "Unpacking block %d / %d (%.2f%%)",
             self::$blockIndex,
-            $context->replay->header->numBlocks,
-            self::$blockIndex++ / $context->replay->header->numBlocks * 100
+            Context::$replay->header->numBlocks,
+            self::$blockIndex++ / Context::$replay->header->numBlocks * 100
         );
 
-        $this->compressedSize   = $stream->uint16 ();
-        $this->uncompressedSize = $stream->uint16 ();
-        $this->checksum         = $stream->uint32 ();
 
+        if (Context::majorVersion () >= Parser::WC3_VERSION_32) {
+            $this->compressedSize   = $stream->uint32 ();
+            $this->uncompressedSize = $stream->uint32 ();
+        } else {
+            $this->compressedSize   = $stream->uint16 ();
+            $this->uncompressedSize = $stream->uint16 ();
+        }
+
+        $this->checksum   = $stream->uint32 ();
         $this->compressed = $stream->read ($this->compressedSize);
 
         if (uint32 ($this->checksum) !== uint32 ($this->crc ())) {
-            // xxd (uint32 ($this->checksum));
-            // xxd (uint32 ($this->crc ()));
+            xxd (uint32 ($this->checksum));
+            xxd (uint32 ($this->crc ()));
 
             throw new Exception (
                 'Block checksum mismatch.'
@@ -72,9 +80,11 @@ class Block extends Model
 
     public function crc ()
     {
+        $size = Context::majorVersion () >= Parser::WC3_VERSION_32 ? 'V' : 'v';
+
         $crc1 = crc32 (
-            pack ('v', $this->compressedSize) .
-            pack ('v', $this->uncompressedSize) .
+            pack ($size, $this->compressedSize) .
+            pack ($size, $this->uncompressedSize) .
             pack ('V', 0)
         );
 

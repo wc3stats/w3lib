@@ -11,7 +11,7 @@ use function w3lib\Library\xxd;
 
 class ActionBlock extends Model
 {
-    public function read (Stream &$stream, $context = NULL)
+    public function read (Stream &$stream)
     {
         $this->playerId = $stream->uint8 ();
         $this->length   = $stream->uint16 ();
@@ -32,12 +32,14 @@ class ActionBlock extends Model
             // xxd ($block);
         // }
 
-        foreach (Action::unpackAll ($block, $context) as $action) {
+        foreach (Action::unpackAll ($block) as $action) {
             // Actions to ignore.
             if (in_array ($action->id, [
                 Action::UNKNOWN_1,
                 Action::UNKNOWN_2,
                 Action::UNKNOWN_3,
+                Action::UNKNOWN_4,
+                Action::UNKNOWN_5,
                 Action::SCENARIO_TRIGGER,
                 Action::PRE_SUBSELECT
             ])) {

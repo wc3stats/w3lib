@@ -20,9 +20,11 @@ use w3lib\w3g\Model\W3MMD;
 
 class Parser
 {
-    const VERSION = 2.1;
+    const VERSION = 2.2;
 
-    protected $context;
+    const WC3_VERSION_31 = 10031;
+    const WC3_VERSION_32 = 10032;
+
     protected $replay;
     protected $settings;
 
@@ -32,20 +34,16 @@ class Parser
             $settings = new Settings ();
         }
 
-        $context = new Context ();
+        Context::$settings = $settings;
+        Context::$replay   = $replay;
+        Context::$time     = 0x00;
 
-        $context->settings = $settings;
-        $context->replay   = $replay;
-        $context->time     = 0x00;
-
-        $this->context  = $context;
         $this->replay   = $replay;
         $this->settings = $settings;
     }
 
     public function parse ()
     {
-        $context = &$this->context;
         $replay  = &$this->replay;
 
         /** **/
@@ -57,10 +55,10 @@ class Parser
 
         /** **/
 
-        $header = Header::unpack ($replay, $context);
+        $header = Header::unpack ($replay);
 
         for ($i = 0; $i < $header->numBlocks; $i++) {
-            $block = Block::unpack ($replay, $context);
+            $block = Block::unpack ($replay);
 
             /** **/
 
@@ -69,7 +67,7 @@ class Parser
             /** **/
 
             if ($i === 0) {
-                $game = Game::unpack ($buffer, $context);
+                $game = Game::unpack ($buffer);
             }
 
             $this->desegment ($buffer);
@@ -80,7 +78,7 @@ class Parser
 
     private function desegment (Stream $block)
     {
-        foreach (Segment::unpackAll ($block, $this->context) as $segment) {
+        foreach (Segment::unpackAll ($block) as $segment) {
             switch ($segment->id) {
                 case Segment::CHAT_MESSAGE:
                     $this->importChat ($segment);
@@ -113,7 +111,7 @@ class Parser
             return;
         }
 
-        $player->leftAt = $this->context->getTime ();
+        $player->leftAt = Context::getTime ();
 
         // Last leave event is the replay saver.
         $this->replay->game->saver = $player->id;
@@ -145,7 +143,7 @@ class Parser
         }
 
         $adx = floor (
-            $this->context->time /
+            Context::getTime () /
             $this->settings->apx
         );
 

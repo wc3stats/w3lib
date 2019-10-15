@@ -48,7 +48,7 @@ class Game extends Model
         "Gra Lokalna"
     ];
 
-    public function read (Stream &$stream, $context = NULL)
+    public function read (Stream &$stream)
     {
         // 4 unknown bytes.
         $stream->read (4);
@@ -56,7 +56,7 @@ class Game extends Model
         /**
          * 4.1 [PlayerRecord]
          */
-        $host = Player::unpack ($stream, $context);
+        $host = Player::unpack ($stream);
         $host->isHost = true;
 
         $this->addPlayer ($host);
@@ -149,7 +149,7 @@ class Game extends Model
          */
         while ($stream->int8 (Stream::PEEK) === Lang::PLAYER) {
             $this->addPlayer (
-                Player::unpack ($stream, $context)
+                Player::unpack ($stream)
             );
 
             // 4 unknown padding bytes.
@@ -167,7 +167,7 @@ class Game extends Model
          * 4.11 [SlotRecord]
          */
         for ($i = 0; $i < $this->slotRecords; $i++) {
-            $slot = Slot::unpack ($stream, $context);
+            $slot = Slot::unpack ($stream);
 
             if (! ($player = $this->getPlayerBy ('id', $slot->playerId))) {
                 continue;

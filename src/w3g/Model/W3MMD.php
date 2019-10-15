@@ -7,6 +7,7 @@ use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\Library\Exception\RecoverableException;
+use w3lib\w3g\Context;
 use w3lib\w3g\Translator\Dota;
 
 use function w3lib\Library\camelCase;
@@ -60,7 +61,7 @@ class W3MMD extends Model
     private static $events    = [];
     private static $variables = [];
 
-    public function read (Stream &$stream, $context = NULL)
+    public function read (Stream &$stream)
     {
         $this->id = $stream->uint8 ();
 
@@ -82,7 +83,7 @@ class W3MMD extends Model
          */
         foreach (self::$translators as $translator) {
             if ($translator::understands ($stream)) {
-                $translator::translate ($stream, $context);
+                $translator::translate ($stream);
             }
         }
 
@@ -129,7 +130,7 @@ class W3MMD extends Model
                         $this->playerId   = $buffer->token ();
                         $this->playerName = $buffer->token ();
 
-                        $player = $context->replay->getPlayerByName ($this->playerName);
+                        $player = Context::$replay->getPlayerByName ($this->playerName);
 
                         self::$pids [$this->playerId] = $player->id;
                     break;
@@ -171,7 +172,7 @@ class W3MMD extends Model
 
                 $this->eventName = $this->normalizeKey ($buffer->token ());
                 $this->event     = self::get ('events', $this->eventName);
-                $this->time      = $context->getTime ();
+                $this->time      = Context::getTime ();
 
                 $this->args = [];
 
