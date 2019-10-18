@@ -211,6 +211,14 @@ class W3MMD extends Model
                 $this->operator = $buffer->token ();
                 $this->value    = $this->normalizeValue ($buffer->token ());
 
+                if (is_numeric ($this->value)) {
+                    if (is_int ($this->value)) {
+                        $this->value = (int) $this->value;
+                    }
+
+                    $this->value = (float) $this->value;
+                }
+
                 try {
                     $this->variable = self::get ('variables', $this->varname);
                 } catch (Exception $e) {

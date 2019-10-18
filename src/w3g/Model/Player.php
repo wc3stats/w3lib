@@ -68,14 +68,6 @@ class Player extends Model
             return $default;
         }
 
-        if (is_numeric ($this->variables [$varname])) {
-            if (is_int ($this->variables [$varname])) {
-                return (int) $this->variables [$varname];
-            }
-
-            return (float) $this->variables [$varname];
-        }
-
         return $this->variables [$varname];
     }
 
