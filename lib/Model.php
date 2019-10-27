@@ -74,9 +74,9 @@ abstract class Model implements JsonSerializable
                 // Logger::debug ('Stream Empty Exception: ' . $e->getMessage ());
                 return;
             } catch (Exception $e) {
-                if (Logger::isDebug ()) {
+                // if (Logger::isDebug ()) {
                     xxd ($stream);
-                }
+                // }
 
                 Logger::error ('Non-Recoverable Exception: ' . $e->getMessage ());
                 return;

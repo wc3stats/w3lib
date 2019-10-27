@@ -228,6 +228,7 @@ class Parser
                 }
 
                 $player->flags [] = $w3mmd->flag;
+                $player->flags = array_unique ($player->flags);
             break;
         }
 

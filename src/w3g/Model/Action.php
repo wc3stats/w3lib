@@ -62,6 +62,7 @@ class Action extends Model
     const UNKNOWN_3     = 0x75;
     const UNKNOWN_4     = 0x7B;
     const UNKNOWN_5     = 0x69;
+    const UNKNOWN_6     = 0x76;
     const W3MMD         = 0x6B;
 
     /** **/
@@ -348,6 +349,13 @@ class Action extends Model
                 $stream->int8 ();
                 $stream->uint32 ();
                 $stream->uint32 ();
+                $stream->uint32 ();
+                $stream->uint32 ();
+            break;
+
+            case self::UNKNOWN_6:
+                // 76 [2c 00] [00 00 00 00] [00 00 00 01]
+                $stream->uint16 ();
                 $stream->uint32 ();
                 $stream->uint32 ();
             break;

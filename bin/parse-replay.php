@@ -12,7 +12,7 @@ use w3lib\w3g\Settings;
 // define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/Dota-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/broken.w3g');
-define ('REPLAY_FILE', __DIR__ . '/risk-2.w3g');
+define ('REPLAY_FILE', __DIR__ . '/lihl29.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/w3r-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
@@ -43,7 +43,7 @@ Logger::info ('Num Players: [%d]',  count ($replay->getPlayers ()));
 Logger::info ('Hash: [%s]',         $replay->getHash ());
 Logger::info ('Map File: [%s]',     $replay->game->map);
 Logger::info ('Map Type: [%s]',     $replay->getMap ());
-Logger::info ('Map Chec ksum: [%s]', $replay->game->checksum);
+Logger::info ('Map Checksum: [%s]', $replay->game->checksum);
 Logger::info ('Saver Id: [%s]',     $replay->game->saver);
 Logger::info ('Host Id: [%s]',      $replay->game->host);
 Logger::info ('W3MMD: [%s]',        $replay->game->hasW3mmd ? 'Yes' : 'No');
@@ -66,8 +66,8 @@ foreach ($replay->getPlayers () as $player) {
         count ($player->variables ?? [])
     );
 
-    var_dump($player->flags);
-    var_dump($player->variables);
+    // var_dump($player->flags);
+    // var_dump($player->variables);
 }
 
 // var_dump($replay->game->events);

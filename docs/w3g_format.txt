@@ -1184,8 +1184,8 @@ o Ziutek for
 
 version 1.18 - 2007-06-26
 -------------------------
- 2007-06-26: - updated weblinks in the header of this file 
- 2007-06-26: + added build numbers for patch 1.21b 
+ 2007-06-26: - updated weblinks in the header of this file
+ 2007-06-26: + added build numbers for patch 1.21b
 
 
 version 1.17 - 2007-01-28

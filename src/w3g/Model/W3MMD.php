@@ -234,7 +234,7 @@ class W3MMD extends Model
                  */
                 $this->playerId = self::get ('pids', $buffer->token ());
                 $this->flag     = $buffer->token ();
-
+                // var_dump ($this->message);
             break;
         }
     }
