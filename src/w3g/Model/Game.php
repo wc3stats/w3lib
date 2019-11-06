@@ -134,8 +134,6 @@ class Game extends Model
         /**
          * 4.7 [GameType]
          */
-
-
         $this->type     = $stream->int8 ();
         $this->private  = $stream->bool ();
 

@@ -12,7 +12,7 @@ use w3lib\w3g\Settings;
 // define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/Dota-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/broken.w3g');
-define ('REPLAY_FILE', __DIR__ . '/lihl29.w3g');
+define ('REPLAY_FILE', __DIR__ . '/TheGhost-BNET (2).w3g');
 // define ('REPLAY_FILE', __DIR__ . '/w3r-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
@@ -43,6 +43,7 @@ Logger::info ('Num Players: [%d]',  count ($replay->getPlayers ()));
 Logger::info ('Hash: [%s]',         $replay->getHash ());
 Logger::info ('Map File: [%s]',     $replay->game->map);
 Logger::info ('Map Type: [%s]',     $replay->getMap ());
+Logger::info ('Game Type: [%s]',    Lang::gameType ($replay->game->type));
 Logger::info ('Map Checksum: [%s]', $replay->game->checksum);
 Logger::info ('Saver Id: [%s]',     $replay->game->saver);
 Logger::info ('Host Id: [%s]',      $replay->game->host);
@@ -53,7 +54,7 @@ echo PHP_EOL;
 
 foreach ($replay->getPlayers () as $player) {
     Logger::info (
-        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Left: %6d | | Stayed: %3.2f | Vars: %2d',
+        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Winner: %s | Left: %6d | | Stayed: %3.2f | Vars: %2d',
         $player->id,
         $player->slot,
         $player->colour,
@@ -61,6 +62,7 @@ foreach ($replay->getPlayers () as $player) {
         $player->name,
         $player->team,
         $player->apm,
+        $player->isWinner === NULL ? 'N/A' : ($player->isWinner ? 'Yes' : 'No'),
         $player->leftAt,
         $player->stayPercent,
         count ($player->variables ?? [])

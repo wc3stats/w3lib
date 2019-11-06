@@ -24,6 +24,8 @@ class Segment extends Model
     const GAME_OVER     = 0x2F;
     const LEAVE_GAME    = 0x17;
 
+    private static $cache = [];
+
     public function read (Stream &$stream)
     {
         $this->id  = $stream->int8 ();
@@ -95,8 +97,20 @@ class Segment extends Model
                 $this->reason   = $stream->uint32 ();
                 $this->playerId = $stream->int8 ();
                 $this->result   = $stream->uint32 ();
+                $this->unknown  = $stream->uint32 ();
 
-                $stream->uint32 ();
+                /** **/
+
+                $this->flagged = false;
+
+                if (isset (self::$cache ['leaveUnknown'])) {
+                    self::$cache ['leaveUnknown'] = $this->unknown - self::$cache ['leaveUnknown'];
+                    $this->flagged = self::$cache ['leaveUnknown'] > 0;
+                }
+
+                self::$cache ['leaveUnknown'] = $this->unknown;
+
+                /** **/
             break;
 
             case self::END_BUFFER:

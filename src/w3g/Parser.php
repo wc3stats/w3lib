@@ -2,12 +2,14 @@
 
 namespace w3lib\w3g;
 
+use stdClass;
 use Exception;
 use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\Library\Type;
+use w3lib\Library\Exception\RecoverableException;
 use w3lib\w3g\Model\Action;
 use w3lib\w3g\Model\ActionBlock;
 use w3lib\w3g\Model\Header;
@@ -17,6 +19,7 @@ use w3lib\w3g\Model\Game;
 use w3lib\w3g\Model\Segment;
 use w3lib\w3g\Model\ChatLog;
 use w3lib\w3g\Model\W3MMD;
+use w3lib\w3g\Util\Detect;
 
 class Parser
 {
@@ -37,9 +40,12 @@ class Parser
         Context::$settings = $settings;
         Context::$replay   = $replay;
         Context::$time     = 0x00;
+        Context::$leavers  = [];
 
         $this->replay   = $replay;
         $this->settings = $settings;
+
+        $this->cache = new stdClass ();
     }
 
     public function parse ()
@@ -105,7 +111,11 @@ class Parser
 
     private function importLeaver (Segment $segment)
     {
-        $player = $this->replay->getPlayerById ($segment->playerId ?? -1);
+        $player = $this
+            ->replay
+            ->getPlayerById (
+                $segment->playerId ?? -1
+            );
 
         if (!$player) {
             return;
@@ -113,8 +123,14 @@ class Parser
 
         $player->leftAt = Context::getTime ();
 
-        // Last leave event is the replay saver.
-        $this->replay->game->saver = $player->id;
+        // Last leave record is the saver.
+        $this
+            ->replay
+            ->game
+            ->saver = $player->id;
+
+        // Save leaver segments for win detection.
+        Context::$leavers [] = $segment;
     }
 
     private function importTimeslot (Segment $segment)
@@ -272,9 +288,25 @@ class Parser
             }
         }
 
-        usort ($this->replay->game->players, function ($p1, $p2) {
-            return $p1->team <=> $p2->team;
-        });
+        usort (
+            $this
+                ->replay
+                ->game
+                ->players, 
+        
+            function ($p1, $p2) {
+                return $p1->team <=> $p2->team;
+            }
+        );
+
+        try {
+            Detect::winner (
+                $this->replay,
+                Context::$leavers
+            );
+        } catch (RecoverableException $e) {
+            // No-op.
+        }
     }
 }
 

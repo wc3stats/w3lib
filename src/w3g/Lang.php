@@ -6,6 +6,7 @@ use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Data\Actions;
 use w3lib\w3g\Model\Game;
+use w3lib\w3g\Model\Segment;
 use w3lib\w3g\Model\Player;
 
 class Lang

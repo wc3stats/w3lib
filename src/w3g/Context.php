@@ -7,6 +7,7 @@ class Context
     public static $settings;
     public static $replay;
     public static $time;
+    public static $leavers;
 
     public static function majorVersion ()
     {

@@ -185,6 +185,12 @@ class Replay extends Archive
         $this->chatlog = array_values ($chatlog);
     }
 
+    public function isLadder () 
+    {
+        return $this->game->type === Lang::TYPE_LADDER_FFA ||
+               $this->game->type === Lang::TYPE_LADDER_TEAM;
+    }
+
     public function toDisplay ()
     {
         $this->game->speed         = Lang::speed ($this->game->speed);
