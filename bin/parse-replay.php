@@ -12,7 +12,8 @@ use w3lib\w3g\Settings;
 // define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/Dota-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/broken.w3g');
-define ('REPLAY_FILE', __DIR__ . '/TheGhost-BNET (2).w3g');
+define ('REPLAY_FILE', __DIR__ . '/Dota-4.w3g');
+// define ('REPLAY_FILE', __DIR__ . '/ladder-1.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/w3r-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/events.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
@@ -34,11 +35,15 @@ $replay = new Replay (REPLAY_FILE, $settings);
 echo PHP_EOL;
 
 Logger::info ('File: [%s]',              $replay->getFile ());
+Logger::info ('File Size: [%s]',         $replay->getSize ());
 Logger::info ('Compressed Size: [%s]',   $replay->header->compressedSize);
 Logger::info ('Uncompressed Size: [%s]', $replay->header->uncompressedSize);
 
 Logger::info ('Game Name: [%s]',    $replay->game->name);
-Logger::info ('Is Local: [%s]',     $replay->game->isLocal ? 'Yes' : 'No');
+Logger::info ('Is Local: [%s]',     $replay->isLocal () ? 'Yes' : 'No');
+Logger::info ('Is Ladder: [%s]',    $replay->isLadder () ? 'Yes' : 'No');
+Logger::info ('Is FFA: [%s]',       $replay->isFFA () ? 'Yes' : 'No');
+Logger::info ('Is Private: [%s]',   $replay->isPrivate () ? 'Yes' : 'No');
 Logger::info ('Num Players: [%d]',  count ($replay->getPlayers ()));
 Logger::info ('Hash: [%s]',         $replay->getHash ());
 Logger::info ('Map File: [%s]',     $replay->game->map);
@@ -47,14 +52,14 @@ Logger::info ('Game Type: [%s]',    Lang::gameType ($replay->game->type));
 Logger::info ('Map Checksum: [%s]', $replay->game->checksum);
 Logger::info ('Saver Id: [%s]',     $replay->game->saver);
 Logger::info ('Host Id: [%s]',      $replay->game->host);
-Logger::info ('W3MMD: [%s]',        $replay->game->hasW3mmd ? 'Yes' : 'No');
+Logger::info ('W3MMD: [%s]',        $replay->hasW3mmd () ? 'Yes' : 'No');
 Logger::info ('W3MMD Events: [%s]', count ($replay->game->events));
 
 echo PHP_EOL;
 
 foreach ($replay->getPlayers () as $player) {
     Logger::info (
-        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Winner: %s | Left: %6d | | Stayed: %3.2f | Vars: %2d',
+        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Winner: %s | Left: %6d | | Stayed: %3.2f | Vars: %2d | Obs: %3s | Order: %2d',
         $player->id,
         $player->slot,
         $player->colour,
@@ -65,7 +70,9 @@ foreach ($replay->getPlayers () as $player) {
         $player->isWinner === NULL ? 'N/A' : ($player->isWinner ? 'Yes' : 'No'),
         $player->leftAt,
         $player->stayPercent,
-        count ($player->variables ?? [])
+        count ($player->variables ?? []),
+        $player->isObserver ? 'Yes' : 'No',
+        $player->order
     );
 
     // var_dump($player->flags);

@@ -243,7 +243,7 @@ class Dota
                                     sprintf (
                                         '%s %d %s',
                                         W3MMD::FLAGP,
-                                        $pid,
+                                        self::pid ($pid),
                                         $team === $value ?
                                             W3MMD::FLAG_WINNER :
                                             W3MMD::FLAG_LOSER
@@ -353,7 +353,7 @@ class Dota
                         $buffer,
                         $varname, // {pid}
                         '3',      // creepKills
-                        W3MMD::OP_ADD,
+                        W3MMD::OP_SET,
                         $value
                     );
                 } else if ($varname->startsWith (self::V_CSD)) {
@@ -363,7 +363,7 @@ class Dota
                         $buffer,
                         $varname, // {pid}
                         '4',      // creepDenies
-                        W3MMD::OP_ADD,
+                        W3MMD::OP_SET,
                         $value
                     );
                 } else if ($varname->startsWith (self::V_NK)) {
@@ -373,7 +373,7 @@ class Dota
                         $buffer,
                         $varname, // {pid}
                         '7',      // neutralKills
-                        W3MMD::OP_ADD,
+                        W3MMD::OP_SET,
                         $value
                     );
                 } else if (
@@ -455,7 +455,7 @@ class Dota
                     '%s %s %d %s',
                     W3MMD::INIT,
                     W3MMD::INIT_PID,
-                    $player->colour,
+                    $player->order,
                     $player->name
                 )
             );
@@ -495,6 +495,17 @@ class Dota
                 )
             );
         }
+
+        /* Send colours as order. */
+        foreach (Context::$replay->getPlayers () as $player) {
+            self::var (
+                $stream,
+                $player->order + $player->team + 1,
+                'colour',
+                W3MMD::OP_SET,
+                $player->order + $player->team + 1
+            );
+        }
     }
 
     protected static function event (Stream &$stream, $eventName, ... $argv)
@@ -527,7 +538,7 @@ class Dota
             sprintf (
                 '%s %s %s %s %s',
                 W3MMD::VARP,
-                $pid,
+                self::pid ($pid),
                 $varname,
                 $operator,
                 $value
@@ -537,13 +548,23 @@ class Dota
 
     protected static function getPlayerName (Replay $replay, $pid)
     {
-        $player = $replay->getPlayerByColour ($pid);
+        $player = $replay->getPlayerByOrder (
+            self::pid ($pid)
+        );
 
         if (!$player) {
             return $pid;
         }
 
         return $player->name;
+    }
+
+    protected static function pid ($pid)
+    {
+        $pid  = (string) $pid;
+        $pid -= $pid >= 7 ? 2 : 1;
+
+        return $pid;
     }
 
     protected static function pack (Stream $stream, $action)

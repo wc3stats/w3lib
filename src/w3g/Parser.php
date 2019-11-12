@@ -129,6 +129,29 @@ class Parser
             ->game
             ->saver = $player->id;
 
+        if (!$player->isObserver) {
+            switch ($segment->reason) {
+                case 0x01:
+                    $player->isObserver = [
+                        0x01 => true,
+                        0x0B => true
+                    ] [$segment->result] ?? false;
+                break;
+
+                case 0x0E:
+                    $player->isObserver = [
+                        0x0B => true
+                    ] [$segment->result] ?? false;
+                break;
+
+                case 0x0C:
+                    $player->isObserver = [
+                        0x01 => true
+                    ] [$segment->result] ?? false;
+                break;
+            }
+        }
+
         // Save leaver segments for win detection.
         Context::$leavers [] = $segment;
     }
@@ -231,24 +254,15 @@ class Parser
             break;
 
             case W3MMD::FLAGP:
-                // if (!isset ($player->flags [$w3mmd->flag])) {
-                //     $player->flags [$w3mmd->flag] = 0;
-                // }
-
-                // $player->flags [$w3mmd->flag]++;
-
-                if ($w3mmd->flag === W3MMD::FLAG_WINNER) {
-                    $player->isWinner = true;
-                } else if ($w3mmd->flag === W3MMD::FLAG_LOSER) {
-                    $player->isWinner = false;
-                }
-
                 $player->flags [] = $w3mmd->flag;
                 $player->flags = array_unique ($player->flags);
             break;
         }
 
-        $this->replay->game->hasW3mmd = true;
+        $this
+            ->replay
+            ->game
+            ->hasW3MMD = true;
     }
 
     /** **/
@@ -257,7 +271,11 @@ class Parser
     {
         $replayLength = $this->replay->getLength ();
 
-        foreach ($this->replay->getPlayers () as $player) {
+        foreach (
+            $this
+                ->replay
+                ->getPlayers () as $player
+        ) {
             // If there are players still in the game, must set leave time.
             if ($player->leftAt === NULL) {
                 $player->leftAt = $replayLength;
@@ -292,21 +310,17 @@ class Parser
             $this
                 ->replay
                 ->game
-                ->players, 
-        
+                ->players,
+
             function ($p1, $p2) {
                 return $p1->team <=> $p2->team;
             }
         );
 
-        try {
-            Detect::winner (
-                $this->replay,
-                Context::$leavers
-            );
-        } catch (RecoverableException $e) {
-            // No-op.
-        }
+        Detect::winner (
+            $this->replay,
+            Context::$leavers
+        );
     }
 }
 

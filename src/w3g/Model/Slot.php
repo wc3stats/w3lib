@@ -4,6 +4,7 @@ namespace w3lib\w3g\Model;
 
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
+use w3lib\w3g\Lang;
 
 class Slot extends Model
 {
@@ -15,6 +16,7 @@ class Slot extends Model
     public $race       = NULL;
     public $aiStrength = NULL;
     public $handicap   = NULL;
+    public $isObserver = NULL;
 
     public function read (Stream &$stream)
     {
@@ -30,6 +32,7 @@ class Slot extends Model
         $this->race       = $stream->int8 ();
         $this->aiStrength = $stream->int8 ();
         $this->handicap   = $stream->int8 ();
+        $this->isObserver = $this->team === Lang::SLOT_OBSERVER;
     }
 }
 

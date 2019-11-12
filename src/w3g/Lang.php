@@ -52,6 +52,9 @@ class Lang
     const TYPE_LOCAL       = 0x0D;
     const TYPE_LADDER_TEAM = 0x20;
 
+    const TYPE_PUBLIC  = 0x00;
+    const TYPE_PRIVATE = 0x08;
+
     // 4.10 [GameStartRecord] - Select Mode
     const MODE_TEAM_RACE_SELECTABLE     = 0x00;
     const MODE_TEAM_NOT_SELECTABLE      = 0x01;
@@ -60,9 +63,11 @@ class Lang
     const MODE_AUTOMATIC_MATCHMAKING    = 0xCC;
 
     // 4.11 [SlotRecord] - Slot Status
-    const EMPTY  = 0x00;
-    const CLOSED = 0x01;
-    const USED   = 0x02;
+    const SLOT_EMPTY  = 0x00;
+    const SLOT_CLOSED = 0x01;
+    const SLOT_USED   = 0x02;
+
+    const SLOT_OBSERVER = 0x18;
 
     // 4.11 [SlotRecord] - Is Computer
     const PLAYER_HUMAN    = 0x00;
@@ -123,6 +128,18 @@ class Lang
     const CHAT_ALLIES   = 0x01;
     const CHAT_OBSERVER = 0x02;
     const CHAT_PRIVATE  = 0x03; // + N (N = slotNumber)
+
+    const LOCAL_GAMES = [
+        "Local Game",
+        "Lokales Spiel",
+        "Partida Local",
+        "Partie Locale",
+        "Partita Locale",
+        "Gra Lokalna"
+    ];
+
+    const LADDER_HOST = 'Battle.net';
+    const LADDER_NAME = 'BNet';
 
 	public static function speed ($value)
 	{

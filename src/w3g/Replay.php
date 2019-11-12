@@ -25,6 +25,19 @@ class Replay extends Archive
         return $this->game->getPlayers ();
     }
 
+    public function getPlayersByTeam ($team)
+    {
+        return array_filter (
+            $this
+                ->game
+                ->getPlayers (),
+
+            function ($player) use ($team) {
+                return $player->team === $team;
+            }
+        );
+    }
+
     public function getPlayer ($search)
     {
         if (is_numeric ($search)) {
@@ -37,6 +50,11 @@ class Replay extends Archive
     public function getPlayerById ($playerId)
     {
         return $this->game->getPlayerBy ('id', $playerId);
+    }
+
+    public function getPlayerByOrder ($order)
+    {
+        return $this->game->getPlayerBy ('order', $order);
     }
 
     public function getPlayerByName ($playerName)
@@ -59,6 +77,50 @@ class Replay extends Archive
     public function getEvents ()
     {
         return $this->game->events;
+    }
+
+    public function isLadder ()
+    {
+        return ($this->game->type === Lang::TYPE_LADDER_FFA ||
+               $this->game->type === Lang::TYPE_LADDER_TEAM) &&
+               $this->game->name === Lang::LADDER_NAME &&
+               $this->game->host === Lang::LADDER_HOST;
+    }
+
+    public function isLocal ()
+    {
+        foreach (Lang::LOCAL_GAMES as $gameName) {
+            if (stripos ($this->game->name, $gameName) !== FALSE) {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+    }
+
+    public function isFFA ()
+    {
+        $teams = [];
+
+        foreach ($this->getPlayers () as $player) {
+            if (in_array ($player->team, $teams)) {
+                return FALSE;
+            }
+
+            $teams [] = $player->team;
+        }
+
+        return TRUE;
+    }
+
+    public function isPrivate ()
+    {
+        return $this->game->private === Lang::TYPE_PRIVATE;
+    }
+
+    public function hasW3MMD ()
+    {
+        return $this->game->hasW3MMD;
     }
 
     /** **/
@@ -183,12 +245,6 @@ class Replay extends Archive
         }
 
         $this->chatlog = array_values ($chatlog);
-    }
-
-    public function isLadder () 
-    {
-        return $this->game->type === Lang::TYPE_LADDER_FFA ||
-               $this->game->type === Lang::TYPE_LADDER_TEAM;
     }
 
     public function toDisplay ()

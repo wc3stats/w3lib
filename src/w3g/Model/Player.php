@@ -20,7 +20,9 @@ class Player extends Model
 
     public $isHost      = FALSE;
     public $isWinner    = NULL;
+    public $isObserver  = FALSE;
     public $slot        = NULL;
+    public $order       = NULL;
     public $colour      = NULL;
     public $handicap    = NULL;
     public $leftAt      = NULL;

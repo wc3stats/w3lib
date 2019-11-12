@@ -37,16 +37,7 @@ class Game extends Model
     // Deferred.
 
     public $saver = NULL;
-    public $hasW3mmd = false;
-
-    const LOCAL_GAMES = [
-        "Local Game",
-        "Lokales Spiel",
-        "Partida Local",
-        "Partie Locale",
-        "Partita Locale",
-        "Gra Lokalna"
-    ];
+    public $hasW3MMD = false;
 
     public function read (Stream &$stream)
     {
@@ -135,7 +126,7 @@ class Game extends Model
          * 4.7 [GameType]
          */
         $this->type     = $stream->int8 ();
-        $this->private  = $stream->bool ();
+        $this->private  = $stream->int8 ();
 
         /**
          * 4.8 [Language ID]
@@ -164,6 +155,8 @@ class Game extends Model
         /**
          * 4.11 [SlotRecord]
          */
+        $order = 0;
+
         for ($i = 0; $i < $this->slotRecords; $i++) {
             $slot = Slot::unpack ($stream);
 
@@ -171,11 +164,16 @@ class Game extends Model
                 continue;
             }
 
-            $player->slot     = $i;
-            $player->team     = $slot->team;
-            $player->colour   = $slot->colour;
-            $player->race     = $player->race ?? $slot->race;
-            $player->handicap = $slot->handicap;
+            $player->slot       = $i;
+            $player->team       = $slot->team;
+            $player->colour     = $slot->colour;
+            $player->race       = $player->race ?? $slot->race;
+            $player->handicap   = $slot->handicap;
+            $player->isObserver = $slot->isObserver;
+
+            if (!$player->isObserver) {
+                $player->order = $order++;
+            }
         }
 
         /**
@@ -185,17 +183,6 @@ class Game extends Model
 
         $this->selectMode = $stream->int8 ();
         $this->startSpots = $stream->int8 ();
-
-        /** **/
-
-        $this->isLocal = FALSE;
-
-        foreach (self::LOCAL_GAMES as $gameName) {
-            if (stripos ($this->name, $gameName) !== FALSE) {
-                $this->isLocal = TRUE;
-                break;
-            }
-        }
     }
 
     /** **/
