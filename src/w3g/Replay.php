@@ -246,30 +246,6 @@ class Replay extends Archive
 
         $this->chatlog = array_values ($chatlog);
     }
-
-    public function toDisplay ()
-    {
-        $this->game->speed         = Lang::speed ($this->game->speed);
-        $this->game->visibility    = Lang::visibility ($this->game->visibility);
-        $this->game->observers     = Lang::observer ($this->game->observers);
-        $this->game->teamsTogether = Lang::boolean ($this->game->teamsTogether);
-        $this->game->lockedTeams   = Lang::boolean ($this->game->lockedTeams);
-        $this->game->fullShare     = Lang::boolean ($this->game->fullShare);
-        $this->game->randomHero    = Lang::boolean ($this->game->randomHero);
-        $this->game->randomRaces   = Lang::boolean ($this->game->randomRaces);
-        $this->game->type          = Lang::gameType ($this->game->type);
-        $this->game->private       = Lang::boolean ($this->game->private);
-
-        foreach ($this->game->players as $player) {
-            $player->colour = Lang::colour ($player->colour);
-            $player->race   = Lang::race ($player->race);
-            $player->isHost = Lang::boolean ($player->isHost);
-        }
-
-        foreach ($this->chatlog as $chat) {
-            $chat->mode = Lang::chat ($chat->mode);
-        }
-    }
 }
 
 ?>

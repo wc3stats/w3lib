@@ -211,6 +211,8 @@ class W3MMD extends Model
                 $this->operator = $buffer->token ();
                 $this->value    = $this->normalizeValue ($buffer->token ());
 
+                // var_dump ($this->message);
+
                 if (is_numeric ($this->value)) {
                     if (is_int ($this->value)) {
                         $this->value = (int) $this->value;

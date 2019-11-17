@@ -133,7 +133,7 @@ class Parser
             switch ($segment->reason) {
                 case 0x01:
                     $player->isObserver = [
-                        0x01 => true,
+                        // 0x01 => true,
                         0x0B => true
                     ] [$segment->result] ?? false;
                 break;
@@ -146,7 +146,7 @@ class Parser
 
                 case 0x0C:
                     $player->isObserver = [
-                        0x01 => true
+                        // 0x01 => true
                     ] [$segment->result] ?? false;
                 break;
             }
