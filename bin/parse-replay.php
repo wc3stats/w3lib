@@ -12,7 +12,7 @@ use w3lib\w3g\Settings;
 // define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/Dota-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/broken.w3g');
-define ('REPLAY_FILE', __DIR__ . '/lihl7.w3g');
+define ('REPLAY_FILE', __DIR__ . '/vf.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/ladder-1.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/w3r-2.w3g');
 // define ('REPLAY_FILE', __DIR__ . '/events.w3g');
@@ -75,7 +75,7 @@ foreach ($replay->getPlayers () as $player) {
         $player->order
     );
 
-    // var_dump($player->flags);
+    var_dump($player->flags);
     // var_dump($player->variables);
 }
 

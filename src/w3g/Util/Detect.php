@@ -23,6 +23,8 @@ class Detect
             self::detectW3MMDWinner (
                 $replay
             );
+
+            return;
         }
 
         // If one team has been identified as the winner, everyone else lost.
@@ -68,7 +70,7 @@ class Detect
 
             $player->isWinner = $highScore;
         }
-	}
+    }
 
     protected static function detectLadderWinner (
         Replay $replay,
