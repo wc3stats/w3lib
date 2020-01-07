@@ -8,29 +8,37 @@ use w3lib\w3g\Replay;
 use w3lib\w3g\Lang;
 use w3lib\w3g\Settings;
 
-// define ('REPLAY_FILE', __DIR__ . '/krur-krur21.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/Wc3addict-dihl6.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/Dota-2.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/broken.w3g');
-define ('REPLAY_FILE', __DIR__ . '/vf.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/ladder-1.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/w3r-2.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/events.w3g');
-// define ('REPLAY_FILE', __DIR__ . '/BrokenAlliances-w3mmd-4.w3g');
+define ('REPLAY_FILE', getcwd () . '/' . $argv [1]);
 
 /** **/
 
 error_reporting (E_ALL);
 ini_set ('display_errors', 1);
 
-Logger::setup (Monolog::INFO);
-// Logger::setup (Monolog::DEBUG);
+$opts = getopt ('df:', [ 'debug', 'file:' ]);
+
+if (
+    isset ($opts ['d']) ||
+    isset ($opts ['debug'])
+) {
+    Logger::setup (Monolog::DEBUG);
+} else {
+    Logger::setup (Monolog::INFO);
+}
+
+/** **/
+
+$file = getcwd () . '/' . ($opts ['f'] ?? $opts ['file'] ?? null);
+
+if (!is_file ($file)) {
+    printf ('File not found: \'%s\'.' . PHP_EOL, $file);
+    die ();
+}
 
 $settings = new Settings ();
+$replay   = new Replay ($file, $settings);
 
-// $settings->keepActions = true;
-
-$replay = new Replay (REPLAY_FILE, $settings);
+/** **/
 
 echo PHP_EOL;
 
@@ -59,7 +67,7 @@ echo PHP_EOL;
 
 foreach ($replay->getPlayers () as $player) {
     Logger::info (
-        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Winner: %s | Left: %6d | | Stayed: %3.2f | Vars: %2d | Obs: %3s | Order: %2d',
+        'Id: %2d | Slot: %2d | Colour: %2d %-10s | Player: %-16s | Team: %2d | APM: %4d | Winner: %s | Left: %6d | | Stayed: %3.2f | Vars: %2d | Obs: %3s',
         $player->id,
         $player->slot,
         $player->colour,
@@ -71,16 +79,14 @@ foreach ($replay->getPlayers () as $player) {
         $player->leftAt,
         $player->stayPercent,
         count ($player->variables ?? []),
-        $player->isObserver ? 'Yes' : 'No',
-        $player->order
+        $player->isObserver ? 'Yes' : 'No'
     );
 
-    var_dump($player->flags);
+    // var_dump($player->flags);
     // var_dump($player->variables);
 }
 
-// var_dump($replay->game->events);
-// echo PHP_EOL;
+echo PHP_EOL;
 
 Logger::info ('Memory usage: [%d]', memory_get_usage ());
 

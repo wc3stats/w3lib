@@ -370,6 +370,11 @@ class Action extends Model
                 $this->w3mmd = W3MMD::unpack ($stream);
             break;
         }
+
+        if (Logger::isDebug ()) {
+            echo json_encode ($this, JSON_PRETTY_PRINT);
+            echo PHP_EOL;
+        }
     }
 }
 
