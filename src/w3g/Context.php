@@ -18,6 +18,11 @@ class Context
     {
         return floor (self::$time);
     }
+
+    public static function isReforged ()
+    {
+        return self::majorVersion () >= Parser::WC3_VERSION_32;
+    }
 }
 
 ?>

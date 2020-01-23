@@ -31,6 +31,7 @@ class Segment extends Model
         $this->id  = $stream->int8 ();
         $this->key = $this->keyName ($this->id);
 
+
         // Logger::debug (
         //     sprintf (
         //         'Found segment: [0x%2X:%s].',
@@ -38,6 +39,7 @@ class Segment extends Model
         //         $this->key
         //     )
         // );
+
 
         switch ($this->id) {
             default:

@@ -12,6 +12,8 @@ use w3lib\w3g\Lang;
 
 class Action extends Model
 {
+    const UNKNOWN_20         = 0x00;
+
     const PAUSE_GAME         = 0x01;
     const RESUME_GAME        = 0x02;
     const SAVE_GAME          = 0x06;
@@ -39,6 +41,13 @@ class Action extends Model
     const SELECT_HOTKEY      = 0x18;
     const SELECT_SUBGROUP    = 0x19;
     const UNKNOWN_1          = 0x21;
+    const UNKNOWN_14         = 0x30;
+    const UNKNOWN_9          = 0x31;
+    const UNKNOWN_16         = 0x32;
+    const UNKNOWN_10         = 0x33;
+    const UNKNOWN_21         = 0x34;
+    const UNKNOWN_15         = 0x35;
+    const UNKNOWN_22         = 0x36;
     const PRE_SUBSELECT      = 0x1A;
     const SELECT_GROUND_ITEM = 0x1C;
     const CANCEL_HERO_REVIVE = 0x1D;
@@ -47,23 +56,33 @@ class Action extends Model
     const CANCEL_UNIT = 0x1E;
 
     const UNKNOWN_2                       = 0x1B;
+    const UNKNOWN_11                      = 0x41;
     const CHANGE_ALLY_OPTIONS             = 0x50;
     const TRANSFER_RESOURCES              = 0x51;
     const MAPFILE_TRIGGER_CHAT_COMMAND    = 0x60;
     const ESCAPE_PRESSED                  = 0x61;
     const SCENARIO_TRIGGER                = 0x62;
+    const UNKNOWN_12                      = 0x65;
     const ENTER_CHOOSE_HERO_SKILL_SUBMENU = 0x66;
     const ENTER_CHOOSE_BUILDING_SUBMENU   = 0x67;
+
 
     // Ping.
     const MINIMAP_SIGNAL = 0x68;
 
     const CONTINUE_GAME = 0x6A;
+    const UNKNOWN_8     = 0x70;
+    const UNKNOWN_23    = 0x73;
     const UNKNOWN_3     = 0x75;
     const UNKNOWN_4     = 0x7B;
     const UNKNOWN_5     = 0x69;
+    const UNKNOWN_18    = 0x71;
+    const UNKNOWN_13    = 0x72;
+    const UNKNOWN_17    = 0x74;
     const UNKNOWN_6     = 0x76;
+    const UNKNOWN_7     = 0x77;
     const W3MMD         = 0x6B;
+    const UNKNOWN_19    = 0x6D;
 
     /** **/
 
@@ -109,6 +128,16 @@ class Action extends Model
                         $this->id
                     )
                 );
+            break;
+
+            case self::UNKNOWN_20:
+                // 00 [00 00 08 00 0d 00]
+                // 00 [00 00 07 00 0d 00]
+                // 00 [00 00 0f 00 0d 00]
+                // 00 [00 00 19 00 0d 00]
+                // 00 [00 00 29 00 0d 00]
+                // ...
+                $stream->read (6);
             break;
 
             case self::PAUSE_GAME:
@@ -280,6 +309,12 @@ class Action extends Model
                 $stream->uint32 ();
             break;
 
+            case self::UNKNOWN_11:
+                // 41 [72 6b 57 68] ArkWh
+                // Always followed by 0x10
+                $stream->uint32 ();
+            break;
+
             case self::CHANGE_ALLY_OPTIONS:
                 $this->playerId = $stream->int8 ();
 
@@ -360,6 +395,49 @@ class Action extends Model
                 $stream->uint32 ();
             break;
 
+            case self::UNKNOWN_7:
+            case self::UNKNOWN_8:
+            case self::UNKNOWN_9:
+            case self::UNKNOWN_10:
+            case self::UNKNOWN_12:
+            case self::UNKNOWN_13:
+            case self::UNKNOWN_14:
+            case self::UNKNOWN_15:
+            case self::UNKNOWN_16:
+            case self::UNKNOWN_17:
+            case self::UNKNOWN_21:
+            case self::UNKNOWN_22:
+                // 30 [30 41] [2d 02 0d 00] 00A-...
+                // 31 [39 41] [08 02 0d 00] 10A....
+                // 32 [30 41] [9a 00 0d 00] 20A....
+                // 33 [30 41] [15 02 0d 00] 30A....
+                // 34 [30 41] [01 01 0d 00] 40A....
+                // 35 [30 41] [97 00 0d 00] 50A....
+                // 36 [30 41] [40 01 0d 00] 60A@...
+                // 77 [4f 41] [9f 00 0d 00] wOA....
+                // 65 [48 41] [72 63 4f 41] eHArcOA
+
+                // 70 [75 41] [35 30 30 68] puA500h
+                // Always followed by 0x10
+
+                // 74 [48 41] [2e 01 0d 00] HA.....
+                // Always followed by 0x11
+
+                // 72 [68 41] [38 00 0d 00] rhA8...
+                $stream->uint16 ();
+                $stream->uint32 ();
+            break;
+
+            case self::UNKNOWN_18:
+            case self::UNKNOWN_23:
+                // 71 [1a 00] [75 62 55 41] [34 30 30 68] ..ubUA400h
+                // 73 [00 00] [75 62 55 41] [65 73 48 68] ..ubUAesHh
+
+                $stream->uint16 ();
+                $stream->uint32 ();
+                $stream->uint32 ();
+            break;
+
             case self::W3MMD:
                 // W3mmd stores as a chain of variables which are not necessarily
                 // associated to the current action's playerId. Prepend the ID
@@ -368,6 +446,12 @@ class Action extends Model
                 $stream->prepend (self::W3MMD, 'c');
 
                 $this->w3mmd = W3MMD::unpack ($stream);
+            break;
+
+            case self::UNKNOWN_19:
+                // 6D 67 42 68 [.gBh]
+                // Always same
+                $stream->read (3);
             break;
         }
 

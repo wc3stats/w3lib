@@ -8,7 +8,6 @@ use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Context;
-use w3lib\w3g\Parser;
 use function \w3lib\Library\xxd;
 
 class Block extends Model
@@ -30,8 +29,7 @@ class Block extends Model
             self::$blockIndex++ / Context::$replay->header->numBlocks * 100
         );
 
-
-        if (Context::majorVersion () >= Parser::WC3_VERSION_32) {
+        if (Context::isReforged ()) {
             $this->compressedSize   = $stream->uint32 ();
             $this->uncompressedSize = $stream->uint32 ();
         } else {
@@ -39,12 +37,13 @@ class Block extends Model
             $this->uncompressedSize = $stream->uint16 ();
         }
 
+
         $this->checksum   = $stream->uint32 ();
         $this->compressed = $stream->read ($this->compressedSize);
 
         if (uint32 ($this->checksum) !== uint32 ($this->crc ())) {
-            xxd (uint32 ($this->checksum));
-            xxd (uint32 ($this->crc ()));
+            // xxd (uint32 ($this->checksum));
+            // xxd (uint32 ($this->crc ()));
 
             throw new Exception (
                 'Block checksum mismatch.'
@@ -65,6 +64,7 @@ class Block extends Model
 
         $actual = strlen ($body);
 
+
         if ($actual !== $this->uncompressedSize) {
             throw new Exception (
                 sprintf (
@@ -80,7 +80,7 @@ class Block extends Model
 
     public function crc ()
     {
-        $size = Context::majorVersion () >= Parser::WC3_VERSION_32 ? 'V' : 'v';
+        $size = Context::isReforged () ? 'V' : 'v';
 
         $crc1 = crc32 (
             pack ($size, $this->compressedSize) .

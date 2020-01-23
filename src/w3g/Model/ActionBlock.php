@@ -33,20 +33,37 @@ class ActionBlock extends Model
         // }
 
         foreach (Action::unpackAll ($block) as $action) {
-            // Actions to ignore.
-            if (in_array ($action->id, [
-                Action::UNKNOWN_1,
-                Action::UNKNOWN_2,
-                Action::UNKNOWN_3,
-                Action::UNKNOWN_4,
-                Action::UNKNOWN_5,
-                Action::SCENARIO_TRIGGER,
-                Action::PRE_SUBSELECT
-            ])) {
-                continue;
-            }
+            // // Actions to ignore.
+            // if (in_array ($action->id, [
+            //     Action::UNKNOWN_1,
+            //     Action::UNKNOWN_2,
+            //     Action::UNKNOWN_3,
+            //     Action::UNKNOWN_4,
+            //     Action::UNKNOWN_5,
+            //     Action::SCENARIO_TRIGGER,
+            //     Action::PRE_SUBSELECT
+            // ])) {
+            //     continue;
+            // }
 
-            $this->actions [] = $action;
+            // Actions to keep.
+            if (
+                in_array ($action->id, [
+                    Action::UNIT_BUILDING_ABILITY_1,
+                    Action::UNIT_BUILDING_ABILITY_2,
+                    Action::UNIT_BUILDING_ABILITY_3,
+                    Action::UNIT_BUILDING_ABILITY_4,
+                    Action::GIVE_ITEM,
+                    Action::CHANGE_SELECTION,
+                    Action::ASSIGN_HOTKEY,
+                    Action::SELECT_HOTKEY,
+                    Action::CANCEL_UNIT,
+                    Action::ESCAPE_PRESSED,
+                    Action::ENTER_CHOOSE_BUILDING_SUBMENU
+                ])
+            ) {
+                $this->actions [] = $action;
+            }
         }
 
         // Logger::debug (

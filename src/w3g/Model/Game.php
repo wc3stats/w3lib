@@ -4,8 +4,10 @@ namespace w3lib\w3g\Model;
 
 use Exception;
 use w3lib\Library\Model;
+use w3lib\Library\Logger;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
+use w3lib\w3g\Context;
 use w3lib\w3g\Lang;
 
 class Game extends Model
@@ -144,6 +146,34 @@ class Game extends Model
             // 4 unknown padding bytes.
             $stream->read (4);
         }
+
+        /**
+         * Reforged adds another player listing.
+         */
+        if (Context::isReforged ()) {
+            $stream->read (4);
+            $stream->read (8);
+
+            while ($stream->int8 (Stream::PEEK) === ClanPlayer::HEADER) {
+                $clanPlayer = ClanPlayer::unpack ($stream);
+
+                foreach ($this->players as $player) {
+                    if (
+                        stripos ($clanPlayer->name, $player->name) === 0 &&
+                        strlen ($clanPlayer->name) > strlen ($player->name)
+                    ) {
+                        Logger::debug (
+                            'Updating player name from [%s] to [%s]',
+                            $player->name,
+                            $clanPlayer->name
+                        );
+
+                        $player->name = $clanPlayer->name;
+                    }
+                }
+            }
+        }
+
 
         /**
          * 4.10 [GameStartRecord]
