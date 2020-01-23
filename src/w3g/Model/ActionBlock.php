@@ -59,7 +59,8 @@ class ActionBlock extends Model
                     Action::SELECT_HOTKEY,
                     Action::CANCEL_UNIT,
                     Action::ESCAPE_PRESSED,
-                    Action::ENTER_CHOOSE_BUILDING_SUBMENU
+                    Action::ENTER_CHOOSE_BUILDING_SUBMENU,
+                    Action::W3MMD
                 ])
             ) {
                 $this->actions [] = $action;
