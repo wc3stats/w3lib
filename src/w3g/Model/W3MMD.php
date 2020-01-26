@@ -131,7 +131,6 @@ class W3MMD extends Model
                         $this->playerName = $buffer->token ();
 
                         $player = Context::$replay->getPlayerByName ($this->playerName);
-
                         self::$pids [$this->playerId] = $player->id;
                     break;
                 }

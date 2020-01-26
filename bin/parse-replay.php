@@ -82,7 +82,7 @@ foreach ($replay->getPlayers () as $player) {
         $player->isObserver ? 'Yes' : 'No'
     );
 
-    // var_dump($player->flags);
+    var_dump($player->flags);
     // var_dump($player->variables);
 }
 

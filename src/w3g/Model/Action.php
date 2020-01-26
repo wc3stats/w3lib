@@ -83,6 +83,7 @@ class Action extends Model
     const UNKNOWN_7     = 0x77;
     const W3MMD         = 0x6B;
     const UNKNOWN_19    = 0x6D;
+    const UNKNOWN_24    = 0x6E;
 
     /** **/
 
@@ -407,6 +408,7 @@ class Action extends Model
             case self::UNKNOWN_17:
             case self::UNKNOWN_21:
             case self::UNKNOWN_22:
+            case self::UNKNOWN_24:
                 // 30 [30 41] [2d 02 0d 00] 00A-...
                 // 31 [39 41] [08 02 0d 00] 10A....
                 // 32 [30 41] [9a 00 0d 00] 20A....
@@ -424,6 +426,7 @@ class Action extends Model
                 // Always followed by 0x11
 
                 // 72 [68 41] [38 00 0d 00] rhA8...
+                // 6E [61 46] [2e 02 0d 00] .aF....
                 $stream->uint16 ();
                 $stream->uint32 ();
             break;

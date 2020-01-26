@@ -14,6 +14,7 @@ class Player extends Model
     public $type      = NULL;
     public $id        = NULL;
     public $name      = NULL;
+    public $partial   = NULL;
     public $race      = NULL;
 
     // Deferred.
@@ -36,9 +37,10 @@ class Player extends Model
 
     public function read (Stream &$stream)
     {
-        $this->type = $stream->uint8 ();
-        $this->id   = $stream->uint8 ();
-        $this->name = $stream->string ();
+        $this->type    = $stream->uint8 ();
+        $this->id      = $stream->uint8 ();
+        $this->name    = $stream->string ();
+        $this->partial = $this->name;
 
         $platform = $stream->uint8 ();
 

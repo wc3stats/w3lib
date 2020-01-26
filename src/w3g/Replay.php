@@ -59,7 +59,8 @@ class Replay extends Archive
 
     public function getPlayerByName ($playerName)
     {
-        return $this->game->getPlayerBy ('name', $playerName);
+        return $this->game->getPlayerBy ('name', $playerName) ??
+               $this->game->getPlayerBy ('partial', $playerName);
     }
 
     public function getPlayerByColour ($colour)
