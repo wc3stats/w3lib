@@ -63,6 +63,7 @@ class Parser
 
         $header = Header::unpack ($replay);
 
+
         for ($i = 0; $i < $header->numBlocks; $i++) {
             $block = Block::unpack ($replay);
 

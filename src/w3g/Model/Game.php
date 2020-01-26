@@ -52,6 +52,7 @@ class Game extends Model
         $host = Player::unpack ($stream);
         $host->isHost = true;
 
+        
         $this->addPlayer ($host);
 
         /**
@@ -59,14 +60,15 @@ class Game extends Model
          */
         $this->name = $stream->string ();
 
-        // 1 null byte.
-        $stream->read (1);
+        // null byte.
+        $stream->string ();
 
         /**
          * 4.3 [Encoded String]
          */
         $encoded = $stream->string ();
         $decoded = $this->decode ($encoded);
+
 
         /**
          * 4.4 [GameSettings]
