@@ -38,6 +38,9 @@ if (!is_file ($file)) {
 $settings = new Settings ();
 $replay   = new Replay ($file, $settings);
 
+var_dump ($replay->chatlog);
+die ();
+
 /** **/
 
 echo PHP_EOL;
