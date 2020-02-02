@@ -107,6 +107,24 @@ class Parser
 
     private function importChat (Segment $segment)
     {
+        $lastMessage = $this
+            ->replay
+            ->chatlog [
+                count (
+                    $this
+                        ->replay
+                        ->chatlog
+                ) - 1
+            ];
+
+        if (
+            $segment->message->time - $lastMessage->time <= 1 &&
+            strcasecmp ($segment->message->message, $lastMessage->message) === 0
+        ) {
+            // Duplicate entry in replay.
+            return;
+        }
+
         $this->replay->chatlog [] = $segment->message;
     }
 

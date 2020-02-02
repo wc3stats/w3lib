@@ -9,15 +9,16 @@ class File extends Stream
 {
     protected $filepath;
     protected $filesize;
+    protected $handle;
 
     public function __construct (string $filepath)
     {
         $this->filepath = $filepath;
         $this->filesize = filesize ($filepath);
 
-        $stream = fopen ($filepath, 'rb+');
+        $this->handle = fopen ($filepath, 'rb+');
 
-        if (!$stream) {
+        if (!$this->handle) {
             throw new Exception (
                 sprintf (
                     'Failed to open archive: [%s] with error: [%s]',
@@ -27,7 +28,7 @@ class File extends Stream
             );
         }
 
-        parent::__construct ($stream);
+        parent::__construct ($this->handle);
     }
 
     public function getFile ()
@@ -38,6 +39,11 @@ class File extends Stream
     public function getSize ()
     {
         return $this->filesize;
+    }
+
+    public function close ()
+    {
+        fclose ($this->handle);
     }
 }
 

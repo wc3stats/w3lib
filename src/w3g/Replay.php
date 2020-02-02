@@ -16,6 +16,8 @@ class Replay extends Archive
 
         $parser = new Parser ($this, $settings);
         $parser->parse ();
+
+        $this->close ();
     }
 
     /** **/
