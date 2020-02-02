@@ -8,7 +8,7 @@ use w3lib\Library\Encoding;
 
 class Gamelist extends Model
 {
-    public $gameName;
+    public $name;
     public $server;
     public $map;
     public $slotsTaken;
@@ -28,15 +28,7 @@ class Gamelist extends Model
 
         $this->duration = $stream->uint32 ();
 
-        $this->gameName = $stream->string ();
-
-        // $stream->read (10);
-        // $stream->read (4);
-
-        // $stream->read (16 + 7);
-        // $stream->read (16);
-        // $stream->readTo (chr (0) . chr (0));
-        // $stream->read (2);
+        $this->name = $stream->string ();
 
         $stream->readTo (
             chr (0x4d) .
@@ -57,8 +49,18 @@ class Gamelist extends Model
         $decoded->read (9);
 
         $this->checksum = $decoded->uint32 ();
-        $this->map      = $decoded->string ();
-        $this->host     = $decoded->string ();
+
+        /** **/
+
+        $this->map = $decoded->string ();
+
+        // Fix for windows download paths.
+        $this->map = str_replace ('\\', '/', $this->map);
+        $this->map = basename ($this->map);
+
+        /** **/
+
+        $this->host = $decoded->string ();
 
         $stream->seek (-32);
 
