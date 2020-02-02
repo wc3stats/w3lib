@@ -1,8 +1,7 @@
 <?php
 
-require dirname (__DIR__) . '/vendor/autoload.php';
+require 'base.php';
 
-use Monolog\Logger as Monolog;
 use w3lib\Library\Logger;
 use w3lib\w3g\Replay;
 use w3lib\w3g\Lang;
@@ -10,24 +9,7 @@ use w3lib\w3g\Settings;
 
 define ('REPLAY_FILE', getcwd () . '/' . $argv [1]);
 
-/** **/
-
-error_reporting (E_ALL);
-ini_set ('display_errors', 1);
-
-$opts = getopt ('df:', [ 'debug', 'file:' ]);
-
-if (
-    isset ($opts ['d']) ||
-    isset ($opts ['debug'])
-) {
-    Logger::setup (Monolog::DEBUG);
-} else {
-    Logger::setup (Monolog::INFO);
-}
-
-/** **/
-
+$opts = getopt ('f:', [ 'file:' ]);
 $file = getcwd () . '/' . ($opts ['f'] ?? $opts ['file'] ?? null);
 
 if (!is_file ($file)) {
@@ -83,7 +65,7 @@ foreach ($replay->getPlayers () as $player) {
     );
 
     var_dump($player->flags);
-    // var_dump($player->variables);
+    var_dump($player->variables);
 }
 
 echo PHP_EOL;

@@ -5,6 +5,7 @@ namespace w3lib\w3g\Model;
 use Exception;
 use w3lib\Library\Model;
 use w3lib\Library\Logger;
+use w3lib\Library\Encoding;
 use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Context;
@@ -52,7 +53,7 @@ class Game extends Model
         $host = Player::unpack ($stream);
         $host->isHost = true;
 
-        
+
         $this->addPlayer ($host);
 
         /**
@@ -67,8 +68,7 @@ class Game extends Model
          * 4.3 [Encoded String]
          */
         $encoded = $stream->string ();
-        $decoded = $this->decode ($encoded);
-
+        $decoded = Encoding::decodeString ($encoded);
 
         /**
          * 4.4 [GameSettings]
@@ -248,21 +248,6 @@ class Game extends Model
     }
 
     /** **/
-
-    protected function decode ($encoded)
-    {
-        $decoded = new Buffer ();
-
-        for ($i = 0, $cc = strlen ($encoded); $i < $cc; $i++) {
-            if ($i % 8 === 0) {
-                $mask = ord ($encoded [$i]);
-            } else {
-                $decoded->append (chr (ord ($encoded [$i]) - !($mask & (1 << $i % 8))));
-            }
-        }
-
-        return $decoded;
-    }
 
     protected function encode (Stream $stream)
     {

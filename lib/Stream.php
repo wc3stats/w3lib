@@ -79,6 +79,16 @@ class Stream
         return $block;
     }
 
+    public function readTo ($s)
+    {
+        while (
+            !feof ($this->handle) &&
+            !$this->startsWith ($s)
+        ) {
+            $this->read (1);
+        }
+    }
+
     public function readAll ()
     {
         $buffer = '';
@@ -235,6 +245,12 @@ class Stream
     public function seek ($offset)
     {
         rewind ($this->handle);
+
+        if ($offset < 0) {
+            $stat = fstat ($this->handle);
+            $offset = $stat ['size'] - abs ($offset);
+        }
+
         fseek ($this->handle, $offset);
     }
 
