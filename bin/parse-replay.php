@@ -38,6 +38,7 @@ Logger::info ('Num Players: [%d]',  count ($replay->getPlayers ()));
 Logger::info ('Hash: [%s]',         $replay->getHash ());
 Logger::info ('Map File: [%s]',     $replay->game->map);
 Logger::info ('Map Type: [%s]',     $replay->getMap ());
+Logger::info ('Map Version: [%s]',  $replay->getVersion ());
 Logger::info ('Game Type: [%s]',    Lang::gameType ($replay->game->type));
 Logger::info ('Map Checksum: [%s]', $replay->game->checksum);
 Logger::info ('Saver Id: [%s]',     $replay->game->saver);

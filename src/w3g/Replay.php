@@ -178,6 +178,44 @@ class Replay extends Archive
      */
     public function getMap ()
     {
+        $map = $this->getNormalizedMap ();
+
+        $toks = explode (' ', $map);
+
+        for ($i = 1, $cc = count ($toks); $i < $cc; $i++) {
+            if (empty ($toks [$i])) {
+                continue;
+            }
+
+            if (strlen ($toks [$i]) === 1 || ctype_digit ($toks [$i] [0])) {
+                break;
+            }
+        }
+
+        $toks = array_slice ($toks, 0, $i);
+
+        $map = implode (' ', $toks);
+        $map = trim ($map);
+        $map = ucwords ($map);
+
+        return $map;
+    }
+
+    public function getVersion ()
+    {
+        $map = $this->getNormalizedMap ();
+
+        $toks = explode (' ', $map);
+
+        $toks = array_filter ($toks, function ($tok) {
+            return preg_match ('/\d/', $tok);
+        });
+
+        return implode (' ', $toks);
+    }
+
+    private function getNormalizedMap ()
+    {
         $file = $this->game->map;
 
         $file = str_replace ([ '_', '?', '!', '-' ], ' ', $file);
@@ -198,24 +236,6 @@ class Replay extends Archive
 
         /* Remove duplicate spaces. */
         $map = preg_replace ('/\s\s+/', ' ', $map);
-
-        $toks = explode (' ', $map);
-
-        for ($i = 1, $cc = count ($toks); $i < $cc; $i++) {
-            if (empty ($toks [$i])) {
-                continue;
-            }
-
-            if (strlen ($toks [$i]) === 1 || ctype_digit ($toks [$i] [0])) {
-                break;
-            }
-        }
-
-        $toks = array_slice ($toks, 0, $i);
-
-        $map = implode (' ', $toks);
-        $map = trim ($map);
-        $map = ucwords ($map);
 
         return $map;
     }
