@@ -192,49 +192,49 @@ class Stream
         return $this->string (ord (' '));
     }
 
-    public function char ($n = 1)
+    public function char ($n = 1, $f = 0x00)
     {
-        return $this->read ($n);
+        return $this->read ($n, $f);
     }
 
-    public function bool ()
+    public function bool ($f = 0x00)
     {
-        return (bool) ord ($this->char ());
+        return (bool) ord ($this->char (1, $f));
     }
 
-    public function int8 ($flags = 0x00)
+    public function int8 ($f = 0x00)
     {
-        return ord ($this->read (1, $flags));
+        return ord ($this->read (1, $f));
     }
 
-    public function float ()
+    public function float ($f = 0x00)
     {
-        return $this->unpack ('g', 'G', 4);
+        return $this->unpack ('g', 'G', 4, $f);
     }
 
-    public function double ()
+    public function double ($f = 0x00)
     {
-        return $this->unpack ('e', 'E', 8);
+        return $this->unpack ('e', 'E', 8, $f);
     }
 
-    public function uint8 ()
+    public function uint8 ($f = 0x00)
     {
-        return $this->unpack ('c', 'c', 1);
+        return $this->unpack ('c', 'c', 1, $f);
     }
 
-    public function uint16 ()
+    public function uint16 ($f = 0x00)
     {
-        return $this->unpack ('v', 'n', 2);
+        return $this->unpack ('v', 'n', 2, $f);
     }
 
-    public function uint32 ()
+    public function uint32 ($f = 0x00)
     {
-        return $this->unpack ('V', 'N', 4);
+        return $this->unpack ('V', 'N', 4, $f);
     }
 
-    public function uint64 ()
+    public function uint64 ($f = 0x00)
     {
-        return $this->unpack ('P', 'J', 8);
+        return $this->unpack ('P', 'J', 8, $f);
     }
 
     public function offset ()
@@ -259,9 +259,9 @@ class Stream
         return $data ? pack ($format, $data) : pack ($format);
     }
 
-    protected function unpack ($le, $be, $size)
+    protected function unpack ($le, $be, $size, $f = 0x00)
     {
-        $data = unpack ($this->endian ? $le : $be, $this->read ($size));
+        $data = unpack ($this->endian ? $le : $be, $this->read ($size, $f));
         return current ($data);
     }
 

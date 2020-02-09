@@ -100,7 +100,7 @@ class W3MMD extends Model
 
         // xxd ($buffer);
 
-        // var_dump ($this->message);
+        var_dump ($this->message);
         // xxd ($this->message);
 
         $this->type = lcfirst ($buffer->token ());

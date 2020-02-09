@@ -92,13 +92,7 @@ class Replay extends Archive
 
     public function isLocal ()
     {
-        foreach (Lang::LOCAL_GAMES as $gameName) {
-            if (stripos ($this->game->name, $gameName) !== FALSE) {
-                return TRUE;
-            }
-        }
-
-        return FALSE;
+        return $this->game->isLocal;
     }
 
     public function isFFA ()

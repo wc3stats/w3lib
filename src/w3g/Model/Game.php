@@ -27,6 +27,7 @@ class Game extends Model
     public $host          = NULL;
     public $numSlots      = NULL;
     public $type          = NULL;
+    public $isLocal       = NULL;
     public $private       = NULL;
     public $recordId      = NULL;
     public $recordLength  = NULL;
@@ -153,29 +154,68 @@ class Game extends Model
          * Reforged adds another player listing.
          */
         if (Context::isReforged ()) {
-            $stream->read (4);
-            $stream->read (8);
 
-            while ($stream->int8 (Stream::PEEK) === ClanPlayer::HEADER) {
-                $clanPlayer = ClanPlayer::unpack ($stream);
+            // ???
+            $localHeader = chr (0x39) . chr (0x04) . chr (0x02);
+            $localHeaderLen = strlen ($localHeader);
 
-                foreach ($this->players as $player) {
-                    if (
-                        stripos ($clanPlayer->name, $player->name) === 0 &&
-                        strlen ($clanPlayer->name) > strlen ($player->name)
-                    ) {
-                        Logger::debug (
-                            'Updating player name from [%s] to [%s]',
-                            $player->name,
-                            $clanPlayer->name
-                        );
+            if ($stream->read ($localHeaderLen, Stream::PEEK) === $localHeader) {
+                $this->isLocal = TRUE;
 
-                        $player->name = $clanPlayer->name;
+                while ($byte = $stream->uint8 (Stream::PEEK)) {
+                    switch ($byte) {
+                        default:
+                        break 2;
+
+                        case 0x10:
+                            $stream->read (2);
+                        break;
+
+                        case 0x39:
+                            $stream->read (8);
+                        break;
+
+                        case 0x12:
+                            $stream->read (1);
+
+                            $n = $stream->uint8 ();
+                            $stream->read ($n);
+
+                            $stream->uint16 ();
+
+                            if ($stream->uint8 (Stream::PEEK) === 0x70) {
+                                $stream->uint32 ();
+                            }
+
+                        break;
+                    }
+                }
+
+            } else {
+                $stream->read (4);
+                $stream->read (8);
+
+                while ($stream->int8 (Stream::PEEK) === ClanPlayer::HEADER) {
+                    $clanPlayer = ClanPlayer::unpack ($stream);
+
+                    foreach ($this->players as $player) {
+                        if (
+                            stripos ($clanPlayer->name, $player->name) === 0 &&
+                            strlen ($clanPlayer->name) > strlen ($player->name)
+                        ) {
+                            Logger::debug (
+                                'Updating player name from [%s] to [%s]',
+                                $player->name,
+                                $clanPlayer->name
+                            );
+
+                            $player->name = $clanPlayer->name;
+                        }
                     }
                 }
             }
-        }
 
+        }
 
         /**
          * 4.10 [GameStartRecord]
@@ -215,6 +255,15 @@ class Game extends Model
 
         $this->selectMode = $stream->int8 ();
         $this->startSpots = $stream->int8 ();
+
+        /** **/
+
+        foreach (Lang::LOCAL_GAMES as $gameName) {
+            if (stripos ($this->name, $gameName) !== FALSE) {
+                $this->isLocal = TRUE;
+                break;
+            }
+        }
     }
 
     /** **/
