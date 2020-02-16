@@ -255,13 +255,27 @@ class Replay extends Archive
             return $cX->time <=> $cY->time;
         });
 
+        $chatlog = array_values ($chatlog);
+
+        for ($i = 1; $i < count ($chatlog); $i++) {
+
+            if (
+                $chatlog [$i]->playerId === $chatlog [$i - 1]->playerId &&
+                $chatlog [$i]->message  === $chatlog [$i - 1]->message &&
+
+                abs ($chatlog [$i]->time - $chatlog [$i - 1]->time) <= 5
+            ) {
+                array_splice ($chatlog, $i--, 1);
+            }
+        }
+
+        $this->chatlog = $chatlog;
+
         // Choose the longer of the two replays.
         if ($replay->getLength () >= $this->getLength ()) {
             $this->header = $replay->header;
             $this->game   = $replay->game;
         }
-
-        $this->chatlog = array_values ($chatlog);
     }
 }
 
