@@ -152,10 +152,10 @@ class W3MMD extends Model
                 $this->params = [];
 
                 for ($i = 0; $i < $this->numParams; $i++) {
-                    $this->params [] = $buffer->token ();
+                    $this->params [] = $this->normalizeValue ($buffer->token ());
                 }
 
-                $this->format = $buffer->token ();
+                $this->format = $this->normalizeValue ($buffer->token ());
 
                 self::$events [$this->eventName] = $this;
             break;
