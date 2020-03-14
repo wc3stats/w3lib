@@ -176,7 +176,14 @@ class W3MMD extends Model
                 $this->args = [];
 
                 for ($i = 0; $i < $this->event->numParams; $i++) {
-                    $this->args [] = $buffer->token ();
+                    $arg = $buffer->token ();
+
+                    if ($player = Context::$replay->getPlayerByName ($arg)) {
+                        $this->message = str_replace ($arg, $player->name, $this->message);
+                        $arg = $player->name;
+                    }
+
+                    $this->args [] = $arg;
                 }
             break;
 

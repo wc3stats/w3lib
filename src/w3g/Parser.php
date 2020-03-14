@@ -325,6 +325,8 @@ class Parser
                     array_sum ($player->activity) / count ($player->activity)
                 );
             }
+
+            unset ($player->partial);
         }
 
         usort (
