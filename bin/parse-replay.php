@@ -30,6 +30,8 @@ Logger::info ('Compressed Size: [%s]',   $replay->header->compressedSize);
 Logger::info ('Uncompressed Size: [%s]', $replay->header->uncompressedSize);
 
 Logger::info ('Game Name: [%s]',    $replay->game->name);
+Logger::info ('Major Version [%d]', $replay->header->majorVersion);
+Logger::info ('Build Version [%d]', $replay->header->buildVersion);
 Logger::info ('Is Local: [%s]',     $replay->isLocal () ? 'Yes' : 'No');
 Logger::info ('Is Ladder: [%s]',    $replay->isLadder () ? 'Yes' : 'No');
 Logger::info ('Is FFA: [%s]',       $replay->isFFA () ? 'Yes' : 'No');

@@ -243,6 +243,11 @@ class Parser
             break;
         }
 
+        $this
+            ->replay
+            ->game
+            ->hasW3MMD = true;
+
         $player = $this->replay->getPlayer (
             // $w3mmd->playerName ??
             $w3mmd->playerId ??
@@ -279,11 +284,6 @@ class Parser
                 $player->flags = array_unique ($player->flags);
             break;
         }
-
-        $this
-            ->replay
-            ->game
-            ->hasW3MMD = true;
     }
 
     /** **/

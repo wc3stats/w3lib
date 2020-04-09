@@ -84,6 +84,7 @@ class Action extends Model
     const W3MMD         = 0x6B;
     const UNKNOWN_19    = 0x6D;
     const UNKNOWN_24    = 0x6E;
+    const UNKNOWN_25    = 0x78;
 
     /** **/
 
@@ -123,6 +124,8 @@ class Action extends Model
 
         switch ($this->id) {
             default:
+                // \w3lib\Library\xxd ($stream);
+
                 throw new Exception (
                     sprintf (
                         'Encountered unknown action id: [%2X]',
@@ -455,6 +458,10 @@ class Action extends Model
                 // 6D 67 42 68 [.gBh]
                 // Always same
                 $stream->read (3);
+            break;
+
+            case self::UNKNOWN_25:
+                $stream->read (20);
             break;
         }
 
