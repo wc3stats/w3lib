@@ -61,6 +61,10 @@ class Replay extends Archive
 
     public function getPlayerByName ($playerName)
     {
+        if (stripos ($playerName, '|cff') === 0) {
+            $playerName = substr ($playerName, 10);
+        }
+
         return $this->game->getPlayerBy ('name', $playerName) ??
                $this->game->getPlayerBy ('partial', $playerName);
     }

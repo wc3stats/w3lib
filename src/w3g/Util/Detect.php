@@ -199,7 +199,7 @@ class Detect
         foreach ($replay->getPlayers () as $player) {
             if ($player->hasFlag (W3MMD::FLAG_WINNER)) {
                 $player->isWinner = true;
-            } else if ($player->hasFlag (W3MMD::FLAG_LOSER)) {
+            } else if ($player->hasFlag (W3MMD::FLAG_LOSER) || $player->hasFlag (W3MMD::FLAG_LEAVER)) {
                 $player->isWinner = false;
             }
         }

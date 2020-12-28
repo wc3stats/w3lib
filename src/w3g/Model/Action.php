@@ -124,7 +124,7 @@ class Action extends Model
 
         switch ($this->id) {
             default:
-                // \w3lib\Library\xxd ($stream);
+                \w3lib\Library\xxd ($stream);
 
                 throw new Exception (
                     sprintf (
