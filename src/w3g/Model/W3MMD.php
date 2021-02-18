@@ -89,9 +89,26 @@ class W3MMD extends Model
 
         /** **/
 
+        // xxd ($stream);
+
         $this->intro   = $stream->string ();
         $this->header  = $stream->string ();
-        $this->message = $stream->string ();
+        $this->message = $stream->readTo (Stream::NUL);
+
+        $stream->read (1);
+
+        var_dump ($this->message);
+
+        // // if (substr ($this->message, -1) == Stream::ESCAPE) {
+        // //     $stream->read (1);
+        // // }
+
+        // // if (stripos ($this->message, "26v05710\\ 010v2567\\ 57v02610\\ 25v06710\\ 67v02510\\ 010v2567\\ 510v0267\\ 27v05610\\ 06v25710\\ 710v0256\\ 02v56710\\ 56v02710\\ 210v0567\\ 05v26710\\ 67v02510\\ 07v25610\\ 56v02710\\ 210v0567\\ 610v0257\\ 02v56710\\ 57v02610\\ 27v05610\\ 05v26710\\ 610v0257\\") !== false) {
+        // //  die ('test');
+        // // }
+
+        // var_dump ($this->message);
+        // // die ();
 
         // 4 unknown bytes.
         $stream->read (4);
@@ -100,7 +117,7 @@ class W3MMD extends Model
 
         // xxd ($buffer);
 
-        var_dump ($this->message);
+        // var_dump ($this->message);
         // xxd ($this->message);
 
         $this->type = lcfirst ($buffer->token ());
@@ -216,8 +233,6 @@ class W3MMD extends Model
                 $this->varname  = $this->normalizeKey ($buffer->token ());
                 $this->operator = $buffer->token ();
                 $this->value    = $this->normalizeValue ($buffer->token ());
-
-                // var_dump ($this->message);
 
                 if (is_numeric ($this->value)) {
                     if (is_int ($this->value)) {

@@ -81,12 +81,16 @@ class Stream
 
     public function readTo ($s)
     {
+        $r = '';
+
         while (
             !feof ($this->handle) &&
             !$this->startsWith ($s)
         ) {
-            $this->read (1);
+            $r .= $this->read (1);
         }
+
+        return ($r);
     }
 
     public function readAll ()
@@ -139,14 +143,10 @@ class Stream
             return FALSE;
         }
 
-        return strcmp (
-            $this->read (
-                strlen ($s),
-                self::PEEK
-            ),
+        $x = $this->read (strlen ($s), self::PEEK);
+        if (is_int ($s)) $x = ord ($x);
 
-            $s
-        ) === 0;
+        return strcmp ($x, $s) === 0;
     }
 
     public function eof ()
@@ -159,7 +159,7 @@ class Stream
         return $this->handle;
     }
 
-    public function string ($term = self::NUL)
+    public function string ($term = self::NUL, $esc = 1)
     {
         $s = '';
         $p = NULL;
@@ -169,7 +169,7 @@ class Stream
                 $c = $this->read (1, self::QUIET);
 
                 if (   ord ($c) === $term
-                    && $p !== self::ESCAPE) {
+                    && ($esc && $p !== self::ESCAPE)) {
                     break;
                 }
 

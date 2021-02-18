@@ -68,7 +68,7 @@ foreach ($replay->getPlayers () as $player) {
     );
 
     //var_dump($player->flags);
-    //var_dump($player->variables);
+    var_dump($player->variables);
 }
 
 echo PHP_EOL;
