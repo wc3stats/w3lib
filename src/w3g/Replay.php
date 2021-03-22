@@ -203,6 +203,10 @@ class Replay extends Archive
     {
         $map = $this->getNormalizedMap ();
 
+        if (preg_match ('/v\d+\.\d+[a-z]?/i', $map, $m)) {
+            return ltrim ($m [0], 'v ');
+        }
+
         $toks = explode (' ', $map);
 
         $toks = array_filter ($toks, function ($tok) {
