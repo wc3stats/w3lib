@@ -65,8 +65,17 @@ class Replay extends Archive
             $playerName = substr ($playerName, 10);
         }
 
-        return $this->game->getPlayerBy ('name', $playerName) ??
-               $this->game->getPlayerBy ('partial', $playerName);
+        $p = $this->game->getPlayerBy ('name', $playerName) ??
+             $this->game->getPlayerBy ('partial', $playerName);
+
+        if (!$p) {
+           $pn = preg_replace ('/\[[^\]]*\]/', '', $playerName);
+
+           $p = $this->game->getPlayerBy ('name', $pn) ??
+                $this->game->getPlayerBy ('partial', $pn);
+        }
+
+        return $p;
     }
 
     public function getPlayerByColour ($colour)
