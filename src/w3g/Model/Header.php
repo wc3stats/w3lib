@@ -43,7 +43,7 @@ class Header extends Model
 
         $this->flags            = $stream->uint16 ();
         $this->length           = ceil ($stream->uint32 () / 1000);
-        $this->checksum         = $stream->uint32 ();
+        $this->checksum         = $stream->hex (4);
 
         if ($this->numBlocks <= 0) {
             throw new FatalException ('Malformed or empty replay.');
