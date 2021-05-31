@@ -23,6 +23,7 @@ class Game extends Model
     public $randomHero    = NULL;
     public $randomRaces   = NULL;
     public $checksum      = NULL;
+    public $path          = NULL;
     public $map           = NULL;
     public $host          = NULL;
     public $sha1          = NULL;
@@ -116,11 +117,11 @@ class Game extends Model
         /**
          * 4.5 [Map & Creator Name]
          */
-        $this->map = $decoded->string ();
+        $this->path = $decoded->string ();
 
         // Fix for windows download paths.
 
-        $this->map = str_replace ('\\', '/', $this->map);
+        $this->map = str_replace ('\\', '/', $this->path);
         $this->map = basename ($this->map);
 
         $this->host = $decoded->string ();
