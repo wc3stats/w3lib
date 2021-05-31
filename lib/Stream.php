@@ -197,6 +197,11 @@ class Stream
         return $this->read ($n, $f);
     }
 
+    public function hex ($n = 1, $f = 0x00)
+    {
+        return bin2hex ($this->read ($n, $f));
+    }
+
     public function bool ($f = 0x00)
     {
         return (bool) ord ($this->char (1, $f));

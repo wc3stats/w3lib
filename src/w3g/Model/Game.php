@@ -25,6 +25,7 @@ class Game extends Model
     public $checksum      = NULL;
     public $map           = NULL;
     public $host          = NULL;
+    public $sha1          = NULL;
     public $numSlots      = NULL;
     public $type          = NULL;
     public $isLocal       = NULL;
@@ -108,7 +109,9 @@ class Game extends Model
         // 5 unknown bytes.
         $decoded->read (5);
 
-        $this->checksum = $decoded->uint32 ();
+        // $this->checksum = $decoded->uint32 ();
+
+        $this->checksum = $decoded->hex (4);
 
         /**
          * 4.5 [Map & Creator Name]
@@ -121,6 +124,13 @@ class Game extends Model
         $this->map = basename ($this->map);
 
         $this->host = $decoded->string ();
+
+        $decoded->read (1);
+
+        $this->sha1 = $decoded->hex (20);
+
+        // \w3lib\Library\xxd ($decoded);
+        // die ();
 
         /**
          * 4.6 [PlayerCount]
