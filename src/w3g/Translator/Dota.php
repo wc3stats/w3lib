@@ -561,8 +561,10 @@ class Dota
 
     protected static function pid ($pid)
     {
+        if (!is_numeric ($pid)) return 1;
+
         $pid  = (string) $pid;
-        $pid -= $pid >= 7 ? 2 : 1;
+        $pid -= ((int) $pid) >= 7 ? 2 : 1;
 
         return $pid;
     }
