@@ -9,6 +9,8 @@ use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\w3g\Lang;
 use w3lib\w3g\Context;
+use w3lib\w3g\Parser;
+use function w3lib\Library\xxd;
 
 class ClanPlayer extends Model
 {
@@ -47,6 +49,18 @@ class ClanPlayer extends Model
 
         $stream->read ($n);
         $stream->read (4);
+
+
+        /**
+         * Added in Patch 1.33
+         */
+
+        if (Context::majorVersion () >= Parser::WC3_VERSION_33) {
+            $stream->int8 ();
+
+            $stream->uint32 ();
+            $stream->uint32 ();
+        }
     }
 }
 

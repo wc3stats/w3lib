@@ -86,6 +86,12 @@ class Action extends Model
     const UNKNOWN_24    = 0x6E;
     const UNKNOWN_25    = 0x78;
 
+    // Patch 1.33
+    const UNKNOWN_26    = 0x7A;
+    const UNKNOWN_27    = 0x47;
+    const UNKNOWN_28    = 0x48;
+    const UNKNOWN_29    = 0x45;
+
     /** **/
 
     // Shift held down.
@@ -462,6 +468,18 @@ class Action extends Model
 
             case self::UNKNOWN_25:
                 $stream->read (20);
+            break;
+
+            case self::UNKNOWN_26:
+                $stream->read (20);
+            break;
+
+            case self::UNKNOWN_27:
+                $stream->read (21);
+            break;
+
+            case self::UNKNOWN_28:
+               $stream->read (6);
             break;
         }
 

@@ -2,6 +2,7 @@
 
 require 'base.php';
 
+use Monolog\Logger as Monolog;
 use w3lib\Library\Logger;
 use w3lib\w3g\Replay;
 use w3lib\w3g\Lang;
@@ -16,6 +17,8 @@ if (!is_file ($file)) {
     printf ('File not found: \'%s\'.' . PHP_EOL, $file);
     die ();
 }
+
+// Logger::setup (Monolog::DEBUG);
 
 $settings = new Settings ();
 $replay   = new Replay ($file, $settings);

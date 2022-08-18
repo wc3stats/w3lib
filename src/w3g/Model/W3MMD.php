@@ -97,7 +97,7 @@ class W3MMD extends Model
 
         $stream->read (1);
 
-        var_dump ($this->message);
+        // var_dump ($this->message);
 
         // // if (substr ($this->message, -1) == Stream::ESCAPE) {
         // //     $stream->read (1);

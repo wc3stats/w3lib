@@ -4,6 +4,7 @@ namespace w3lib\w3g;
 
 use stdClass;
 use Exception;
+use function w3lib\Library\xxd;
 use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
@@ -27,6 +28,7 @@ class Parser
 
     const WC3_VERSION_31 = 10031;
     const WC3_VERSION_32 = 10032;
+    const WC3_VERSION_33 = 10033;
 
     protected $replay;
     protected $settings;

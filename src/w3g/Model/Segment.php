@@ -10,6 +10,8 @@ use w3lib\Library\Stream;
 use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Context;
 
+use function w3lib\Library\xxd;
+
 class Segment extends Model
 {
     const END_BUFFER    = 0x00;
@@ -31,15 +33,13 @@ class Segment extends Model
         $this->id  = $stream->int8 ();
         $this->key = $this->keyName ($this->id);
 
-
-        // Logger::debug (
-        //     sprintf (
-        //         'Found segment: [0x%2X:%s].',
-        //         $this->id,
-        //         $this->key
-        //     )
-        // );
-
+        Logger::debug (
+            sprintf (
+                'Found segment: [0x%2X:%s].',
+                $this->id,
+                $this->key
+            )
+        );
 
         switch ($this->id) {
             default:
