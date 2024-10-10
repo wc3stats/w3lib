@@ -150,7 +150,7 @@ class W3MMD extends Model
                         $player = Context::$replay->getPlayerByName ($this->playerName);
 
                         if (!$player) {
-                           $player = Context::$replay->getPlayerByOrder ($this->playerId);
+                           break;
                         }
 
                         self::$pids [$this->playerId] = $player->id;
