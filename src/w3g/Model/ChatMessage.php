@@ -25,7 +25,7 @@ class ChatMessage extends Model
 
         $this->flags    = $block->int8 ();
         $this->mode     = $block->uint32 ();
-        $this->message  = $block->string ();
+        $this->message  = utf8_encode($block->string ());
 
         $this->time     = Context::getTime ();
     }

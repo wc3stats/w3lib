@@ -5,6 +5,7 @@ namespace w3lib\w3g\Model;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\Library\Exception\FatalException;
+use w3lib\Library\Stream\Buffer;
 
 class Header extends Model
 {

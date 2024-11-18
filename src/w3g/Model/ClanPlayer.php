@@ -49,17 +49,23 @@ class ClanPlayer extends Model
 
         $stream->read ($n);
         $stream->read (4);
-
+        
 
         /**
          * Added in Patch 1.33
          */
-
+        
         if (Context::majorVersion () >= Parser::WC3_VERSION_33) {
+            $stream->uint32 ();
+            $stream->uint32 ();
+
             $stream->int8 ();
 
-            $stream->uint32 ();
-            $stream->uint32 ();
+            // $stream->uint32 ();
+
+            if (Context::majorVersion () >= Parser::WC3_VERSION_34) {
+                $stream->uint16 ();
+            }
         }
     }
 }

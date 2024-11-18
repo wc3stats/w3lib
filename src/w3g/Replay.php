@@ -205,6 +205,16 @@ class Replay extends Archive
         $map = trim ($map);
         $map = ucwords ($map);
 
+        $manual = [
+            "Lotr Hero Siege" => "LOTR Hero Siege MT",
+            "Lo TR Hero Siege V." => "LOTR Hero Siege MT",
+            // "LoTR Hero Siege" => "LOTR Hero Siege MT"
+        ];
+
+        if (isset ($manual [$map])) {
+        return $manual [$map];
+        }
+
         return $map;
     }
 

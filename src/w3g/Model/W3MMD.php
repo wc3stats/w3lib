@@ -93,7 +93,7 @@ class W3MMD extends Model
 
         $this->intro   = $stream->string ();
         $this->header  = $stream->string ();
-        $this->message = $stream->readTo (Stream::NUL);
+        $this->message = utf8_encode($stream->readTo (Stream::NUL));
 
         $stream->read (1);
 
@@ -205,7 +205,7 @@ class W3MMD extends Model
                         $arg = $player->name;
                     }
 
-                    $this->args [] = $arg;
+                    $this->args [] = utf8_encode($arg);
                 }
             break;
 

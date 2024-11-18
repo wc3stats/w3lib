@@ -37,10 +37,8 @@ class Block extends Model
             $this->uncompressedSize = $stream->uint16 ();
         }
 
-
         $this->checksum   = $stream->uint32 ();
         $this->compressed = $stream->read ($this->compressedSize);
-
 
         if (uint32 ($this->checksum) !== uint32 ($this->crc ())) {
             xxd (uint32 ($this->checksum));
@@ -57,6 +55,7 @@ class Block extends Model
         $body [0] = chr (ord ($body [0]) | 1);
 
         /* Decompress body. */
+        
         $body = gzinflate ($body);
 
         if (!$body) {
@@ -64,7 +63,6 @@ class Block extends Model
         }
 
         $actual = strlen ($body);
-
 
         if ($actual !== $this->uncompressedSize) {
             throw new Exception (

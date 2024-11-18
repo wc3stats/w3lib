@@ -39,7 +39,7 @@ class Player extends Model
     {
         $this->type    = $stream->uint8 ();
         $this->id      = $stream->uint8 ();
-        $this->name    = $stream->string ();
+        $this->name    = utf8_encode($stream->string ());
         $this->partial = $this->name;
 
         $platform = $stream->uint8 ();

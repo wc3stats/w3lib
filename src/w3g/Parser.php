@@ -29,6 +29,7 @@ class Parser
     const WC3_VERSION_31 = 10031;
     const WC3_VERSION_32 = 10032;
     const WC3_VERSION_33 = 10033;
+    const WC3_VERSION_34 = 10100;
 
     protected $replay;
     protected $settings;
@@ -68,7 +69,6 @@ class Parser
         for ($i = 0; $i < $header->numBlocks; $i++) {
             $block = Block::unpack ($replay);
 
-
             /** **/
 
             $buffer->append ($block->body);
@@ -80,7 +80,7 @@ class Parser
             }
 
             $this->desegment ($buffer);
-        }
+         }
 
         $this->package ();
     }

@@ -25,7 +25,7 @@ class Logger
     public static function __callStatic ($name, $arguments = [])
     {
         if (!self::$instance) {
-            $instance = new Monolog (NULL);
+            $instance = new Monolog ('');
 
             $handler = new StreamHandler ('php://stdout', self::$level ?? Monolog::ERROR);
 
@@ -34,7 +34,7 @@ class Logger
             );
 
             $instance->pushProcessor (function ($record) {
-                $trace = debug_backtrace () [4];
+                $trace = debug_backtrace () [3];
 
                 $record ['extra'] ['file'] = basename ($trace ['file']);
                 $record ['extra'] ['line'] = $trace ['line'];

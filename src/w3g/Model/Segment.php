@@ -25,15 +25,28 @@ class Segment extends Model
     const UNKNOWN_2     = 0x23;
     const GAME_OVER     = 0x2F;
     const LEAVE_GAME    = 0x17;
+    const UNKNOWN_3     = 0x40;
 
+    private static $started = false;
     private static $cache = [];
 
     public function read (Stream &$stream)
     {
+        if (!self::$started) {
+            self::$started = true;
+
+            // Start block...
+            $stream->readTo ("\x1a\x01\x00\x00");
+        }
+
+        // \w3lib\Library\xxd ($stream->read (512, Stream::PEEK));
+        
         $this->id  = $stream->int8 ();
         $this->key = $this->keyName ($this->id);
 
-        Logger::debug (
+        // \w3lib\Library\xxd ($stream->read (512, Stream::PEEK));
+
+        Logger::debug(
             sprintf (
                 'Found segment: [0x%2X:%s].',
                 $this->id,
@@ -117,6 +130,10 @@ class Segment extends Model
 
             case self::END_BUFFER:
                 while ($stream->read (1) === self::END_BUFFER);
+            break;
+
+            case self::UNKNOWN_3:
+                $stream->read (32);
             break;
         }
     }
