@@ -27,17 +27,17 @@ class Segment extends Model
     const LEAVE_GAME    = 0x17;
     const UNKNOWN_3     = 0x40;
 
-    private static $started = false;
+    // private static $started = false;
     private static $cache = [];
 
     public function read (Stream &$stream)
     {
-        if (!self::$started) {
-            self::$started = true;
+        // if (!self::$started) {
+        //     self::$started = true;
 
-            // Start block...
-            $stream->readTo ("\x1a\x01\x00\x00");
-        }
+        //     // Start block...
+        //     $stream->readTo ("\x1a\x01\x00\x00");
+        // }
 
         // \w3lib\Library\xxd ($stream->read (512, Stream::PEEK));
         
