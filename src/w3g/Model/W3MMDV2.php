@@ -37,11 +37,13 @@ class W3MMDV2 extends Model
             if (isset ($parsed [1])) {
                switch ($parsed [1]) {
                   case 'player':
-                     self::$players [$parsed ['store'] ['id']] = [
-                        ... $parsed ['store'],
-                        'frame' => null,
-                        'frames' => []
-                     ];
+                     self::$players [$parsed ['store'] ['id']] = array_merge (
+                        $parsed ['store'],
+                        [
+                           'frame' => null,
+                           'frames' => []
+                        ]
+                     );
                   break;
 
                   case 'keys':
@@ -56,11 +58,14 @@ class W3MMDV2 extends Model
          break;
 
          case 'player':
-            $frame = [
-               'round' => self::$game ['round'],
-               'turn'  => self::$game ['turn'],
-               ... $parsed ['store']
-            ];
+            $frame = array_merge (
+               [
+                  'round' => self::$game ['round'],
+                  'turn'  => self::$game ['turn']
+               ],
+
+               $parsed ['store']
+            );
 
             self::$players [$parsed [1]] ['frame'] = $frame;
             self::$players [$parsed [1]] ['frames'] [] = $frame;
