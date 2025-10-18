@@ -8,7 +8,7 @@ use w3lib\Library\Logger;
 error_reporting (E_ALL ^ E_DEPRECATED);
 ini_set ('display_errors', 1);
 
-$opts = getopt ('d:', [ 'debug' ]);
+$opts = getopt ('d', [ 'debug' ]);
 
 if (
     isset ($opts ['d']) ||

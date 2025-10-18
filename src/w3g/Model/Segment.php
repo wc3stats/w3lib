@@ -56,7 +56,14 @@ class Segment extends Model
 
         switch ($this->id) {
             default:
-                throw new Exception (
+                // throw new Exception (
+                //     sprintf (
+                //         'Encountered unknown segment id: [%2X]',
+                //         $this->id
+                //     )
+                // );
+
+                Logger::error (
                     sprintf (
                         'Encountered unknown segment id: [%2X]',
                         $this->id

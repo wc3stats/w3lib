@@ -83,6 +83,11 @@ class Replay extends Archive
         return $this->game->getPlayerBy ('colour', $colour);
     }
 
+    public function getPlayerBySlot ($slot)
+    {
+        return $this->game->getPlayerBy ('slot', $slot);
+    }
+
     public function getSaver ()
     {
         return $this->getPlayerById (

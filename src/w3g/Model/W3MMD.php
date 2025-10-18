@@ -15,6 +15,8 @@ use function w3lib\Library\xxd;
 
 class W3MMD extends Model
 {
+    static $meta = [];
+
     const VERSION = 2.1;
 
     const PREFIX    = "MMD.Dat";
@@ -74,8 +76,6 @@ class W3MMD extends Model
             );
         }
 
-        // xxd ($stream);
-
         /** **/
 
         /**
@@ -94,6 +94,10 @@ class W3MMD extends Model
         $this->intro   = $stream->string ();
         $this->header  = $stream->string ();
         $this->message = utf8_encode($stream->readTo (Stream::NUL));
+
+        if ($this->message === 'meta version=2') {
+            self::$meta ['version'] = 2;
+        }
 
         $stream->read (1);
 

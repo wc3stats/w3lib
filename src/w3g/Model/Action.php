@@ -10,6 +10,8 @@ use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Context;
 use w3lib\w3g\Lang;
 
+use function w3lib\Library\xxd;
+
 class Action extends Model
 {
     const UNKNOWN_20         = 0x00;
@@ -97,6 +99,7 @@ class Action extends Model
     const UNKNOWN_30    = 0x44;
     const UNKNOWN_31    = 0x46;
     const UNKNOWN_32    = 0x5F;
+    const UNKNOWN_33    = 0x3D;
 
     /** **/
 
@@ -463,7 +466,12 @@ class Action extends Model
 
                 $stream->prepend (self::W3MMD, 'c');
 
-                $this->w3mmd = W3MMD::unpack ($stream);
+                if (@W3MMD::$meta ['version'] === 2) {
+                    // Stores on V2 state.
+                    W3MMDV2::unpack ($stream);
+                } else {
+                    $this->w3mmd = W3MMD::unpack ($stream);
+                }
             break;
 
             case self::UNKNOWN_19:
@@ -495,6 +503,10 @@ class Action extends Model
 
             case self::UNKNOWN_32:
                $stream->read (10);
+            break;
+
+            case self::UNKNOWN_33:
+               $stream->read (13);
             break;
         }
 

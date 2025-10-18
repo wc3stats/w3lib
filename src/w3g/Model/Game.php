@@ -39,6 +39,7 @@ class Game extends Model
     public $selectMode    = NULL;
     public $startSpots    = NULL;
     public $events        = [];
+    public $variables     = [];
 
     // Deferred.
 

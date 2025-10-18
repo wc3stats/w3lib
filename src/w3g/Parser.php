@@ -20,6 +20,7 @@ use w3lib\w3g\Model\Game;
 use w3lib\w3g\Model\Segment;
 use w3lib\w3g\Model\ChatLog;
 use w3lib\w3g\Model\W3MMD;
+use w3lib\w3g\Model\W3MMDV2;
 use w3lib\w3g\Util\Detect;
 
 class Parser
@@ -68,7 +69,7 @@ class Parser
 
         for ($i = 0; $i < $header->numBlocks; $i++) {
             $block = Block::unpack ($replay);
-
+	        
             /** **/
 
             $buffer->append ($block->body);
@@ -292,6 +293,20 @@ class Parser
 
     private function package ()
     {
+        // Load W3MMDV2 (Risk)
+
+        $this->replay->game->variables = W3MMDV2::$game;
+
+        foreach (W3MMDV2::$players as $player) {
+            $replayPlayer = $this->replay->getPlayerBySlot ($player ['id']);
+
+            $replayPlayer->variables = $player ['frame'];
+            $replayPlayer->frame     = $player ['frame'];
+            $replayPlayer->frames    = $player ['frames']; 
+
+            $replayPlayer->variables ['mode'] = W3MMDV2::$game ['diplomacy'];
+        }
+
         $replayLength = $this->replay->getLength ();
 
         foreach (

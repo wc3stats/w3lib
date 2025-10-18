@@ -19,6 +19,7 @@ if (!is_file ($file)) {
 }
 
 // Logger::setup (Monolog::DEBUG);
+Logger::setup (Monolog::INFO);
 
 $settings = new Settings ();
 $replay   = new Replay ($file, $settings);
@@ -73,6 +74,10 @@ foreach ($replay->getPlayers () as $player) {
     // var_dump($player->flags);
     // var_dump($player->variables);
 }
+
+// foreach ($replay->chatlog as $log) {
+//     Logger::info ('%s: %s', $replay->getPlayerById ($log->playerId)->name, $log->message);
+// }
 
 echo PHP_EOL;
 

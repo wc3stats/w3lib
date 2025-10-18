@@ -61,7 +61,9 @@ class ClanPlayer extends Model
 
             $stream->int8 ();
 
-            // $stream->uint32 ();
+            /**
+             * Added in Patch 2.0
+             */
 
             if (Context::majorVersion () >= Parser::WC3_VERSION_34) {
                 $stream->uint16 ();
