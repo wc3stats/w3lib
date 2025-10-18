@@ -59,6 +59,8 @@ class W3MMDV2 extends Model
 
          case 'player':
             $frame = array_merge (
+               self::$players [$parsed [1]] ['frame'] ?? [],
+               
                [
                   'round' => self::$game ['round'],
                   'turn'  => self::$game ['turn']
@@ -67,7 +69,7 @@ class W3MMDV2 extends Model
                $parsed ['store']
             );
 
-            self::$players [$parsed [1]] ['frame'] = $frame;
+            self::$players [$parsed [1]] ['frame'] =  $frame;
             self::$players [$parsed [1]] ['frames'] [] = $frame;
          break;
       }
