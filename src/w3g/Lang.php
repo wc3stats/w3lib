@@ -141,6 +141,35 @@ class Lang
     const LADDER_HOST = 'Battle.net';
     const LADDER_NAME = 'BNet';
 
+    public static $colors = [
+        'Red' => self::RED 	   ,
+        'Blue' => self::BLUE 	   ,
+        'Teal' => self::TEAL 	   ,
+        'Purple' => self::PURPLE ,
+        'Yellow' => self::YELLOW ,
+        'Orange' => self::ORANGE   ,
+        'Green' => self::GREEN    ,
+        'Pink' => self::PINK 	   ,
+        'Grey' => self::GREY 	   ,
+        'Light-Blue' => self::LIGHTBLUE,
+        'Light Blue' => self::LIGHTBLUE,
+        'Dark-Green' => self::DARKGREEN,
+        'Dark Green' => self::DARKGREEN,
+        'Brown' => self::BROWN ,
+        'Maroon' => self::MAROON ,
+        'Navy' => self::NAVY 	   ,
+        'Turquoise' => self::TURQUOISE,
+        'Violet' => self::VIOLET ,
+        'Wheat' => self::WHEAT ,
+        'Peach' => self::PEACH ,
+        'Mint' => self::MINT 	   ,
+        'Lavender' => self::LAVENDER ,
+        'Coal' => self::COAL 	   ,
+        'Snow' => self::SNOW 	   ,
+        'Emerald' => self::EMERALD  ,
+        'Peanut' => self::PEANUT   ,
+    ];
+
 	public static function speed ($value)
 	{
 		return [
