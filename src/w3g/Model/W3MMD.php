@@ -89,8 +89,6 @@ class W3MMD extends Model
 
         /** **/
 
-        // xxd ($stream);
-
         $this->intro   = $stream->string ();
         $this->header  = $stream->string ();
         $this->message = utf8_encode($stream->readTo (Stream::NUL));
@@ -154,7 +152,7 @@ class W3MMD extends Model
                         $player = Context::$replay->getPlayerByName ($this->playerName);
 
                         if (!$player) {
-                           $player = Context::$replay->getPlayerByOrder ($this->playerId);
+                           $player = Context::$replay->getPlayerBySlot ($this->playerId - 1);
                         }
 
                         self::$pids [$this->playerId] = $player->id;
@@ -237,7 +235,10 @@ class W3MMD extends Model
                  * [3] => {operator}
                  * [4] => {value}
                  */
-                $this->playerId = self::get ('pids', $buffer->token ());
+                $pid = $buffer->token ();
+
+                $this->playerId = self::get ('pids', $pid);
+
 
                 $this->varname  = $this->normalizeKey ($buffer->token ());
                 $this->operator = $buffer->token ();

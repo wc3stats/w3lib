@@ -257,6 +257,11 @@ class Parser
             NULL
         );
 
+        if (@$w3mmd->playerId === 7) {
+            var_dump ($w3mmd);
+            var_dump ($player->name);
+        }
+
         if (!$player) {
             return;
         }
