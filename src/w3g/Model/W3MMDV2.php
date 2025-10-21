@@ -3,6 +3,7 @@
 namespace w3lib\w3g\Model;
 
 use Exception;
+use w3lib\Library\Logger;
 use w3lib\Library\Model;
 use w3lib\Library\Stream;
 use w3lib\w3g\Model\Action;
@@ -31,6 +32,8 @@ class W3MMDV2 extends Model
       $this->message = utf8_encode ($stream->readTo (Stream::NUL));
 
       $parsed = self::parse ($this->message);
+
+      Logger::info ('W3MMDV2: %s', $this->message);
 
       switch ($parsed [0]) {
          case 'meta':
@@ -85,6 +88,7 @@ class W3MMDV2 extends Model
       $line = trim ($line);
 
       $parsed = [];
+
 
       if (preg_match ('/^(?:\w+\s)+/', $line, $preamble)) {
          $parsed = explode (' ', trim ($preamble [0]));

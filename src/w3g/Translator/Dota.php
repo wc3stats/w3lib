@@ -189,6 +189,8 @@ class Dota
         '2' => []
     ];
 
+    private static $idMap = [];
+
     /**
      * The first time we translate a message the W3MMD init messages need to
      * be packed.
@@ -224,7 +226,7 @@ class Dota
 
         $varname = new Buffer ($varname);
 
-        // var_dump ($type . ' ' . $varname . ' ' . $value);
+        // var_dump ($intro . ' ' . $type . ' ' . $varname . ' ' . $value);
 
         switch ($type) {
 
@@ -411,6 +413,8 @@ class Dota
                     || $varname->startsWith ('9')) {
                     $value = Lang::objectId ($value);
                 } else if ($varname->startsWith ('id')) {
+                    self::$idMap [$pid] = $value;
+
                     $value = $value < 6 ? 1 : 2;
 
                     if (!in_array ($pid, self::$teams [$value])) {
@@ -455,7 +459,7 @@ class Dota
                     '%s %s %d %s',
                     W3MMD::INIT,
                     W3MMD::INIT_PID,
-                    $player->order,
+                    $player->slot + 1,
                     $player->name
                 )
             );
@@ -496,16 +500,16 @@ class Dota
             );
         }
 
-        /* Send colours as order. */
-        foreach (Context::$replay->getPlayers () as $player) {
-            self::var (
-                $stream,
-                $player->order + $player->team + 1,
-                'colour',
-                W3MMD::OP_SET,
-                $player->order + $player->team + 1
-            );
-        }
+        // /* Send colours as order. */
+        // foreach (Context::$replay->getPlayers () as $player) {
+        //     self::var (
+        //         $stream,
+        //         $player->order + $player->team + 1,
+        //         'colour',
+        //         W3MMD::OP_SET,
+        //         $player->order + $player->team + 1
+        //     );
+        // }
     }
 
     protected static function event (Stream &$stream, $eventName, ... $argv)
@@ -563,8 +567,15 @@ class Dota
     {
         if (!is_numeric ($pid)) return 1;
 
-        $pid  = (string) $pid;
-        $pid -= ((int) $pid) >= 7 ? 2 : 1;
+        if (isset (self::$idMap [$pid])) {
+            return self::$idMap [$pid];
+        } else {
+            return $pid;
+        }
+        
+
+        // $pid  = (string) $pid;
+        // $pid -= ((int) $pid) >= 7 ? 2 : 1;
 
         return $pid;
     }
