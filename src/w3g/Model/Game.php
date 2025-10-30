@@ -11,6 +11,8 @@ use w3lib\Library\Stream\Buffer;
 use w3lib\w3g\Context;
 use w3lib\w3g\Lang;
 
+use function w3lib\Library\xxd;
+
 class Game extends Model
 {
     public $name          = NULL;
@@ -204,29 +206,39 @@ class Game extends Model
                 }
 
             } else {
-                $stream->read (4);
-                $stream->read (8);
+                while ($stream->int8 (Stream::PEEK) === 0x38 ||
+                       $stream->int8 (Stream::PEEK) === 0x39) {
+                    
+                    $type    = $stream->int8 (); // 0x38 or 0x39
+                    $subtype = $stream->int8 ();
 
-                while ($stream->int8 (Stream::PEEK) === ClanPlayer::HEADER) {
-                    $clanPlayer = ClanPlayer::unpack ($stream);
-
-                    foreach ($this->players as $player) {
-                        if (
-                            stripos ($clanPlayer->name, $player->name) === 0 &&
-                            strlen ($clanPlayer->name) > strlen ($player->name)
-                        ) {
-                            Logger::debug (
-                                'Updating player name from [%s] to [%s]',
-                                $player->name,
-                                $clanPlayer->name
-                            );
-
-                            $player->name = $clanPlayer->name;
-                        }
-                    }
+                    $length = $stream->uint32 ();
+                        
+                    $stream->read ($length);
                 }
-            }
 
+                // while ($stream->int8 (Stream::PEEK) === ClanPlayer::HEADER) {
+                //     $clanPlayer = ClanPlayer::unpack ($stream);
+
+                //     var_dump ($clanPlayer);
+
+
+                //     foreach ($this->players as $player) {
+                //         if (
+                //             stripos ($clanPlayer->name, $player->name) === 0 &&
+                //             strlen ($clanPlayer->name) > strlen ($player->name)
+                //         ) {
+                //             Logger::debug (
+                //                 'Updating player name from [%s] to [%s]',
+                //                 $player->name,
+                //                 $clanPlayer->name
+                //             );
+
+                //             $player->name = $clanPlayer->name;
+                //         }
+                //     }
+                // }
+            }
         }
 
         /**
@@ -242,7 +254,11 @@ class Game extends Model
         $order = 0;
 
         for ($i = 0; $i < $this->slotRecords; $i++) {
+            // $stream->string ();
+            // $stream->read (20);
+            
             $slot = Slot::unpack ($stream);
+
 
             if (! ($player = $this->getPlayerBy ('id', $slot->playerId))) {
                 continue;

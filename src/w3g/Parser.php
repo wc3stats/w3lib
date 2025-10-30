@@ -305,6 +305,10 @@ class Parser
         foreach (W3MMDV2::$players as $player) {
             $replayPlayer = $this->replay->getPlayerBySlot ($player ['id']);
 
+            if (!$replayPlayer) {
+                continue;
+            }
+
             if (!empty ($player ['color'])) {
                 $replayPlayer->colour = Lang::$colors [$player ['color']];
             }
